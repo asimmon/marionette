@@ -1,10 +1,15 @@
 using System;
+using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Threading.Tasks;
 
 namespace Askaiser.UITesting.Commands
 {
     internal abstract class BaseWaitForCommandHandler
     {
+        private static readonly TimeSpan ThrottlingInterval = TimeSpan.FromMilliseconds(50);
+
         private readonly IMonitorService _monitorService;
         private readonly IElementRecognizer _elementRecognizer;
 
@@ -14,9 +19,38 @@ namespace Askaiser.UITesting.Commands
             this._elementRecognizer = elementRecognizer;
         }
 
-        protected async Task<SearchResult> WaitFor(IElement element, TimeSpan duration, int monitorIndex)
+        protected async Task<SearchResult> WaitFor(IElement element, TimeSpan duration, Rectangle searchRectangle, int monitorIndex)
         {
-            return await ElementAwaiter.WaitFor(this._monitorService, this._elementRecognizer, element, duration, monitorIndex).ConfigureAwait(false);
+            if (duration < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException(nameof(duration), "Duration must be greater or equal to zero");
+
+            var monitor = await this._monitorService.GetMonitor(monitorIndex);
+
+            var isFirstLoop = true;
+            for (var sw = Stopwatch.StartNew(); sw.Elapsed < duration || isFirstLoop;)
+            {
+                using var screenshot = await this.GetScreenshot(monitor, searchRectangle).ConfigureAwait(false);
+                screenshot.Save(@"C:\Users\simmo\Desktop\out\" + DateTime.Now.Ticks + ".png", ImageFormat.Png);
+
+                var result = await this._elementRecognizer.Recognize(screenshot, element).ConfigureAwait(false);
+                if (result.Success)
+                    return result.AdjustToMonitor(monitor);
+
+                await Task.Delay(ThrottlingInterval).ConfigureAwait(false);
+                isFirstLoop = false;
+            }
+
+            throw new WaitForTimeoutException(element, duration);
+        }
+
+        private async Task<Bitmap> GetScreenshot(MonitorDescription monitor, Rectangle searchRectangle)
+        {
+            var screenshot = await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
+            if (searchRectangle == null)
+                return screenshot;
+
+            using (screenshot)
+                return screenshot.Crop(searchRectangle);
         }
     }
 }

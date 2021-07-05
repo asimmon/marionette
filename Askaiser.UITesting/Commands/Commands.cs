@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Askaiser.UITesting.Commands
 {
-    internal record WaitForCommand(IReadOnlyCollection<IElement> Elements, TimeSpan Duration, int MonitorIndex);
+    internal record WaitForCommand(IReadOnlyCollection<IElement> Elements, TimeSpan Duration, Rectangle SearchRectangle, int MonitorIndex);
 
     internal record MouseLocationCommand(int X, int Y, MouseSpeed Speed);
 

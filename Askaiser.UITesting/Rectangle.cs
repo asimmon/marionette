@@ -1,9 +1,32 @@
-﻿namespace Askaiser.UITesting
+﻿using System;
+
+namespace Askaiser.UITesting
 {
-    public record Rectangle(int Left, int Top, int Right, int Bottom)
+    public record Rectangle
     {
+        public Rectangle(int left, int top, int right, int bottom)
+        {
+            if (left < 0) throw new ArgumentOutOfRangeException(nameof(left), $"Left property cannot be negative: {left}.");
+            if (top < 0) throw new ArgumentOutOfRangeException(nameof(top), $"Top property cannot be negative: {top}.");
+            if (right < 0) throw new ArgumentOutOfRangeException(nameof(right), $"Right property cannot be negative: {right}.");
+            if (bottom < 0) throw new ArgumentOutOfRangeException(nameof(bottom), $"Bottom property cannot be negative: {bottom}.");
+
+            if (left > right) throw new ArgumentOutOfRangeException(nameof(left), $"Left property {left} is greater than the Right property {right}.");
+            if (top > bottom) throw new ArgumentOutOfRangeException(nameof(top), $"Top property {top} is greater than the Bottom property {bottom}.");
+
+            this.Left = left;
+            this.Top = top;
+            this.Right = right;
+            this.Bottom = bottom;
+        }
+
+        public int Left { get; private init; }
+        public int Top { get; private init; }
+        public int Right { get; private init; }
+        public int Bottom { get; private init; }
+
         public int Width => this.Right - this.Left;
-        public int Heigh => this.Bottom - this.Top;
+        public int Height => this.Bottom - this.Top;
 
         public void Deconstruct(out int left, out int top, out int right, out int bottom)
         {

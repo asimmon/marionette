@@ -17,14 +17,12 @@ namespace Askaiser.UITesting.ConsoleApp
 
             using var context = TestContext.Create();
 
-            var monitors = await context.GetMonitors();
-            context.SetMonitor(monitors[^1].Index);
-            await context.MoveTo(riderLogo);
+            await context.MoveTo(riderLogo, searchRectangle: new Rectangle(100, 100, 200, 200));
 
-            //await context.ScrollUpUntilVisible(desktopLoulouwhat, TimeSpan.FromSeconds(10));
-            //await context.Drag(desktopLoulouwhat);
-            //await context.MoveTo(trayOpener);
-            //await context.Drop(sidebarRecycleBin);
+            // await context.ScrollUpUntilVisible(desktopLoulouwhat, TimeSpan.FromSeconds(10));
+            // await context.Drag(desktopLoulouwhat);
+            // await context.MoveTo(trayOpener);
+            // await context.Drop(sidebarRecycleBin);
 
             //*/
         }

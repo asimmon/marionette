@@ -7,7 +7,7 @@ namespace Askaiser.UITesting
         public static Point GetCenter(this Rectangle rect)
         {
             var halfWidth = (int)Math.Round(rect.Width / 2d);
-            var halfHeight = (int)Math.Round(rect.Heigh / 2d);
+            var halfHeight = (int)Math.Round(rect.Height / 2d);
             return new Point(rect.Left + halfWidth, rect.Top + halfHeight);
         }
     }

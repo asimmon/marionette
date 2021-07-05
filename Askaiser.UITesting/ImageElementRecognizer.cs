@@ -14,7 +14,6 @@ namespace Askaiser.UITesting
             SearchResult SearchInternal()
             {
                 var imageElement = (ImageElement)element;
-                var stopwatch = Stopwatch.StartNew();
 
                 // https://stackoverflow.com/a/35346975/825695
                 using var tpl = imageElement.ToBitmap()
@@ -37,10 +36,7 @@ namespace Askaiser.UITesting
 
                     var notFound = maxval < imageElement.Threshold;
                     if (notFound)
-                    {
-                        stopwatch.Stop();
                         return new SearchResult(element, areas);
-                    }
 
                     areas.Add(new Rectangle(maxloc.X, maxloc.Y, maxloc.X + tpl.Width, maxloc.Y + tpl.Height));
                     res.FloodFill(maxloc, new Scalar(0), out _, loDiff, upDiff);

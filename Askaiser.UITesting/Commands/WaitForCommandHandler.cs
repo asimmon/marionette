@@ -12,7 +12,7 @@ namespace Askaiser.UITesting.Commands
 
         public async Task<SearchResult> Execute(WaitForCommand command)
         {
-            var result = await this.WaitFor(command.Elements.First(), command.Duration, command.MonitorIndex).ConfigureAwait(false);
+            var result = await this.WaitFor(command.Elements.First(), command.Duration, command.SearchRectangle, command.MonitorIndex).ConfigureAwait(false);
             result.EnsureSingleLocation();
             return result;
         }
