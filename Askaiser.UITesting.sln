@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.UITesting", "Askaiser.UITesting\Askaiser.UITesting.csproj", "{AA995F64-3903-4069-8BAE-3E38D3CD8F99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.UITesting.ConsoleApp", "Askaiser.UITesting.ConsoleApp\Askaiser.UITesting.ConsoleApp.csproj", "{87D7EA43-70A5-4D8A-939C-5880CDB865C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.UITesting.Editor", "Askaiser.UITesting.Editor\Askaiser.UITesting.Editor.csproj", "{875D0A52-7532-425C-A2A4-DC4C73836C29}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|AnyCPU = Release|AnyCPU
+		Debug|AnyCPU = Debug|AnyCPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AA995F64-3903-4069-8BAE-3E38D3CD8F99}.Release|AnyCPU.ActiveCfg = Release|Any CPU
+		{AA995F64-3903-4069-8BAE-3E38D3CD8F99}.Release|AnyCPU.Build.0 = Release|Any CPU
+		{AA995F64-3903-4069-8BAE-3E38D3CD8F99}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
+		{AA995F64-3903-4069-8BAE-3E38D3CD8F99}.Debug|AnyCPU.Build.0 = Debug|Any CPU
+		{87D7EA43-70A5-4D8A-939C-5880CDB865C1}.Release|AnyCPU.ActiveCfg = Release|Any CPU
+		{87D7EA43-70A5-4D8A-939C-5880CDB865C1}.Release|AnyCPU.Build.0 = Release|Any CPU
+		{87D7EA43-70A5-4D8A-939C-5880CDB865C1}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
+		{87D7EA43-70A5-4D8A-939C-5880CDB865C1}.Debug|AnyCPU.Build.0 = Debug|Any CPU
+		{875D0A52-7532-425C-A2A4-DC4C73836C29}.Release|AnyCPU.ActiveCfg = Release|Any CPU
+		{875D0A52-7532-425C-A2A4-DC4C73836C29}.Release|AnyCPU.Build.0 = Release|Any CPU
+		{875D0A52-7532-425C-A2A4-DC4C73836C29}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
+		{875D0A52-7532-425C-A2A4-DC4C73836C29}.Debug|AnyCPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+EndGlobal
