@@ -28,6 +28,16 @@ namespace Askaiser.UITesting
         public int Width => this.Right - this.Left;
         public int Height => this.Bottom - this.Top;
 
+        public Point Center
+        {
+            get
+            {
+                var halfWidth = (int)Math.Round(this.Width / 2d);
+                var halfHeight = (int)Math.Round(this.Height / 2d);
+                return new Point(this.Left + halfWidth, this.Top + halfHeight);
+            }
+        }
+
         public void Deconstruct(out int left, out int top, out int right, out int bottom)
         {
             left = this.Left;

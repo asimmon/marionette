@@ -99,7 +99,7 @@ namespace Askaiser.UITesting
         {
             for (var i = 0; i < this.Areas.Count; i++)
             {
-                var (x, y) = this.Areas[i].GetCenter();
+                var (x, y) = this.Areas[i].Center;
                 sb.Append('(').Append(x).Append(", ").Append(y).Append(')');
 
                 if (i != this.Areas.Count - 1)

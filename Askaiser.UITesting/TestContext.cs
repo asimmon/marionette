@@ -6,7 +6,7 @@ using Askaiser.UITesting.Commands;
 
 namespace Askaiser.UITesting
 {
-    public class TestContext : IDisposable
+    public class TestContext
     {
         private readonly IMonitorService _monitorService;
         private readonly WaitForCommandHandler _waitForHandler;
@@ -49,12 +49,17 @@ namespace Askaiser.UITesting
             this._keyUpHandler = new KeyUpCommandHandler(keyboardController);
 
             this._monitorIndex = 0;
-            this._mouseSpeed = MouseSpeed.Fast;
+            this._mouseSpeed = MouseSpeed.Immediate;
         }
 
         public static TestContext Create()
         {
-            return DisposableTestContext.CreateInternal();
+            var monitorService = new MonitorService(TimeSpan.FromMilliseconds(200));
+            var elementRecognizer = new AggregateElementRecognizer(new ImageElementRecognizer(), new TextElementRecognizer());
+            var mouseController = new MouseController();
+            var keyboardController = new KeyboardController();
+
+            return new TestContext(monitorService, elementRecognizer, mouseController, keyboardController);
         }
 
         public async Task<MonitorDescription[]> GetMonitors()
@@ -102,7 +107,7 @@ namespace Askaiser.UITesting
         public async Task MoveTo(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
             var result = await this.WaitFor(element, waitFor, searchRect).ConfigureAwait(false);
-            var (x, y) = result.Area.GetCenter();
+            var (x, y) = result.Area.Center;
             await this.MoveTo(x, y).ConfigureAwait(false);
         }
 
@@ -113,38 +118,51 @@ namespace Askaiser.UITesting
 
         public async Task SingleClick(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            await this.ElementClick(element, waitFor, searchRect, this.SingleClick).ConfigureAwait(false);
+            await this.ElementMouseAction(element, waitFor, searchRect, this.SingleClick).ConfigureAwait(false);
         }
 
         public async Task DoubleClick(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            await this.ElementClick(element, waitFor, searchRect, this.DoubleClick).ConfigureAwait(false);
+            await this.ElementMouseAction(element, waitFor, searchRect, this.DoubleClick).ConfigureAwait(false);
         }
 
         public async Task TripleClick(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            await this.ElementClick(element, waitFor, searchRect, this.TripleClick).ConfigureAwait(false);
+            await this.ElementMouseAction(element, waitFor, searchRect, this.TripleClick).ConfigureAwait(false);
         }
 
         public async Task RightClick(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            await this.ElementClick(element, waitFor, searchRect, this.RightClick).ConfigureAwait(false);
+            await this.ElementMouseAction(element, waitFor, searchRect, this.RightClick).ConfigureAwait(false);
         }
 
         public async Task Drag(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            await this.ElementClick(element, waitFor, searchRect, this.Drag).ConfigureAwait(false);
+            await this.ElementMouseAction(element, waitFor, searchRect, this.Drag).ConfigureAwait(false);
         }
 
         public async Task Drop(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            await this.ElementClick(element, waitFor, searchRect, this.Drop).ConfigureAwait(false);
+            await this.ElementMouseAction(element, waitFor, searchRect, this.Drop).ConfigureAwait(false);
         }
 
-        private async Task ElementClick(IElement element, TimeSpan waitFor, Rectangle searchRect, Func<int, int, Task> clickFunc)
+        public async Task SingleClick(SearchResult searchResult) => await SearchResultMouseAction(searchResult, this.SingleClick).ConfigureAwait(false);
+        public async Task DoubleClick(SearchResult searchResult) => await SearchResultMouseAction(searchResult, this.DoubleClick).ConfigureAwait(false);
+        public async Task TripleClick(SearchResult searchResult) => await SearchResultMouseAction(searchResult, this.TripleClick).ConfigureAwait(false);
+        public async Task RightClick(SearchResult searchResult) => await SearchResultMouseAction(searchResult, this.RightClick).ConfigureAwait(false);
+        public async Task Drag(SearchResult searchResult) => await SearchResultMouseAction(searchResult, this.Drag).ConfigureAwait(false);
+        public async Task Drop(SearchResult searchResult) => await SearchResultMouseAction(searchResult, this.Drop).ConfigureAwait(false);
+        public async Task MoveTo(SearchResult searchResult) => await SearchResultMouseAction(searchResult, this.MoveTo).ConfigureAwait(false);
+
+        private async Task ElementMouseAction(IElement element, TimeSpan waitFor, Rectangle searchRect, Func<int, int, Task> clickFunc)
         {
-            var result = await this.WaitFor(element, waitFor).ConfigureAwait(false);
-            var (x, y) = result.Area.GetCenter();
+            var result = await this.WaitFor(element, waitFor, searchRect).ConfigureAwait(false);
+            await SearchResultMouseAction(result, clickFunc).ConfigureAwait(false);
+        }
+
+        private static async Task SearchResultMouseAction(SearchResult sr, Func<int, int, Task> clickFunc)
+        {
+            var (x, y) = sr.Area.Center;
             await clickFunc(x, y).ConfigureAwait(false);
         }
 
@@ -209,7 +227,7 @@ namespace Askaiser.UITesting
 
             for (var sw = Stopwatch.StartNew(); sw.Elapsed < totalDuration;)
             {
-                if (await this.IsVisible(element, TimeSpan.Zero, searchRect))
+                if (await this.IsVisible(element, TimeSpan.Zero, searchRect).ConfigureAwait(false))
                     return;
 
                 var scrollTask = isUp ? this.ScrollUp(scrollTicks) : this.ScrollDown(scrollTicks);
@@ -262,16 +280,7 @@ namespace Askaiser.UITesting
             return this;
         }
 
-        // TODO sub area search
-
-        protected virtual void Dispose(bool disposing)
-        {
-        }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+        public Task Sleep(int millisecondsDelay) => Task.Delay(millisecondsDelay);
+        public Task Sleep(TimeSpan delay) => Task.Delay(delay);
     }
 }

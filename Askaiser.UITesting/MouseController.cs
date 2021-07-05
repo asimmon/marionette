@@ -13,7 +13,7 @@ namespace Askaiser.UITesting
         private static readonly Dictionary<MouseSpeed, int> MouseSpeedSteps = new()
         {
             [MouseSpeed.Immediate] = 0,
-            [MouseSpeed.Fast] = 80,
+            [MouseSpeed.Fast] = 60,
             [MouseSpeed.Slow] = 160,
         };
 

@@ -1,26 +1,28 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Askaiser.UITesting
 {
-    internal sealed class MonitorService : IMonitorService, IDisposable
+    internal sealed class MonitorService : IMonitorService
     {
         private readonly SemaphoreSlim _monitorsMutex = new SemaphoreSlim(1);
         private readonly SemaphoreSlim _screenshotMutex = new SemaphoreSlim(1);
 
         private readonly TimeSpan _cacheDuration;
         private MonitorDescription[] _monitors;
-        private Bitmap _cachedBitmap;
+        private byte[] _cachedBitmapBytes;
         private DateTime? _cacheDate;
 
         public MonitorService(TimeSpan cacheDuration)
         {
             this._cacheDuration = cacheDuration > TimeSpan.Zero ? cacheDuration : throw new ArgumentOutOfRangeException(nameof(cacheDuration), "Cache duration must be greater than zero.");
             this._monitors = null;
-            this._cachedBitmap = null;
+            this._cachedBitmapBytes = null;
             this._cacheDate = null;
         }
 
@@ -53,18 +55,23 @@ namespace Askaiser.UITesting
 
         public async Task<Bitmap> GetScreenshot(MonitorDescription monitor)
         {
-            if (this.TryGetNonExpiredCachedBitmapClone(out var cachedBitmap))
-                return cachedBitmap;
+            if (this.TryGetNonExpiredCachedBitmapClone(out var cachedScreenshot))
+                return cachedScreenshot;
 
             using (await SemaphoreWaiter.EnterAsync(this._screenshotMutex).ConfigureAwait(false))
             {
-                if (this.TryGetNonExpiredCachedBitmapClone(out cachedBitmap))
-                    return cachedBitmap;
+                if (this.TryGetNonExpiredCachedBitmapClone(out cachedScreenshot))
+                    return cachedScreenshot;
 
-                this._cachedBitmap = await GraphicsScreenshot.Take(monitor).ConfigureAwait(false);
-                this._cacheDate = DateTime.UtcNow;
+                var screenshot = await GraphicsScreenshot.Take(monitor).ConfigureAwait(false);
 
-                return new Bitmap(this._cachedBitmap);
+                await using (var screenshotStream = new MemoryStream())
+                {
+                    screenshot.Save(screenshotStream, ImageFormat.Png);
+                    this._cachedBitmapBytes = screenshotStream.ToArray();
+                    this._cacheDate = DateTime.UtcNow;
+                    return screenshot;
+                }
             }
         }
 
@@ -79,17 +86,9 @@ namespace Askaiser.UITesting
             if (cacheAge > this._cacheDuration)
                 return false;
 
-            bitmap = new Bitmap(this._cachedBitmap);
+            using var bitmapStream = new MemoryStream(this._cachedBitmapBytes);
+            bitmap = new Bitmap(bitmapStream);
             return true;
-        }
-
-        public void Dispose()
-        {
-            if (this._cachedBitmap != null)
-            {
-                this._cachedBitmap.Dispose();
-                this._cachedBitmap = null;
-            }
         }
 
         private sealed class SemaphoreWaiter : IDisposable
