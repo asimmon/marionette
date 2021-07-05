@@ -16,8 +16,9 @@ namespace Askaiser.UITesting.ConsoleApp
             var desktopLoulouwhat = elements["desktop-loulouwhat"];
 
             using var context = TestContext.Create();
+            context.SetMonitor(1);
 
-            await context.MoveTo(riderLogo, searchRect: new Rectangle(100, 100, 200, 200), waitFor: TimeSpan.FromSeconds(5));
+            await context.MoveTo(riderLogo, searchRect: new Rectangle(860, 440, 1060, 640), waitFor: TimeSpan.FromSeconds(2));
 
             // await context.ScrollUpUntilVisible(desktopLoulouwhat, TimeSpan.FromSeconds(10));
             // await context.Drag(desktopLoulouwhat);

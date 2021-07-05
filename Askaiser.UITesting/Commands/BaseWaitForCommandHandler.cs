@@ -33,7 +33,7 @@ namespace Askaiser.UITesting.Commands
 
                 var result = await this._elementRecognizer.Recognize(screenshot, element).ConfigureAwait(false);
                 if (result.Success)
-                    return result.AdjustToMonitor(monitor);
+                    return result.AdjustToMonitor(monitor).AdjustToSearchRectangle(searchRect);
 
                 await Task.Delay(ThrottlingInterval).ConfigureAwait(false);
                 isFirstLoop = false;

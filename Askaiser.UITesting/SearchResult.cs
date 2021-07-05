@@ -46,6 +46,15 @@ namespace Askaiser.UITesting
             return new SearchResult(this.Element, newAreas);
         }
 
+        internal SearchResult AdjustToSearchRectangle(Rectangle rect)
+        {
+            if (rect == null)
+                return this;
+
+            var newAreas = this.Areas.Select(x => x.AddOffset(rect.Left, rect.Top));
+            return new SearchResult(this.Element, newAreas);
+        }
+
         public override string ToString()
         {
             if (!this.Success)
