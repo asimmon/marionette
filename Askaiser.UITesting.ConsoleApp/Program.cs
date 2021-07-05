@@ -17,7 +17,7 @@ namespace Askaiser.UITesting.ConsoleApp
 
             using var context = TestContext.Create();
 
-            await context.MoveTo(riderLogo, searchRectangle: new Rectangle(100, 100, 200, 200));
+            await context.MoveTo(riderLogo, searchRect: new Rectangle(100, 100, 200, 200), waitFor: TimeSpan.FromSeconds(5));
 
             // await context.ScrollUpUntilVisible(desktopLoulouwhat, TimeSpan.FromSeconds(10));
             // await context.Drag(desktopLoulouwhat);

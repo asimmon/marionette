@@ -62,11 +62,11 @@ namespace Askaiser.UITesting
             return await this._monitorService.GetMonitors().ConfigureAwait(false);
         }
 
-        public async Task<bool> IsVisible(IElement element, TimeSpan waitFor = default, Rectangle searchRectangle = default)
+        public async Task<bool> IsVisible(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
             try
             {
-                await this.WaitFor(element, waitFor, searchRectangle).ConfigureAwait(false);
+                await this.WaitFor(element, waitFor, searchRect).ConfigureAwait(false);
                 return true;
             }
             catch (WaitForTimeoutException)
@@ -75,33 +75,33 @@ namespace Askaiser.UITesting
             }
         }
 
-        public async Task<SearchResult> WaitFor(IElement element, TimeSpan duration = default, Rectangle searchRectangle = default)
+        public async Task<SearchResult> WaitFor(IElement element, TimeSpan duration = default, Rectangle searchRect = default)
         {
             if (element == null) throw new ArgumentNullException(nameof(element));
-            return await this._waitForHandler.Execute(new WaitForCommand(new[] { element }, duration, searchRectangle, this._monitorIndex)).ConfigureAwait(false);
+            return await this._waitForHandler.Execute(new WaitForCommand(new[] { element }, duration, searchRect, this._monitorIndex)).ConfigureAwait(false);
         }
 
-        public async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan duration = default, Rectangle searchRectangle = default)
+        public async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan duration = default, Rectangle searchRect = default)
         {
             if (elements == null) throw new ArgumentNullException(nameof(elements));
             var enumeratedElements = new List<IElement>(elements);
 
             if (enumeratedElements.Count == 0) throw new ArgumentException("Elements cannot be empty", nameof(elements));
-            return await this._waitForAnyHandler.Execute(new WaitForCommand(enumeratedElements, duration, searchRectangle, this._monitorIndex)).ConfigureAwait(false);
+            return await this._waitForAnyHandler.Execute(new WaitForCommand(enumeratedElements, duration, searchRect, this._monitorIndex)).ConfigureAwait(false);
         }
 
-        public async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan duration = default, Rectangle searchRectangle = default)
+        public async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan duration = default, Rectangle searchRect = default)
         {
             if (elements == null) throw new ArgumentNullException(nameof(elements));
             var enumeratedElements = new List<IElement>(elements);
 
             if (enumeratedElements.Count == 0) throw new ArgumentException("Elements cannot be empty", nameof(elements));
-            return await this._waitForAllHandler.Execute(new WaitForCommand(enumeratedElements, duration, searchRectangle, this._monitorIndex)).ConfigureAwait(false);
+            return await this._waitForAllHandler.Execute(new WaitForCommand(enumeratedElements, duration, searchRect, this._monitorIndex)).ConfigureAwait(false);
         }
 
-        public async Task MoveTo(IElement element, TimeSpan waitFor = default, Rectangle searchRectangle = default)
+        public async Task MoveTo(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            var result = await this.WaitFor(element, waitFor, searchRectangle).ConfigureAwait(false);
+            var result = await this.WaitFor(element, waitFor, searchRect).ConfigureAwait(false);
             var (x, y) = result.Area.GetCenter();
             await this.MoveTo(x, y).ConfigureAwait(false);
         }
@@ -111,37 +111,37 @@ namespace Askaiser.UITesting
             await this._moveToLocationHandler.Execute(new MouseLocationCommand(x, y, this._mouseSpeed)).ConfigureAwait(false);
         }
 
-        public async Task SingleClick(IElement element, TimeSpan waitFor = default, Rectangle searchRectangle = default)
+        public async Task SingleClick(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            await this.ElementClick(element, waitFor, searchRectangle, this.SingleClick).ConfigureAwait(false);
+            await this.ElementClick(element, waitFor, searchRect, this.SingleClick).ConfigureAwait(false);
         }
 
-        public async Task DoubleClick(IElement element, TimeSpan waitFor = default, Rectangle searchRectangle = default)
+        public async Task DoubleClick(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            await this.ElementClick(element, waitFor, searchRectangle, this.DoubleClick).ConfigureAwait(false);
+            await this.ElementClick(element, waitFor, searchRect, this.DoubleClick).ConfigureAwait(false);
         }
 
-        public async Task TripleClick(IElement element, TimeSpan waitFor = default, Rectangle searchRectangle = default)
+        public async Task TripleClick(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            await this.ElementClick(element, waitFor, searchRectangle, this.TripleClick).ConfigureAwait(false);
+            await this.ElementClick(element, waitFor, searchRect, this.TripleClick).ConfigureAwait(false);
         }
 
-        public async Task RightClick(IElement element, TimeSpan waitFor = default, Rectangle searchRectangle = default)
+        public async Task RightClick(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            await this.ElementClick(element, waitFor, searchRectangle, this.RightClick).ConfigureAwait(false);
+            await this.ElementClick(element, waitFor, searchRect, this.RightClick).ConfigureAwait(false);
         }
 
-        public async Task Drag(IElement element, TimeSpan waitFor = default, Rectangle searchRectangle = default)
+        public async Task Drag(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            await this.ElementClick(element, waitFor, searchRectangle, this.Drag).ConfigureAwait(false);
+            await this.ElementClick(element, waitFor, searchRect, this.Drag).ConfigureAwait(false);
         }
 
-        public async Task Drop(IElement element, TimeSpan waitFor = default, Rectangle searchRectangle = default)
+        public async Task Drop(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            await this.ElementClick(element, waitFor, searchRectangle, this.Drop).ConfigureAwait(false);
+            await this.ElementClick(element, waitFor, searchRect, this.Drop).ConfigureAwait(false);
         }
 
-        private async Task ElementClick(IElement element, TimeSpan waitFor, Rectangle searchRectangle, Func<int, int, Task> clickFunc)
+        private async Task ElementClick(IElement element, TimeSpan waitFor, Rectangle searchRect, Func<int, int, Task> clickFunc)
         {
             var result = await this.WaitFor(element, waitFor).ConfigureAwait(false);
             var (x, y) = result.Area.GetCenter();
@@ -192,24 +192,24 @@ namespace Askaiser.UITesting
                 await this._mouseWheelHandler.Execute(new MouseWheelCommand(IsUp: false)).ConfigureAwait(false);
         }
 
-        public Task ScrollUpUntilVisible(IElement element, TimeSpan totalDuration, int scrollTicks = 1, Rectangle searchRectangle = default)
+        public Task ScrollUpUntilVisible(IElement element, TimeSpan totalDuration, int scrollTicks = 1, Rectangle searchRect = default)
         {
-            return this.ScrollUntilVisible(element, totalDuration, isUp: true, scrollTicks, searchRectangle);
+            return this.ScrollUntilVisible(element, totalDuration, isUp: true, scrollTicks, searchRect);
         }
 
-        public Task ScrollDownUntilVisible(IElement element, TimeSpan totalDuration, int scrollTicks = 1, Rectangle searchRectangle = default)
+        public Task ScrollDownUntilVisible(IElement element, TimeSpan totalDuration, int scrollTicks = 1, Rectangle searchRect = default)
         {
-            return this.ScrollUntilVisible(element, totalDuration, isUp: false, scrollTicks, searchRectangle);
+            return this.ScrollUntilVisible(element, totalDuration, isUp: false, scrollTicks, searchRect);
         }
 
-        private async Task ScrollUntilVisible(IElement element, TimeSpan totalDuration, bool isUp, int scrollTicks, Rectangle searchRectangle)
+        private async Task ScrollUntilVisible(IElement element, TimeSpan totalDuration, bool isUp, int scrollTicks, Rectangle searchRect)
         {
             if (totalDuration <= TimeSpan.Zero)
                 throw new ArgumentException("Total duration must be greater than zero.", nameof(totalDuration));
 
             for (var sw = Stopwatch.StartNew(); sw.Elapsed < totalDuration;)
             {
-                if (await this.IsVisible(element, TimeSpan.Zero, searchRectangle))
+                if (await this.IsVisible(element, TimeSpan.Zero, searchRect))
                     return;
 
                 var scrollTask = isUp ? this.ScrollUp(scrollTicks) : this.ScrollDown(scrollTicks);

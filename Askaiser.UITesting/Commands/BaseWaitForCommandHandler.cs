@@ -19,7 +19,7 @@ namespace Askaiser.UITesting.Commands
             this._elementRecognizer = elementRecognizer;
         }
 
-        protected async Task<SearchResult> WaitFor(IElement element, TimeSpan duration, Rectangle searchRectangle, int monitorIndex)
+        protected async Task<SearchResult> WaitFor(IElement element, TimeSpan duration, Rectangle searchRect, int monitorIndex)
         {
             if (duration < TimeSpan.Zero)
                 throw new ArgumentOutOfRangeException(nameof(duration), "Duration must be greater or equal to zero");
@@ -29,8 +29,7 @@ namespace Askaiser.UITesting.Commands
             var isFirstLoop = true;
             for (var sw = Stopwatch.StartNew(); sw.Elapsed < duration || isFirstLoop;)
             {
-                using var screenshot = await this.GetScreenshot(monitor, searchRectangle).ConfigureAwait(false);
-                screenshot.Save(@"C:\Users\simmo\Desktop\out\" + DateTime.Now.Ticks + ".png", ImageFormat.Png);
+                using var screenshot = await this.GetScreenshot(monitor, searchRect).ConfigureAwait(false);
 
                 var result = await this._elementRecognizer.Recognize(screenshot, element).ConfigureAwait(false);
                 if (result.Success)
@@ -43,14 +42,14 @@ namespace Askaiser.UITesting.Commands
             throw new WaitForTimeoutException(element, duration);
         }
 
-        private async Task<Bitmap> GetScreenshot(MonitorDescription monitor, Rectangle searchRectangle)
+        private async Task<Bitmap> GetScreenshot(MonitorDescription monitor, Rectangle searchRect)
         {
             var screenshot = await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
-            if (searchRectangle == null)
+            if (searchRect == null)
                 return screenshot;
 
             using (screenshot)
-                return screenshot.Crop(searchRectangle);
+                return screenshot.Crop(searchRect);
         }
     }
 }
