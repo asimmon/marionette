@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Askaiser.UITesting
 {
-    public static class ElementDictionaryExtensions
+    public static class ElementCollectionExtensions
     {
         public static async Task LoadAsync(this ElementCollection elements, Stream stream)
         {

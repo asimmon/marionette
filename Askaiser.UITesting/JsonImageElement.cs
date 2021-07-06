@@ -21,7 +21,7 @@ namespace Askaiser.UITesting
         }
 
         [JsonPropertyName("threshold")]
-        public double Threshold { get; set; }
+        public decimal Threshold { get; set; }
 
         [JsonPropertyName("grayscale")]
         public bool Grayscale { get; set; }

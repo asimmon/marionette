@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Threading.Tasks;
 using OpenCvSharp;
@@ -23,7 +22,7 @@ namespace Askaiser.UITesting
                 using var res = screenshot.ToMat()
                     .ConvertAndDispose(x => imageElement.Grayscale ? x.CvtColor(ColorConversionCodes.BGRA2GRAY) : x)
                     .MatchTemplate(tpl, TemplateMatchModes.CCoeffNormed)
-                    .ConvertAndDispose(x => x.Threshold(imageElement.Threshold, 1d, ThresholdTypes.Tozero));
+                    .ConvertAndDispose(x => x.Threshold((double)imageElement.Threshold, 1d, ThresholdTypes.Tozero));
 
                 var areas = new List<Rectangle>();
 
@@ -34,7 +33,7 @@ namespace Askaiser.UITesting
                 {
                     res.MinMaxLoc(out _, out var maxval, out _, out var maxloc);
 
-                    var notFound = maxval < imageElement.Threshold;
+                    var notFound = maxval < (double)imageElement.Threshold;
                     if (notFound)
                         return new SearchResult(element, areas);
 

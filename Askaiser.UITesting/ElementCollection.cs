@@ -16,6 +16,12 @@ namespace Askaiser.UITesting
             get => this.First(x => name.Equals(x.Name, StringComparison.OrdinalIgnoreCase));
         }
 
+        public bool TryGetValue(string name, out IElement value)
+        {
+            value = this.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+            return value != null;
+        }
+
         private sealed class ElementComparer: IEqualityComparer<IElement>
         {
             public static readonly ElementComparer Instance = new ElementComparer();

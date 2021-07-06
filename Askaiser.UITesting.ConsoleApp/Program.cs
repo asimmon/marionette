@@ -5,6 +5,8 @@ namespace Askaiser.UITesting.ConsoleApp
 {
     public static class Program
     {
+        private static TestContext Context = TestContext.Create();
+
         public static async Task Main()
         {
             //*
@@ -15,7 +17,7 @@ namespace Askaiser.UITesting.ConsoleApp
             var sidebarRecycleBin = elements["sidebar-recycle-bin"];
             var desktopLoulouwhat = elements["desktop-loulouwhat"];
 
-            using var context = TestContext.Create();
+            var context = TestContext.Create();
             context.SetMonitor(1);
 
             await context.MoveTo(riderLogo, searchRect: new Rectangle(860, 440, 1060, 640), waitFor: TimeSpan.FromSeconds(2));

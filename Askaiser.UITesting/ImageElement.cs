@@ -8,14 +8,14 @@ namespace Askaiser.UITesting
     {
         private readonly string _name;
         private readonly byte[] _content;
-        private readonly double _threshold;
+        private readonly decimal _threshold;
 
-        public ImageElement(string name, string base64Content, double threshold)
+        public ImageElement(string name, string base64Content, decimal threshold)
             : this(name, Convert.FromBase64String(base64Content), threshold)
         {
         }
 
-        public ImageElement(string name, byte[] content, double threshold)
+        public ImageElement(string name, byte[] content, decimal threshold)
         {
             this.Name = name;
             this.Content = content;
@@ -43,7 +43,7 @@ namespace Askaiser.UITesting
             init => this._content = value is { Length: > 0 } ? value : throw new ArgumentException("Content must be a non-empty array of bytes.", nameof(this.Content));
         }
 
-        public double Threshold
+        public decimal Threshold
         {
             get => this._threshold;
             init => this._threshold = value is >= 0 or <= 1 ? value : throw new ArgumentOutOfRangeException(nameof(this.Threshold), "Threshold must be a floating number between 0 and 1.");

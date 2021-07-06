@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
         <TargetFramework>net5.0-windows</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <LangVersion>9</LangVersion>
         <UseWPF>true</UseWPF>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Askaiser.UITesting\Askaiser.UITesting.csproj" />
+        <ProjectReference Include="..\Askaiser.UITesting\Askaiser.UITesting.csproj"/>
     </ItemGroup>
-
 </Project>
