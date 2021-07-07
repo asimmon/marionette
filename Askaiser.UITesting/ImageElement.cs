@@ -46,7 +46,7 @@ namespace Askaiser.UITesting
         public decimal Threshold
         {
             get => this._threshold;
-            init => this._threshold = value is >= 0 or <= 1 ? value : throw new ArgumentOutOfRangeException(nameof(this.Threshold), "Threshold must be a floating number between 0 and 1.");
+            init => this._threshold = value is >= 0 and <= 1 ? value : throw new ArgumentOutOfRangeException(nameof(this.Threshold), "Threshold must be a floating number between 0 and 1.");
         }
 
         public bool Grayscale { get; init; }

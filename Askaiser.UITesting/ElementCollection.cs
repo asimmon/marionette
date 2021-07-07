@@ -1,43 +1,74 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Askaiser.UITesting
 {
-    public sealed class ElementCollection : HashSet<IElement>
+    public sealed class ElementCollection : IEnumerable<IElement>
     {
+        private readonly Dictionary<string, IElement> _elements;
+
         public ElementCollection()
-            : base(ElementComparer.Instance)
         {
+            this._elements = new Dictionary<string, IElement>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        public int Count
+        {
+            get => this._elements.Count;
+        }
+
+        public void Add(IElement element)
+        {
+            if (element == null) throw new ArgumentNullException(nameof(element));
+            this._elements.Add(element.Name, element);
+        }
+
+        public void Remove(IElement element)
+        {
+            if (element == null) throw new ArgumentNullException(nameof(element));
+            this._elements.Remove(element.Name);
+        }
+
+        public void Remove(string name)
+        {
+            this._elements.Remove(name);
+        }
+
+        public bool Contains(IElement element)
+        {
+            if (element == null) throw new ArgumentNullException(nameof(element));
+            return this.TryGetValue(element.Name, out _);
+        }
+
+        public bool Contains(string name)
+        {
+            return this.TryGetValue(name, out _);
+        }
+
+        public void Clear()
+        {
+            this._elements.Clear();
         }
 
         public IElement this[string name]
         {
-            get => this.First(x => name.Equals(x.Name, StringComparison.OrdinalIgnoreCase));
+            get => this.TryGetValue(name, out var element) ? element : throw new ArgumentException($"There is no element named {name}.", nameof(name));
         }
 
         public bool TryGetValue(string name, out IElement value)
         {
-            value = this.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
-            return value != null;
+            return this._elements.TryGetValue(name, out value);
         }
 
-        private sealed class ElementComparer: IEqualityComparer<IElement>
+        public IEnumerator<IElement> GetEnumerator()
         {
-            public static readonly ElementComparer Instance = new ElementComparer();
+            return this._elements.Values.GetEnumerator();
+        }
 
-            public bool Equals(IElement x, IElement y)
-            {
-                if (ReferenceEquals(x, y)) return true;
-                if (ReferenceEquals(x, null)) return false;
-                if (ReferenceEquals(y, null)) return false;
-                return x.Name == y.Name;
-            }
-
-            public int GetHashCode(IElement obj)
-            {
-                return obj.Name != null ? obj.Name.GetHashCode() : 0;
-            }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
         }
     }
 }

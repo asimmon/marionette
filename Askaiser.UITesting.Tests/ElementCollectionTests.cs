@@ -62,7 +62,7 @@ namespace Askaiser.UITesting.Tests
             var collection = new ElementCollection();
             collection.Add(ImageElement);
 
-            Assert.Throws<InvalidOperationException>(() => collection[TextElement.Name]);
+            Assert.Throws<ArgumentException>(() => collection[TextElement.Name]);
         }
 
         [Fact]
