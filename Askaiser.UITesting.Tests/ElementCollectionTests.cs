@@ -8,7 +8,7 @@ namespace Askaiser.UITesting.Tests
 {
     public class ElementCollectionTests
     {
-        private static readonly ImageElement ImageElement = new ImageElement("logo", Encoding.UTF8.GetBytes("Hello"), 0.9m);
+        private static readonly ImageElement ImageElement = new ImageElement("logo", Encoding.UTF8.GetBytes("Hello"), 0.9m, false);
         private static readonly TextElement TextElement = new TextElement("title", "Lorem ipsum");
 
         private const string ValidJsonCollection = @"[

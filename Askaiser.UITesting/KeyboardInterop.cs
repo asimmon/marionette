@@ -18,6 +18,8 @@ namespace Askaiser.UITesting
             VirtualKeyCode.LWIN,
             VirtualKeyCode.RWIN,
             VirtualKeyCode.CONTROL,
+            VirtualKeyCode.LCONTROL,
+            VirtualKeyCode.RCONTROL,
             VirtualKeyCode.LALT,
             VirtualKeyCode.RALT,
             VirtualKeyCode.ALT,

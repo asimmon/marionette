@@ -10,17 +10,17 @@ namespace Askaiser.UITesting
         private readonly byte[] _content;
         private readonly decimal _threshold;
 
-        public ImageElement(string name, string base64Content, decimal threshold)
-            : this(name, Convert.FromBase64String(base64Content), threshold)
+        public ImageElement(string name, string base64Content, decimal threshold, bool grayscale)
+            : this(name, Convert.FromBase64String(base64Content), threshold, grayscale)
         {
         }
 
-        public ImageElement(string name, byte[] content, decimal threshold)
+        public ImageElement(string name, byte[] content, decimal threshold, bool grayscale)
         {
             this.Name = name;
             this.Content = content;
             this.Threshold = threshold;
-            this.Grayscale = false;
+            this.Grayscale = grayscale;
         }
 
         internal ImageElement(JsonImageElement json)
