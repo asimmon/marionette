@@ -47,7 +47,7 @@ namespace Askaiser.UITesting.LibraryGenerator
 
             var outputFile = new FileInfo(outputFilePath);
 
-            var result = await new CodeGenerator(namespaceName).ProcessImagesInDirectory(directory);
+            var result = await new CodeGenerator(namespaceName).Process(directory);
 
             foreach (var warning in result.Warnings)
                 Console.WriteLine(warning);

@@ -87,7 +87,7 @@ namespace Askaiser.UITesting.LibraryGenerator
             return new Image(imageFile.Name, bytes, rootLibrary);
         }
 
-        public static Library EnsureLibraryHierarchy(Library library, string[] librariesRawNames)
+        public static Library EnsureLibraryHierarchy(Library library, IEnumerable<string> librariesRawNames)
         {
             foreach (var libName in librariesRawNames)
             {

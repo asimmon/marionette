@@ -28,25 +28,36 @@ namespace Askaiser.UITesting.LibraryGenerator
             this._warnings = new List<string>();
         }
 
-        public async Task<CodeResult> ProcessImagesInDirectory(DirectoryInfo directory)
+        public async Task<CodeResult> Process(DirectoryInfo directory)
         {
-            var imageFiles = directory.EnumerateFiles("*.*", SearchOption.AllDirectories)
-                .Where(x => SupportedImageExtensions.Contains(x.Extension))
-                .OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase);
-
-            var code = await this.ProcessImages(imageFiles);
+            await this.ProcessImagesInDirectory(directory, this._rootLibrary);
+            var code = this.GenerateCode();
             return new CodeResult(code, this._warnings);
         }
 
-        private async Task<string> ProcessImages(IEnumerable<FileInfo> imageFiles)
+        private async Task ProcessImagesInDirectory(DirectoryInfo directory, Library library)
         {
-            foreach (var image in imageFiles)
-                await this.CrawlImage(image);
+            var imageFiles = directory.EnumerateFiles("*.*")
+                .Where(x => SupportedImageExtensions.Contains(x.Extension))
+                .OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase);
 
-            return this.GenerateCode();
+            await this.ProcessImages(imageFiles, library);
+
+            foreach (var subDirectory in directory.EnumerateDirectories())
+            {
+                var localLibraryRef = library;
+                var subLibrary = library.Libraries.GetOrCreate(subDirectory.Name, x => localLibraryRef.CreateChild(x));
+                await ProcessImagesInDirectory(subDirectory, subLibrary);
+            }
         }
 
-        private async Task CrawlImage(FileInfo imageFile)
+        private async Task ProcessImages(IEnumerable<FileInfo> imageFiles, Library library)
+        {
+            foreach (var image in imageFiles)
+                await this.CrawlImage(image, library);
+        }
+
+        private async Task CrawlImage(FileInfo imageFile, Library library)
         {
             if (imageFile.Length > MaxImageFileSize)
             {
@@ -64,7 +75,7 @@ namespace Askaiser.UITesting.LibraryGenerator
 
             try
             {
-                image = await Image.Create(imageFile, this._rootLibrary);
+                image = await Image.Create(imageFile, library);
             }
             catch (Exception ex)
             {
