@@ -16,7 +16,7 @@ namespace Askaiser.UITesting
 
             try
             {
-                await using (stream)
+                await using (stream.ConfigureAwait(false))
                 {
                     jsonDocument = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
                 }
@@ -52,8 +52,9 @@ namespace Askaiser.UITesting
 
         public static async Task<ElementCollection> LoadAsync(this ElementCollection elements, string filePath)
         {
-            await using var stream = File.OpenRead(filePath);
-            await LoadAsync(elements, stream).ConfigureAwait(false);
+            var stream = File.OpenRead(filePath);
+            await using (stream.ConfigureAwait(false))
+                await LoadAsync(elements, stream).ConfigureAwait(false);
             return elements;
         }
 
@@ -78,7 +79,7 @@ namespace Askaiser.UITesting
                 WriteIndented = true
             };
 
-            await using (destinationStream)
+            await using (destinationStream.ConfigureAwait(false))
             {
                 await JsonSerializer.SerializeAsync(destinationStream, jsonElements, jsonSerializerOptions).ConfigureAwait(false);
             }
@@ -88,8 +89,9 @@ namespace Askaiser.UITesting
 
         public static async Task SaveAsync(this ElementCollection elements, string filePath)
         {
-            await using var destinationStream = File.Create(filePath);
-            await SaveAsync(elements, destinationStream).ConfigureAwait(false);
+            var destinationStream = File.Create(filePath);
+            await using (destinationStream.ConfigureAwait(false))
+                await SaveAsync(elements, destinationStream).ConfigureAwait(false);
         }
 
         private static T Deserialize<T>(JsonElement element)

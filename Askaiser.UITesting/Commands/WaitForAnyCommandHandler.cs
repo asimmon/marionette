@@ -23,7 +23,7 @@ namespace Askaiser.UITesting.Commands
 
             // Rethrow exception if all the tasks are faulted
             if (firstTaskToFinish.IsFaulted)
-                await firstTaskToFinish;
+                await firstTaskToFinish.ConfigureAwait(false);
 
             return firstTaskToFinish.Result;
         }

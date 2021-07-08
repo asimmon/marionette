@@ -1,8 +1,11 @@
-﻿namespace Askaiser.UITesting.Keyboard.Native
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Askaiser.UITesting.Keyboard.Native
 {
     /// <summary>
     /// XButton definitions for use in the MouseData property of the <see cref="MOUSEINPUT"/> structure. (See: http://msdn.microsoft.com/en-us/library/ms646273(VS.85).aspx)
     /// </summary>
+    [SuppressMessage("Microsoft.Naming", "CA1712", Justification = "We use the same name as the original constants.")]
     internal enum XButton : uint
     {
         /// <summary>

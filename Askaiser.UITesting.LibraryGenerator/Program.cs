@@ -12,7 +12,7 @@ namespace Askaiser.UITesting.LibraryGenerator
         {
             try
             {
-                await UnsafeMain(args);
+                await UnsafeMain(args).ConfigureAwait(false);
                 return 0;
             }
             catch (Exception ex)
@@ -28,14 +28,13 @@ namespace Askaiser.UITesting.LibraryGenerator
             if (nonEmptyArgs.Length != 3)
             {
                 Console.WriteLine("You must provide two arguments in this order:");
-                Console.WriteLine(" - The directory path where your images are stored,");
-                Console.WriteLine(" - The C# namespace of the generated code,");
-                Console.WriteLine(" - The file path of the generated code.");
+                Console.WriteLine(" 1. The directory path where your images are stored,");
+                Console.WriteLine(" 2. The C# namespace of the generated C# code,");
+                Console.WriteLine(" 3. The path of the generated C# file.");
                 return;
             }
 
             var intputDirPath = nonEmptyArgs[0];
-            var namespaceName = nonEmptyArgs[1];
             var outputFilePath = nonEmptyArgs[2];
 
             var directory = new DirectoryInfo(intputDirPath);
@@ -45,14 +44,20 @@ namespace Askaiser.UITesting.LibraryGenerator
                 return;
             }
 
+            var options = new LibraryCodeGeneratorOptions
+            {
+                ImageDirectoryPath = nonEmptyArgs[0],
+                NamespaceName = nonEmptyArgs[1]
+            };
+
             var outputFile = new FileInfo(outputFilePath);
 
-            var result = await new CodeGenerator(namespaceName).Process(directory);
+            var result = await LibraryCodeGenerator.Generate(options).ConfigureAwait(false);
 
             foreach (var warning in result.Warnings)
                 Console.WriteLine(warning);
 
-            await File.WriteAllTextAsync(outputFile.FullName, result.Code);
+            await File.WriteAllTextAsync(outputFile.FullName, result.Code).ConfigureAwait(false);
         }
     }
 }

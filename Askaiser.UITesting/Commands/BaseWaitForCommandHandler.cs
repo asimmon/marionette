@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Threading.Tasks;
 
 namespace Askaiser.UITesting.Commands
@@ -24,7 +23,7 @@ namespace Askaiser.UITesting.Commands
             if (duration < TimeSpan.Zero)
                 throw new ArgumentOutOfRangeException(nameof(duration), "Duration must be greater or equal to zero");
 
-            var monitor = await this._monitorService.GetMonitor(monitorIndex);
+            var monitor = await this._monitorService.GetMonitor(monitorIndex).ConfigureAwait(false);
 
             var isFirstLoop = true;
             for (var sw = Stopwatch.StartNew(); sw.Elapsed < duration || isFirstLoop;)

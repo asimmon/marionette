@@ -24,7 +24,7 @@ namespace Askaiser.UITesting.Keyboard
         /// <param name="inputSimulator">The <see cref="IInputSimulator"/> that owns this instance.</param>
         public KeyboardSimulator(IInputSimulator inputSimulator)
         {
-            if (inputSimulator == null) throw new ArgumentNullException("inputSimulator");
+            if (inputSimulator == null) throw new ArgumentNullException(nameof(inputSimulator));
 
             this._inputSimulator = inputSimulator;
             this._messageDispatcher = new WindowsInputMessageDispatcher();
@@ -38,12 +38,10 @@ namespace Askaiser.UITesting.Keyboard
         /// <exception cref="InvalidOperationException">If null is passed as the <paramref name="messageDispatcher"/>.</exception>
         internal KeyboardSimulator(IInputSimulator inputSimulator, IInputMessageDispatcher messageDispatcher)
         {
-            if (inputSimulator == null) throw new ArgumentNullException("inputSimulator");
+            if (inputSimulator == null) throw new ArgumentNullException(nameof(inputSimulator));
 
             if (messageDispatcher == null)
-                throw new InvalidOperationException(
-                    string.Format("The {0} cannot operate with a null {1}. Please provide a valid {1} instance to use for dispatching {2} messages.",
-                    typeof(KeyboardSimulator).Name, typeof(IInputMessageDispatcher).Name, typeof(INPUT).Name));
+                throw new InvalidOperationException($"The {nameof(KeyboardSimulator)} cannot operate with a null {nameof(IInputMessageDispatcher)}. Please provide a valid {nameof(IInputMessageDispatcher)} instance to use for dispatching {nameof(INPUT)} messages.");
 
             this._inputSimulator = inputSimulator;
             this._messageDispatcher = messageDispatcher;
@@ -55,13 +53,13 @@ namespace Askaiser.UITesting.Keyboard
         /// <value>The <see cref="IMouseSimulator"/> instance.</value>
         public IMouseSimulator Mouse { get { return this._inputSimulator.Mouse; } }
 
-        private void ModifiersDown(InputBuilder builder, IEnumerable<VirtualKeyCode> modifierKeyCodes)
+        private static void ModifiersDown(InputBuilder builder, IEnumerable<VirtualKeyCode> modifierKeyCodes)
         {
             if (modifierKeyCodes == null) return;
             foreach (var key in modifierKeyCodes) builder.AddKeyDown(key);
         }
 
-        private void ModifiersUp(InputBuilder builder, IEnumerable<VirtualKeyCode> modifierKeyCodes)
+        private static void ModifiersUp(InputBuilder builder, IEnumerable<VirtualKeyCode> modifierKeyCodes)
         {
             if (modifierKeyCodes == null) return;
 
@@ -70,7 +68,7 @@ namespace Askaiser.UITesting.Keyboard
             while (stack.Count > 0) builder.AddKeyUp(stack.Pop());
         }
 
-        private void KeysPress(InputBuilder builder, IEnumerable<VirtualKeyCode> keyCodes)
+        private static void KeysPress(InputBuilder builder, IEnumerable<VirtualKeyCode> keyCodes)
         {
             if (keyCodes == null) return;
             foreach (var key in keyCodes) builder.AddKeyPress(key);
@@ -125,7 +123,7 @@ namespace Askaiser.UITesting.Keyboard
         public IKeyboardSimulator KeyPress(params VirtualKeyCode[] keyCodes)
         {
             var builder = new InputBuilder();
-            this.KeysPress(builder, keyCodes);
+            KeysPress(builder, keyCodes);
             this.SendSimulatedInput(builder.ToArray());
             return this;
         }
@@ -176,9 +174,9 @@ namespace Askaiser.UITesting.Keyboard
         {
             var builder = new InputBuilder();
             var enumeratedModifiers = modifierKeyCodes.ToList();
-            this.ModifiersDown(builder, enumeratedModifiers);
-            this.KeysPress(builder, keyCodes);
-            this.ModifiersUp(builder, enumeratedModifiers);
+            ModifiersDown(builder, enumeratedModifiers);
+            KeysPress(builder, keyCodes);
+            ModifiersUp(builder, enumeratedModifiers);
 
             this.SendSimulatedInput(builder.ToArray());
             return this;
@@ -190,7 +188,7 @@ namespace Askaiser.UITesting.Keyboard
         /// <param name="text">The text to be simulated.</param>
         public IKeyboardSimulator TextEntry(string text)
         {
-            if (text.Length > UInt32.MaxValue / 2) throw new ArgumentException(string.Format("The text parameter is too long. It must be less than {0} characters.", UInt32.MaxValue / 2), "text");
+            if (text.Length > uint.MaxValue / 2) throw new ArgumentException($"The text parameter is too long. It must be less than {uint.MaxValue / 2} characters.", nameof(text));
             var inputList = new InputBuilder().AddCharacters(text).ToArray();
             this.SendSimulatedInput(inputList);
             return this;

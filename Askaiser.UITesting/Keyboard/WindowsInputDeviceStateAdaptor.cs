@@ -32,7 +32,7 @@ namespace Askaiser.UITesting.Keyboard
         /// </remarks>
         public bool IsKeyDown(VirtualKeyCode keyCode)
         {
-            Int16 result = NativeMethods.GetKeyState((UInt16)keyCode);
+            short result = NativeMethods.GetKeyState((ushort)keyCode);
             return (result < 0);
         }
 
@@ -91,7 +91,7 @@ namespace Askaiser.UITesting.Keyboard
         /// </remarks>
         public bool IsHardwareKeyDown(VirtualKeyCode keyCode)
         {
-            var result = NativeMethods.GetAsyncKeyState((UInt16)keyCode);
+            var result = NativeMethods.GetAsyncKeyState((ushort)keyCode);
             return (result < 0);
         }
 
@@ -150,7 +150,7 @@ namespace Askaiser.UITesting.Keyboard
         /// </remarks>
         public bool IsTogglingKeyInEffect(VirtualKeyCode keyCode)
         {
-            Int16 result = NativeMethods.GetKeyState((UInt16)keyCode);
+            short result = NativeMethods.GetKeyState((ushort)keyCode);
             return (result & 0x01) == 0x01;
         }
     }

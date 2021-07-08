@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Askaiser.UITesting
 {
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",  Justification = "We do not use SemaphoreSlim's AvailableWaitHandle.")]
     internal sealed class MonitorService : IMonitorService
     {
         private readonly SemaphoreSlim _monitorsMutex = new SemaphoreSlim(1);
@@ -65,7 +67,8 @@ namespace Askaiser.UITesting
 
                 var screenshot = await GraphicsScreenshot.Take(monitor).ConfigureAwait(false);
 
-                await using (var screenshotStream = new MemoryStream())
+                var screenshotStream = new MemoryStream();
+                await using (screenshotStream.ConfigureAwait(false))
                 {
                     screenshot.Save(screenshotStream, ImageFormat.Png);
                     this._cachedBitmapBytes = screenshotStream.ToArray();

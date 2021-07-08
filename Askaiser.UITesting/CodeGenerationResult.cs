@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Askaiser.UITesting.LibraryGenerator
+namespace Askaiser.UITesting
 {
-    public sealed class CodeResult
+    public sealed class CodeGenerationResult
     {
-        public CodeResult(string code, IEnumerable<string> warnings)
+        public CodeGenerationResult(string code, IEnumerable<string> warnings)
         {
             this.Code = code;
             this.Warnings = warnings.ToList();

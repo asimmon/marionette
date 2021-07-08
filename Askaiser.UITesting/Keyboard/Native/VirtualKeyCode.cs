@@ -1,9 +1,16 @@
 ﻿// ReSharper disable once CheckNamespace
+
+using System.Diagnostics.CodeAnalysis;
+
 namespace Askaiser.UITesting
 {
     /// <summary>
     /// The list of VirtualKeyCodes (see: http://msdn.microsoft.com/en-us/library/ms645540(VS.85).aspx)
     /// </summary>
+    [SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "We use the same name as the original constants.")]
+    [SuppressMessage("Microsoft.Naming", "CA1720", Justification = "We use the same values as the original constants.")]
+    [SuppressMessage("Microsoft.Naming", "CA1712", Justification = "We use the same values as the original constants.")]
+    [SuppressMessage("Microsoft.Naming", "CA1069", Justification = "We use the same values as the original constants.")]
     public enum VirtualKeyCode //: UInt16
     {
         /// <summary>

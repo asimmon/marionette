@@ -28,13 +28,13 @@ namespace Askaiser.UITesting
         public int Width => this.Right - this.Left;
         public int Height => this.Bottom - this.Top;
 
-        public (int, int) Center
+        public Point Center
         {
             get
             {
                 var halfWidth = (int)Math.Round(this.Width / 2d);
                 var halfHeight = (int)Math.Round(this.Height / 2d);
-                return (this.Left + halfWidth, this.Top + halfHeight);
+                return new Point(this.Left + halfWidth, this.Top + halfHeight);
             }
         }
 
@@ -53,5 +53,95 @@ namespace Askaiser.UITesting
             Right = this.Right + leftOffset,
             Bottom = this.Bottom + topOffset,
         };
+
+
+        public Rectangle FromTopLeft(int width, int height)
+        {
+            if (width < 0) throw new ArgumentOutOfRangeException(nameof(width));
+            if (height < 0) throw new ArgumentOutOfRangeException(nameof(width));
+
+            var right = this.Left + width;
+            var bottom = this.Top + height;
+
+            if (right > this.Right) throw new ArgumentOutOfRangeException(nameof(width));
+            if (bottom > this.Bottom) throw new ArgumentOutOfRangeException(nameof(height));
+
+            return new Rectangle(this.Left, this.Top, right, bottom);
+        }
+
+        public Rectangle FromTopRight(int width, int height)
+        {
+            if (width < 0) throw new ArgumentOutOfRangeException(nameof(width));
+            if (height < 0) throw new ArgumentOutOfRangeException(nameof(width));
+
+            var left = this.Right - width;
+            var bottom = this.Top + height;
+
+            if (left < this.Left) throw new ArgumentOutOfRangeException(nameof(width));
+            if (bottom > this.Bottom) throw new ArgumentOutOfRangeException(nameof(height));
+
+            return new Rectangle(left, this.Top, this.Right, bottom);
+        }
+
+        public Rectangle FromBottomLeft(int width, int height)
+        {
+            if (width < 0) throw new ArgumentOutOfRangeException(nameof(width));
+            if (height < 0) throw new ArgumentOutOfRangeException(nameof(width));
+
+            var right = this.Left + width;
+            var top = this.Bottom - height;
+
+            if (right > this.Right) throw new ArgumentOutOfRangeException(nameof(width));
+            if (top < this.Top) throw new ArgumentOutOfRangeException(nameof(height));
+
+            return new Rectangle(this.Left, top, right, this.Bottom);
+        }
+
+        public Rectangle FromBottomRight(int width, int height)
+        {
+            if (width < 0) throw new ArgumentOutOfRangeException(nameof(width));
+            if (height < 0) throw new ArgumentOutOfRangeException(nameof(width));
+
+            var left = this.Right - width;
+            var top = this.Bottom - height;
+
+            if (left < this.Left) throw new ArgumentOutOfRangeException(nameof(width));
+            if (top < this.Top) throw new ArgumentOutOfRangeException(nameof(height));
+
+            return new Rectangle(left, top, this.Right, this.Bottom);
+        }
+
+        public Rectangle FromCenter(int width, int height)
+        {
+            if (width < 0) throw new ArgumentOutOfRangeException(nameof(width));
+            if (height < 0) throw new ArgumentOutOfRangeException(nameof(width));
+            if (width > this.Width) throw new ArgumentOutOfRangeException(nameof(width));
+            if (height > this.Height) throw new ArgumentOutOfRangeException(nameof(height));
+
+            var halfWidth = (int)Math.Round(width / 2d);
+            var halfHeight =  (int)Math.Round(height / 2d);
+
+            var (centerX, centerY) = this.Center;
+
+            var left = centerX - halfWidth;
+            var top = centerY - halfHeight;
+            var right = centerX + halfWidth;
+            var bottom = centerY + halfHeight;
+
+            var widthDiff = width - (right - left);
+            var heightDiff = height - (bottom - top);
+
+            if (widthDiff < 0)
+                right += widthDiff;
+            else
+                left += widthDiff;
+
+            if (heightDiff < 0)
+                bottom += heightDiff;
+            else
+                top += heightDiff;
+
+            return new Rectangle(left, top, right, bottom);
+        }
     }
 }

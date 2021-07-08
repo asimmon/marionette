@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Askaiser.UITesting.LibraryGenerator
+namespace Askaiser.UITesting
 {
     internal static class DictionaryExtensions
     {

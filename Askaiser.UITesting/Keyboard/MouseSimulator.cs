@@ -24,7 +24,7 @@ namespace Askaiser.UITesting.Keyboard
         /// <param name="inputSimulator">The <see cref="IInputSimulator"/> that owns this instance.</param>
         public MouseSimulator(IInputSimulator inputSimulator)
         {
-            if (inputSimulator == null) throw new ArgumentNullException("inputSimulator");
+            if (inputSimulator == null) throw new ArgumentNullException(nameof(inputSimulator));
 
             this._inputSimulator = inputSimulator;
             this._messageDispatcher = new WindowsInputMessageDispatcher();
@@ -39,12 +39,10 @@ namespace Askaiser.UITesting.Keyboard
         internal MouseSimulator(IInputSimulator inputSimulator, IInputMessageDispatcher messageDispatcher)
         {
             if (inputSimulator == null)
-                throw new ArgumentNullException("inputSimulator");
+                throw new ArgumentNullException(nameof(inputSimulator));
 
             if (messageDispatcher == null)
-                throw new InvalidOperationException(
-                    string.Format("The {0} cannot operate with a null {1}. Please provide a valid {1} instance to use for dispatching {2} messages.",
-                    typeof(MouseSimulator).Name, typeof(IInputMessageDispatcher).Name, typeof(INPUT).Name));
+                throw new InvalidOperationException($"The {nameof(MouseSimulator)} cannot operate with a null {nameof(IInputMessageDispatcher)}. Please provide a valid {nameof(IInputMessageDispatcher)} instance to use for dispatching {nameof(INPUT)} messages.");
 
             this._inputSimulator = inputSimulator;
             this._messageDispatcher = messageDispatcher;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Askaiser.UITesting.Commands;
 
@@ -67,103 +68,33 @@ namespace Askaiser.UITesting
             return await this._monitorService.GetMonitors().ConfigureAwait(false);
         }
 
-        public async Task<bool> IsVisible(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
-        {
-            try
-            {
-                await this.WaitFor(element, waitFor, searchRect).ConfigureAwait(false);
-                return true;
-            }
-            catch (WaitForTimeoutException)
-            {
-                return false;
-            }
-        }
-
-        public async Task<SearchResult> WaitFor(IElement element, TimeSpan duration = default, Rectangle searchRect = default)
+        public async Task<SearchResult> WaitFor(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
             if (element == null) throw new ArgumentNullException(nameof(element));
-            return await this._waitForHandler.Execute(new WaitForCommand(new[] { element }, duration, searchRect, this._monitorIndex)).ConfigureAwait(false);
+            return await this._waitForHandler.Execute(new WaitForCommand(new[] { element }, waitFor, searchRect, this._monitorIndex)).ConfigureAwait(false);
         }
 
-        public async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan duration = default, Rectangle searchRect = default)
+        public async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
             if (elements == null) throw new ArgumentNullException(nameof(elements));
             var enumeratedElements = new List<IElement>(elements);
 
             if (enumeratedElements.Count == 0) throw new ArgumentException("Elements cannot be empty", nameof(elements));
-            return await this._waitForAnyHandler.Execute(new WaitForCommand(enumeratedElements, duration, searchRect, this._monitorIndex)).ConfigureAwait(false);
+            return await this._waitForAnyHandler.Execute(new WaitForCommand(enumeratedElements, waitFor, searchRect, this._monitorIndex)).ConfigureAwait(false);
         }
 
-        public async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan duration = default, Rectangle searchRect = default)
+        public async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
             if (elements == null) throw new ArgumentNullException(nameof(elements));
             var enumeratedElements = new List<IElement>(elements);
 
             if (enumeratedElements.Count == 0) throw new ArgumentException("Elements cannot be empty", nameof(elements));
-            return await this._waitForAllHandler.Execute(new WaitForCommand(enumeratedElements, duration, searchRect, this._monitorIndex)).ConfigureAwait(false);
-        }
-
-        public async Task MoveTo(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
-        {
-            var result = await this.WaitFor(element, waitFor, searchRect).ConfigureAwait(false);
-            var (x, y) = result.Area.Center;
-            await this.MoveTo(x, y).ConfigureAwait(false);
+            return await this._waitForAllHandler.Execute(new WaitForCommand(enumeratedElements, waitFor, searchRect, this._monitorIndex)).ConfigureAwait(false);
         }
 
         public async Task MoveTo(int x, int y)
         {
             await this._moveToLocationHandler.Execute(new MouseLocationCommand(x, y, this._mouseSpeed)).ConfigureAwait(false);
-        }
-
-        public async Task SingleClick(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
-        {
-            await this.ElementMouseAction(element, waitFor, searchRect, this.SingleClick).ConfigureAwait(false);
-        }
-
-        public async Task DoubleClick(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
-        {
-            await this.ElementMouseAction(element, waitFor, searchRect, this.DoubleClick).ConfigureAwait(false);
-        }
-
-        public async Task TripleClick(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
-        {
-            await this.ElementMouseAction(element, waitFor, searchRect, this.TripleClick).ConfigureAwait(false);
-        }
-
-        public async Task RightClick(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
-        {
-            await this.ElementMouseAction(element, waitFor, searchRect, this.RightClick).ConfigureAwait(false);
-        }
-
-        public async Task Drag(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
-        {
-            await this.ElementMouseAction(element, waitFor, searchRect, this.Drag).ConfigureAwait(false);
-        }
-
-        public async Task Drop(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
-        {
-            await this.ElementMouseAction(element, waitFor, searchRect, this.Drop).ConfigureAwait(false);
-        }
-
-        public async Task SingleClick(SearchResult searchResult) => await SearchResultMouseAction(searchResult, this.SingleClick).ConfigureAwait(false);
-        public async Task DoubleClick(SearchResult searchResult) => await SearchResultMouseAction(searchResult, this.DoubleClick).ConfigureAwait(false);
-        public async Task TripleClick(SearchResult searchResult) => await SearchResultMouseAction(searchResult, this.TripleClick).ConfigureAwait(false);
-        public async Task RightClick(SearchResult searchResult) => await SearchResultMouseAction(searchResult, this.RightClick).ConfigureAwait(false);
-        public async Task Drag(SearchResult searchResult) => await SearchResultMouseAction(searchResult, this.Drag).ConfigureAwait(false);
-        public async Task Drop(SearchResult searchResult) => await SearchResultMouseAction(searchResult, this.Drop).ConfigureAwait(false);
-        public async Task MoveTo(SearchResult searchResult) => await SearchResultMouseAction(searchResult, this.MoveTo).ConfigureAwait(false);
-
-        private async Task ElementMouseAction(IElement element, TimeSpan waitFor, Rectangle searchRect, Func<int, int, Task> clickFunc)
-        {
-            var result = await this.WaitFor(element, waitFor, searchRect).ConfigureAwait(false);
-            await SearchResultMouseAction(result, clickFunc).ConfigureAwait(false);
-        }
-
-        private static async Task SearchResultMouseAction(SearchResult sr, Func<int, int, Task> clickFunc)
-        {
-            var (x, y) = sr.Area.Center;
-            await clickFunc(x, y).ConfigureAwait(false);
         }
 
         public async Task SingleClick(int x, int y)
@@ -186,12 +117,12 @@ namespace Askaiser.UITesting
             await this._rightClickLocationHandler.Execute(new MouseLocationCommand(x, y, this._mouseSpeed)).ConfigureAwait(false);
         }
 
-        public async Task Drag(int x, int y)
+        public async Task DragFrom(int x, int y)
         {
             await this._dragLocationHandler.Execute(new MouseLocationCommand(x, y, this._mouseSpeed)).ConfigureAwait(false);
         }
 
-        public async Task Drop(int x, int y)
+        public async Task DropTo(int x, int y)
         {
             await this._dropLocationHandler.Execute(new MouseLocationCommand(x, y, this._mouseSpeed)).ConfigureAwait(false);
         }
@@ -237,11 +168,16 @@ namespace Askaiser.UITesting
             throw new WaitForTimeoutException(element, totalDuration);
         }
 
-        public async Task TypeText(string text)
+        public async Task TypeText(string text, TimeSpan sleepAfter = default)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
             if (text.Length > 0)
+            {
                 await this._typeTextHandler.Execute(new KeyboardTextCommand(text)).ConfigureAwait(false);
+
+                if (sleepAfter > TimeSpan.Zero)
+                    await this.Sleep(sleepAfter).ConfigureAwait(false);
+            }
         }
 
         public async Task KeyPress(params VirtualKeyCode[] keyCodes)
@@ -280,7 +216,10 @@ namespace Askaiser.UITesting
             return this;
         }
 
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "It looks more coherent to only use instance methods here.")]
         public Task Sleep(int millisecondsDelay) => Task.Delay(millisecondsDelay);
+
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "It looks more coherent to only use instance methods here.")]
         public Task Sleep(TimeSpan delay) => Task.Delay(delay);
     }
 }
