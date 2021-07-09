@@ -139,7 +139,7 @@ namespace Askaiser.UITesting
 
             sb.AppendLine("    }");
 
-            foreach (var childLibrary in library.Libraries.Values.OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase))
+            foreach (var childLibrary in library.Libraries.Values.OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
                 GenerateLibraryCode(childLibrary, sb);
         }
 
@@ -151,7 +151,7 @@ namespace Askaiser.UITesting
 
             sb.AppendLine("        {");
 
-            foreach (var childLibrary in library.Libraries.Values.OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase))
+            foreach (var childLibrary in library.Libraries.Values.OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
                 sb.Append("            this.").Append(childLibrary.Name).Append(" = new ").Append(childLibrary.UniqueName).AppendLine("Library(this.Elements);");
 
             if (library.Level == 0)
@@ -204,7 +204,7 @@ namespace Askaiser.UITesting
             sb.AppendLine("        private void CreateElements()");
             sb.AppendLine("        {");
 
-            foreach (var image in library.GetImagesChildren())
+            foreach (var image in library.GetImagesChildren().OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
             {
                 sb.Append("            this.Elements.Add(new ImageElement(\"")
                     .Append(image.UniqueName)
