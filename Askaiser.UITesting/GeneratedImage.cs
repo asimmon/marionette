@@ -16,11 +16,11 @@ namespace Askaiser.UITesting
 
         private GeneratedImage(string fileName, byte[] bytes, GeneratedLibrary rootLibrary)
         {
-            var libsAndElementRawNames = Path.GetFileNameWithoutExtension(fileName).Split("--", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var libsAndElementRawNames = Path.GetFileNameWithoutExtension(fileName).Split("--").TrimAndRemoveEmptyEntries().ToArray();
             var librariesRawNames = libsAndElementRawNames.SkipLast(1).ToArray();
 
             var elementRawName = libsAndElementRawNames[^1];
-            var elementNameParts = elementRawName.Split('_', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var elementNameParts = elementRawName.Split('_').TrimAndRemoveEmptyEntries().ToArray();
 
             this.Name = elementNameParts[0].ToPascalCasedPropertyName();
             this.Bytes = bytes;

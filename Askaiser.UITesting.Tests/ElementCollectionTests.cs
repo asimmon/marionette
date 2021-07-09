@@ -82,29 +82,31 @@ namespace Askaiser.UITesting.Tests
         [Fact]
         public async Task LoadAsync_WhenSupportedElements_Works()
         {
-            await using var stream = new MemoryStream();
-            await using (var writer = new StreamWriter(stream, leaveOpen: true))
+            await using (var stream = new MemoryStream())
+            await using (var writer = new StreamWriter(stream))
+            {
                 await writer.WriteAsync(ValidJsonCollection);
+                await writer.FlushAsync();
+                stream.Seek(0, SeekOrigin.Begin);
 
-            stream.Seek(0, SeekOrigin.Begin);
+                var collection = new ElementCollection();
+                await collection.LoadAsync(stream);
 
-            var collection = new ElementCollection();
-            await collection.LoadAsync(stream);
+                Assert.Equal(2, collection.Count);
+                var imageBase = Assert.Single(collection, x => x.Name == ImageElement.Name);
+                var image = Assert.IsType<ImageElement>(imageBase);
+                Assert.NotSame(ImageElement, image);
 
-            Assert.Equal(2, collection.Count);
-            var imageBase = Assert.Single(collection, x => x.Name == ImageElement.Name);
-            var image = Assert.IsType<ImageElement>(imageBase);
-            Assert.NotSame(ImageElement, image);
+                var textBase = Assert.Single(collection, x => x.Name == TextElement.Name);
+                var text = Assert.IsType<TextElement>(textBase);
+                Assert.NotSame(TextElement, text);
 
-            var textBase = Assert.Single(collection, x => x.Name == TextElement.Name);
-            var text = Assert.IsType<TextElement>(textBase);
-            Assert.NotSame(TextElement, text);
+                Assert.Equal(ImageElement.Content, image.Content);
+                Assert.Equal(ImageElement.Threshold, image.Threshold);
+                Assert.Equal(ImageElement.Grayscale, image.Grayscale);
 
-            Assert.Equal(ImageElement.Content, image.Content);
-            Assert.Equal(ImageElement.Threshold, image.Threshold);
-            Assert.Equal(ImageElement.Grayscale, image.Grayscale);
-
-            Assert.Equal(TextElement.Content, text.Content);
+                Assert.Equal(TextElement.Content, text.Content);
+            }
         }
 
         [Fact]
@@ -120,14 +122,16 @@ namespace Askaiser.UITesting.Tests
         [Fact]
         public async Task LoadAsync_WhenNotSupportedElements_Works()
         {
-            await using var stream = new MemoryStream();
-            await using (var writer = new StreamWriter(stream, leaveOpen: true))
+            await using (var stream = new MemoryStream())
+            await using (var writer = new StreamWriter(stream))
+            {
                 await writer.WriteAsync(InvalidJsonCollection);
+                await writer.FlushAsync();
+                stream.Seek(0, SeekOrigin.Begin);
 
-            stream.Seek(0, SeekOrigin.Begin);
-
-            var collection = new ElementCollection();
-            await Assert.ThrowsAsync<ArgumentException>(async () => await collection.LoadAsync(stream));
+                var collection = new ElementCollection();
+                await Assert.ThrowsAsync<ArgumentException>(async () => await collection.LoadAsync(stream));
+            }
         }
 
         private sealed class UnknownElement : IElement
