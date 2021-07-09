@@ -10,7 +10,7 @@ namespace Askaiser.UITesting
     {
         public async Task<SearchResult> Recognize(Bitmap screenshot, IElement element)
         {
-            SearchResult SearchInternal()
+            SearchResult RecognizeInternal()
             {
                 var imageElement = (ImageElement)element;
 
@@ -42,7 +42,7 @@ namespace Askaiser.UITesting
                 }
             }
 
-            return await Task.Run(SearchInternal).ConfigureAwait(false);
+            return await Task.Run(RecognizeInternal).ConfigureAwait(false);
         }
     }
 }

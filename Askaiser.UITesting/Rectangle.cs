@@ -54,11 +54,46 @@ namespace Askaiser.UITesting
             Bottom = this.Bottom + topOffset,
         };
 
+        public Rectangle FromLeft(int width)
+        {
+            if (width < 0) throw new ArgumentOutOfRangeException(nameof(width));
+            var right = this.Left + width;
+            if (right > this.Right) throw new ArgumentOutOfRangeException(nameof(width));
+
+            return this with { Right = right };
+        }
+
+        public Rectangle FromTop(int height)
+        {
+            if (height < 0) throw new ArgumentOutOfRangeException(nameof(height));
+            var bottom = this.Top + height;
+            if (bottom > this.Bottom) throw new ArgumentOutOfRangeException(nameof(height));
+
+            return this with { Bottom = bottom };
+        }
+
+        public Rectangle FromBottom(int height)
+        {
+            if (height < 0) throw new ArgumentOutOfRangeException(nameof(height));
+            var top = this.Bottom - height;
+            if (top < this.Top) throw new ArgumentOutOfRangeException(nameof(height));
+
+            return this with { Top = top };
+        }
+
+        public Rectangle FromRight(int width)
+        {
+            if (width < 0) throw new ArgumentOutOfRangeException(nameof(width));
+            var left = this.Right - width;
+            if (left < this.Left) throw new ArgumentOutOfRangeException(nameof(width));
+
+            return this with { Left = left };
+        }
 
         public Rectangle FromTopLeft(int width, int height)
         {
             if (width < 0) throw new ArgumentOutOfRangeException(nameof(width));
-            if (height < 0) throw new ArgumentOutOfRangeException(nameof(width));
+            if (height < 0) throw new ArgumentOutOfRangeException(nameof(height));
 
             var right = this.Left + width;
             var bottom = this.Top + height;
@@ -66,13 +101,13 @@ namespace Askaiser.UITesting
             if (right > this.Right) throw new ArgumentOutOfRangeException(nameof(width));
             if (bottom > this.Bottom) throw new ArgumentOutOfRangeException(nameof(height));
 
-            return new Rectangle(this.Left, this.Top, right, bottom);
+            return this with { Right = right, Bottom = bottom };
         }
 
         public Rectangle FromTopRight(int width, int height)
         {
             if (width < 0) throw new ArgumentOutOfRangeException(nameof(width));
-            if (height < 0) throw new ArgumentOutOfRangeException(nameof(width));
+            if (height < 0) throw new ArgumentOutOfRangeException(nameof(height));
 
             var left = this.Right - width;
             var bottom = this.Top + height;
@@ -80,13 +115,13 @@ namespace Askaiser.UITesting
             if (left < this.Left) throw new ArgumentOutOfRangeException(nameof(width));
             if (bottom > this.Bottom) throw new ArgumentOutOfRangeException(nameof(height));
 
-            return new Rectangle(left, this.Top, this.Right, bottom);
+            return this with { Left = left, Bottom = bottom };
         }
 
         public Rectangle FromBottomLeft(int width, int height)
         {
             if (width < 0) throw new ArgumentOutOfRangeException(nameof(width));
-            if (height < 0) throw new ArgumentOutOfRangeException(nameof(width));
+            if (height < 0) throw new ArgumentOutOfRangeException(nameof(height));
 
             var right = this.Left + width;
             var top = this.Bottom - height;
@@ -94,13 +129,13 @@ namespace Askaiser.UITesting
             if (right > this.Right) throw new ArgumentOutOfRangeException(nameof(width));
             if (top < this.Top) throw new ArgumentOutOfRangeException(nameof(height));
 
-            return new Rectangle(this.Left, top, right, this.Bottom);
+            return this with { Top = top, Right = right };
         }
 
         public Rectangle FromBottomRight(int width, int height)
         {
             if (width < 0) throw new ArgumentOutOfRangeException(nameof(width));
-            if (height < 0) throw new ArgumentOutOfRangeException(nameof(width));
+            if (height < 0) throw new ArgumentOutOfRangeException(nameof(height));
 
             var left = this.Right - width;
             var top = this.Bottom - height;
@@ -108,13 +143,13 @@ namespace Askaiser.UITesting
             if (left < this.Left) throw new ArgumentOutOfRangeException(nameof(width));
             if (top < this.Top) throw new ArgumentOutOfRangeException(nameof(height));
 
-            return new Rectangle(left, top, this.Right, this.Bottom);
+            return this with { Left = left, Top = top };
         }
 
         public Rectangle FromCenter(int width, int height)
         {
             if (width < 0) throw new ArgumentOutOfRangeException(nameof(width));
-            if (height < 0) throw new ArgumentOutOfRangeException(nameof(width));
+            if (height < 0) throw new ArgumentOutOfRangeException(nameof(height));
             if (width > this.Width) throw new ArgumentOutOfRangeException(nameof(width));
             if (height > this.Height) throw new ArgumentOutOfRangeException(nameof(height));
 
@@ -143,5 +178,13 @@ namespace Askaiser.UITesting
 
             return new Rectangle(left, top, right, bottom);
         }
+
+        public Rectangle Multiply(float factor) => this with
+        {
+            Left = (int)Math.Round(this.Left * factor),
+            Top = (int)Math.Round(this.Top * factor),
+            Right = (int)Math.Round(this.Right * factor),
+            Bottom = (int)Math.Round(this.Bottom * factor),
+        };
     }
 }

@@ -1,33 +1,26 @@
-﻿using System;
+﻿using System.Linq;
 using System.Threading.Tasks;
 
 namespace Askaiser.UITesting.ConsoleApp
 {
     public static class Program
     {
-        private static TestContext Context = TestContext.Create();
-
         public static async Task Main()
         {
-            //*
-            var elements = await new ElementCollection().LoadAsync(@"C:\Users\simmo\Desktop\elements.txt");
+            var ctx = TestContext.Create();
 
-            var trayOpener = elements["tray-opener"];
-            var riderLogo = elements["rider-logo"];
-            var sidebarRecycleBin = elements["sidebar-recycle-bin"];
-            var desktopLoulouwhat = elements["desktop-loulouwhat"];
+            var element = new TextElement("Amazon Music", TextOptions.BlackAndWhite | TextOptions.Negative)
+            {
+                IgnoreCase = true,
+            };
 
-            var context = TestContext.Create();
-            context.SetMonitor(1);
+            var monitors = await ctx.GetMonitors();
+            var monitor = monitors.First();
+            var searchRect = monitor.FromBottomLeft(200, 200);
 
-            await context.MoveTo(riderLogo, searchRect: new Rectangle(860, 440, 1060, 640), waitFor: TimeSpan.FromSeconds(2));
-
-            // await context.ScrollUpUntilVisible(desktopLoulouwhat, TimeSpan.FromSeconds(10));
-            // await context.Drag(desktopLoulouwhat);
-            // await context.MoveTo(trayOpener);
-            // await context.Drop(sidebarRecycleBin);
-
-            //*/
+            await ctx.SingleClick(monitor.Left, monitor.Bottom);
+            await ctx.Sleep(500);
+            await ctx.MoveTo(element, searchRect: searchRect);
         }
     }
 }

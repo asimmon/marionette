@@ -9,10 +9,12 @@ namespace Askaiser.UITesting
         private readonly string _name;
         private readonly string _content;
 
-        public TextElement(string name, string content)
+        public TextElement(string content, TextOptions options = TextOptions.BlackAndWhite)
         {
-            this.Name = name;
+            this.Name = Guid.NewGuid().ToString("N");
             this.Content = content;
+            this.Options = options;
+            this.IgnoreCase = true;
         }
 
         internal TextElement(JsonTextElement json)
@@ -24,13 +26,22 @@ namespace Askaiser.UITesting
         public string Name
         {
             get => this._name;
-            init => this._name = value is { Length: > 0 } ? value : throw new ArgumentException("Name cannot be null or empty.", nameof(this.Name));
+            init => this._name = value?.Trim() is { Length: > 0 } trimmedValue ? trimmedValue : throw new ArgumentException("Name cannot be null or empty.", nameof(this.Name));
         }
 
         public string Content
         {
             get => this._content;
             init => this._content = value is { Length: > 0 } ? value : throw new ArgumentException("Content cannot be null or empty.", nameof(this.Content));
+        }
+
+        public TextOptions Options { get; init; }
+
+        public bool IgnoreCase { get; init; }
+
+        public override string ToString()
+        {
+            return this.Content;
         }
     }
 }

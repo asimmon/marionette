@@ -59,7 +59,7 @@ namespace Askaiser.UITesting
         }
 
         [Flags]
-        public enum MouseEventFlags
+        internal enum MouseEventFlags
         {
             LeftDown =   0x00000002,
             LeftUp =     0x00000004,

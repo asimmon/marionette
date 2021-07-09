@@ -58,7 +58,7 @@ namespace Askaiser.UITesting
         public override string ToString()
         {
             if (!this.Success)
-                return $"Element {this.Element.Name} was not found.";
+                return $"Element {this.Element} was not found.";
 
             var sb = new StringBuilder();
 
@@ -85,10 +85,10 @@ namespace Askaiser.UITesting
                 return;
 
             if (this.Areas.Count == 0)
-                throw new InvalidOperationException("No location was found for element " + this.Element.Name + ".");
+                throw new InvalidOperationException($"No location was found for element {this.Element}.");
 
             var sb = new StringBuilder("Multiple location were found for element ")
-                .Append(this.Element.Name)
+                .Append(this.Element)
                 .Append(": ");
 
             this.SerializeAreasTo(sb);

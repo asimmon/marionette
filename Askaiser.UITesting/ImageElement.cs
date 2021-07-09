@@ -50,5 +50,10 @@ namespace Askaiser.UITesting
         }
 
         public bool Grayscale { get; init; }
+
+        public override string ToString()
+        {
+            return this.Name;
+        }
     }
 }
