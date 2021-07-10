@@ -26,8 +26,7 @@ namespace Askaiser.UITesting
             {
                 var textElement = (TextElement)element;
 
-                using var img = screenshot
-                    .ConvertAndDispose(BitmapConverter.ToMat)
+                using var img = screenshot.ToMat()
                     .ConvertAndDispose(Upscale)
                     .ConvertAndDispose(GetConverters(textElement.Options))
                     .ConvertAndDispose(BitmapConverter.ToBitmap)

@@ -18,15 +18,15 @@ namespace Askaiser.UITesting.Commands
             this._elementRecognizer = elementRecognizer;
         }
 
-        protected async Task<SearchResult> WaitFor(IElement element, TimeSpan duration, Rectangle searchRect, int monitorIndex)
+        protected async Task<SearchResult> WaitFor(IElement element, TimeSpan waitFor, Rectangle searchRect, int monitorIndex)
         {
-            if (duration < TimeSpan.Zero)
-                throw new ArgumentOutOfRangeException(nameof(duration), "Duration must be greater or equal to zero");
+            if (waitFor < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException(nameof(waitFor), "WaitFor duration must be greater or equal to zero");
 
             var monitor = await this._monitorService.GetMonitor(monitorIndex).ConfigureAwait(false);
 
             var isFirstLoop = true;
-            for (var sw = Stopwatch.StartNew(); sw.Elapsed < duration || isFirstLoop;)
+            for (var sw = Stopwatch.StartNew(); sw.Elapsed < waitFor || isFirstLoop;)
             {
                 using var screenshot = await this.GetScreenshot(monitor, searchRect).ConfigureAwait(false);
 
@@ -38,7 +38,7 @@ namespace Askaiser.UITesting.Commands
                 isFirstLoop = false;
             }
 
-            throw new WaitForTimeoutException(element, duration);
+            throw new WaitForTimeoutException(element, waitFor);
         }
 
         private async Task<Bitmap> GetScreenshot(MonitorDescription monitor, Rectangle searchRect)

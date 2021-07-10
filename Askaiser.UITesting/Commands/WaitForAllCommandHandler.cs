@@ -14,7 +14,7 @@ namespace Askaiser.UITesting.Commands
         {
             var tasks = command.Elements.Select(async element =>
             {
-                var result = await this.WaitFor(element, command.Duration, command.SearchRectangle, command.MonitorIndex).ConfigureAwait(false);
+                var result = await this.WaitFor(element, command.WaitFor, command.SearchRectangle, command.MonitorIndex).ConfigureAwait(false);
                 result.EnsureSingleLocation();
                 return result;
             });
