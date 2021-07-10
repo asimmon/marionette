@@ -1,26 +1,13 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
+using Askaiser.UITesting;
+using System.Linq;
 
-namespace Askaiser.UITesting.ConsoleApp
-{
-    public static class Program
-    {
-        public static async Task Main()
-        {
-            var ctx = TestContext.Create();
+using var ctx = TestContext.Create();
 
-            var element = new TextElement("Amazon Music", TextOptions.BlackAndWhite | TextOptions.Negative)
-            {
-                IgnoreCase = true,
-            };
+var element = new TextElement("Amazon Music", TextOptions.BlackAndWhite | TextOptions.Negative);
 
-            var monitors = await ctx.GetMonitors();
-            var monitor = monitors.First();
-            var searchRect = monitor.FromBottomLeft(200, 200);
+var monitors = await ctx.GetMonitors();
+var monitor = monitors.First();
 
-            await ctx.SingleClick(monitor.Left, monitor.Bottom);
-            await ctx.Sleep(500);
-            await ctx.MoveTo(element, searchRect: searchRect);
-        }
-    }
-}
+await ctx.SingleClick(monitor.Left, monitor.Bottom);
+await ctx.MoveTo(element, waitFor: TimeSpan.FromSeconds(1), searchRect: monitor.FromBottomLeft(200, 200));

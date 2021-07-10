@@ -9,9 +9,16 @@ using Tesseract;
 
 namespace Askaiser.UITesting
 {
-    internal sealed class TextElementRecognizer : IElementRecognizer
+    internal sealed class TextElementRecognizer : IElementRecognizer, IDisposable
     {
         private const int UpscalingRatio = 3;
+
+        private readonly TesseractEngine _tesseract;
+
+        public TextElementRecognizer(TestContextOptions options)
+        {
+            this._tesseract = new TesseractEngine(options.TesseractDataPath, options.TesseractLanguage, EngineMode.LstmOnly);
+        }
 
         public async Task<SearchResult> Recognize(Bitmap screenshot, IElement element)
         {
@@ -21,16 +28,16 @@ namespace Askaiser.UITesting
 
                 using var img = screenshot
                     .ConvertAndDispose(BitmapConverter.ToMat)
+                    .ConvertAndDispose(Upscale)
                     .ConvertAndDispose(GetConverters(textElement.Options))
                     .ConvertAndDispose(BitmapConverter.ToBitmap)
                     .ConvertAndDispose(PixConverter.ToPix);
 
-                using var tesseract = new TesseractEngine(@"./tessdata", "eng", EngineMode.LstmOnly);
-                using var page = tesseract.Process(img);
+                using var page = this._tesseract.Process(img);
                 using var iterator = page.GetIterator();
 
-                var rectangles = TesseractResultHandler.Handle(iterator, textElement);
-                return new SearchResult(element, rectangles.Select(r => r.Multiply(1f / UpscalingRatio)));
+                var areas = TesseractResultHandler.Handle(iterator, textElement);
+                return new SearchResult(element, areas.Select(Downscale));
             }
 
             return await Task.Run(RecognizeInternal).ConfigureAwait(false);
@@ -38,8 +45,6 @@ namespace Askaiser.UITesting
 
         private static IEnumerable<Func<Mat, Mat>> GetConverters(TextOptions options)
         {
-            yield return Upscale;
-
             if (options == TextOptions.None)
                 yield break;
 
@@ -87,6 +92,11 @@ namespace Askaiser.UITesting
             var maxBottom = Math.Max(r1.Bottom, r2.Bottom);
 
             return new Rectangle(minLeft, minTop, maxRight, maxBottom);
+        }
+
+        private static Rectangle Downscale(Rectangle r)
+        {
+            return r.Multiply(1f / UpscalingRatio);
         }
 
         private sealed class TesseractResultHandler
@@ -190,6 +200,11 @@ namespace Askaiser.UITesting
 
             private static bool AreEqualOrdinalIgnoreCase(char x, char y) => char.ToUpperInvariant(x) == char.ToUpperInvariant(y);
             private static bool AreEqualOrdinal(char x, char y) => x == y;
+        }
+
+        public void Dispose()
+        {
+            this._tesseract.Dispose();
         }
     }
 }

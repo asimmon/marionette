@@ -7,9 +7,10 @@ using Askaiser.UITesting.Commands;
 
 namespace Askaiser.UITesting
 {
-    public class TestContext
+    public class TestContext : IDisposable
     {
         private readonly IMonitorService _monitorService;
+        private readonly IDisposable[] _disposables;
         private readonly WaitForCommandHandler _waitForHandler;
         private readonly WaitForAnyCommandHandler _waitForAnyHandler;
         private readonly WaitForAllCommandHandler _waitForAllHandler;
@@ -29,9 +30,10 @@ namespace Askaiser.UITesting
         private int _monitorIndex;
         private MouseSpeed _mouseSpeed;
 
-        internal TestContext(IMonitorService monitorService, IElementRecognizer elementRecognizer, IMouseController mouseController, IKeyboardController keyboardController)
+        internal TestContext(IMonitorService monitorService, IElementRecognizer elementRecognizer, IMouseController mouseController, IKeyboardController keyboardController, IDisposable[] disposables)
         {
             this._monitorService = monitorService;
+            this._disposables = disposables;
 
             this._waitForHandler = new WaitForCommandHandler(monitorService, elementRecognizer);
             this._waitForAnyHandler = new WaitForAnyCommandHandler(monitorService, elementRecognizer);
@@ -53,14 +55,18 @@ namespace Askaiser.UITesting
             this._mouseSpeed = MouseSpeed.Immediate;
         }
 
-        public static TestContext Create()
+        public static TestContext Create(TestContextOptions options = null)
         {
+            options ??= new TestContextOptions();
+
             var monitorService = new MonitorService(TimeSpan.FromMilliseconds(200));
-            var elementRecognizer = new AggregateElementRecognizer(new ImageElementRecognizer(), new TextElementRecognizer());
+            var imageRecognizer = new ImageElementRecognizer();
+            var textRecognizer = new TextElementRecognizer(options);
+            var elementRecognizer = new AggregateElementRecognizer(imageRecognizer, textRecognizer);
             var mouseController = new MouseController();
             var keyboardController = new KeyboardController();
 
-            return new TestContext(monitorService, elementRecognizer, mouseController, keyboardController);
+            return new TestContext(monitorService, elementRecognizer, mouseController, keyboardController, new IDisposable[] { textRecognizer });
         }
 
         public async Task<MonitorDescription[]> GetMonitors()
@@ -221,5 +227,20 @@ namespace Askaiser.UITesting
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "It looks more coherent to only use instance methods here.")]
         public Task Sleep(TimeSpan delay) => Task.Delay(delay);
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                foreach (var disposable in this._disposables)
+                    disposable.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }
