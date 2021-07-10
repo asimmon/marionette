@@ -9,7 +9,7 @@ namespace Askaiser.UITesting.Tests
     public class ElementCollectionTests
     {
         private static readonly ImageElement ImageElement = new ImageElement("logo", Encoding.UTF8.GetBytes("Hello"), 0.9m, false);
-        private static readonly TextElement TextElement = new TextElement("Lorem ipsum", TextOptions.None);
+        private static readonly TextElement TextElement = new TextElement("lorem", "Lorem ipsum", TextOptions.BlackAndWhite);
 
         private const string ValidJsonCollection = @"[
   {
@@ -20,8 +20,10 @@ namespace Askaiser.UITesting.Tests
     ""content"": ""SGVsbG8=""
   },
   {
+    ""options"": 3,
+    ""ignoreCase"": true,
     ""kind"": ""text"",
-    ""name"": ""title"",
+    ""name"": ""lorem"",
     ""content"": ""Lorem ipsum""
   }
 ]";
@@ -106,6 +108,8 @@ namespace Askaiser.UITesting.Tests
                 Assert.Equal(ImageElement.Grayscale, image.Grayscale);
 
                 Assert.Equal(TextElement.Content, text.Content);
+                Assert.Equal(TextElement.Options, text.Options);
+                Assert.Equal(TextElement.IgnoreCase, text.IgnoreCase);
             }
         }
 

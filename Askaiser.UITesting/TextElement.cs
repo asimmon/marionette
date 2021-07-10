@@ -9,18 +9,25 @@ namespace Askaiser.UITesting
         private readonly string _name;
         private readonly string _content;
 
-        public TextElement(string content, TextOptions options = TextOptions.BlackAndWhite)
+        public TextElement(string name, string content, TextOptions options)
         {
-            this.Name = Guid.NewGuid().ToString("N");
+            this.Name = name;
             this.Content = content;
             this.Options = options;
             this.IgnoreCase = true;
+        }
+
+        public TextElement(string content, TextOptions options = TextOptions.BlackAndWhite)
+            : this(Guid.NewGuid().ToString("N"), content, options)
+        {
         }
 
         internal TextElement(JsonTextElement json)
         {
             this.Name = json.Name;
             this.Content = json.Content;
+            this.Options = json.Options;
+            this.IgnoreCase = json.IgnoreCase;
         }
 
         public string Name

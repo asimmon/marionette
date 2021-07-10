@@ -15,6 +15,14 @@ namespace Askaiser.UITesting
         {
             this.Name = element.Name;
             this.Content = element.Content;
+            this.Options = element.Options;
+            this.IgnoreCase = element.IgnoreCase;
         }
+
+        [JsonPropertyName("options")]
+        public TextOptions Options { get; set; }
+
+        [JsonPropertyName("ignoreCase")]
+        public bool IgnoreCase { get; set; }
     }
 }
