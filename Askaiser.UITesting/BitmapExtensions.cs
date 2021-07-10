@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 
-namespace Askaiser.UITesting.Commands
+namespace Askaiser.UITesting
 {
     internal static class BitmapExtensions
     {
@@ -26,6 +28,16 @@ namespace Askaiser.UITesting.Commands
                 graphics.DrawImage(src, dstRect, srcRect, GraphicsUnit.Pixel);
 
             return dst;
+        }
+
+        public static byte[] GetBytes(this Image image, ImageFormat format)
+        {
+            if (image == null)
+                throw new ArgumentNullException(nameof(image));
+
+            using var stream = new MemoryStream();
+            image.Save(stream, format);
+            return stream.ToArray();
         }
     }
 }

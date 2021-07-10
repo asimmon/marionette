@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Threading.Tasks;
 
 namespace Askaiser.UITesting
@@ -259,6 +261,45 @@ namespace Askaiser.UITesting
         public static async Task DropTo(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
         {
             await DropTo(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        #endregion
+
+        #region System.Drawing.Image-based actions
+
+        public static async Task MoveTo(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+        {
+            await MoveTo(context, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        public static async Task SingleClick(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+        {
+            await SingleClick(context, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        public static async Task DoubleClick(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+        {
+            await DoubleClick(context, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        public static async Task TripleClick(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+        {
+            await TripleClick(context, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        public static async Task RightClick(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+        {
+            await RightClick(context, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        public static async Task DragFrom(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+        {
+            await DragFrom(context, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        public static async Task DropTo(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+        {
+            await DropTo(context, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
         }
 
         #endregion

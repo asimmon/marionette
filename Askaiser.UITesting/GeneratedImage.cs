@@ -24,7 +24,7 @@ namespace Askaiser.UITesting
 
             this.Name = elementNameParts[0].ToPascalCasedPropertyName();
             this.Bytes = bytes;
-            this.Threshold = 0.95m;
+            this.Threshold = ImageElement.DefaultThreshold;
             this.Grayscale = false;
             this.GroupIndex = 0;
 

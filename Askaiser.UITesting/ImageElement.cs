@@ -6,6 +6,8 @@ namespace Askaiser.UITesting
     [DebuggerDisplay("{Name}")]
     public sealed class ImageElement : IElement
     {
+        internal const decimal DefaultThreshold = 9.5m;
+
         private readonly string _name;
         private readonly byte[] _content;
         private readonly decimal _threshold;

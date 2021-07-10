@@ -179,7 +179,7 @@ namespace Askaiser.UITesting
             return new Rectangle(left, top, right, bottom);
         }
 
-        public Rectangle Multiply(float factor) => this with
+        public Rectangle Multiply(double factor) => this with
         {
             Left = (int)Math.Round(this.Left * factor),
             Top = (int)Math.Round(this.Top * factor),
