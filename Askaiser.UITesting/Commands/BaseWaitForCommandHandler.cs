@@ -69,6 +69,16 @@ namespace Askaiser.UITesting.Commands
             return SearchResult.NotFound(element);
         }
 
+        private async Task<Bitmap> GetScreenshot(MonitorDescription monitor, Rectangle searchRect)
+        {
+            var screenshot = await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
+            if (searchRect == null)
+                return screenshot;
+
+            using (screenshot)
+                return screenshot.Crop(searchRect);
+        }
+
         private static readonly Regex NotAlphanumericRegex = new Regex("[^a-z0-9\\-]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex WhitespaceRegex = new Regex("\\s+", RegexOptions.Compiled);
 
@@ -78,17 +88,7 @@ namespace Askaiser.UITesting.Commands
             var fileName = string.Format(CultureInfo.InvariantCulture, "{0:yyyy-MM-dd-HH-mm-ss-ffff}_{1}.png", DateTime.UtcNow, elementDescriptor);
 
             var screenshotBytes = screenshot.GetBytes(ImageFormat.Png);
-            await File.WriteAllBytesAsync(Path.Combine(this._options.FailureScreenshotPath, fileName), screenshotBytes).ConfigureAwait(false);
-        }
-
-        private async Task<Bitmap> GetScreenshot(MonitorDescription monitor, Rectangle searchRect)
-        {
-            var screenshot = await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
-            if (searchRect == null)
-                return screenshot;
-
-            using (screenshot)
-                return screenshot.Crop(searchRect);
+            await File.WriteAllBytesAsync(Path.Combine(this._options.FailureScreenshotPath, fileName.ToLowerInvariant()), screenshotBytes).ConfigureAwait(false);
         }
     }
 }

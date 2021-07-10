@@ -12,9 +12,9 @@ namespace Askaiser.UITesting
             if (newSize == null) throw new ArgumentNullException(nameof(newSize));
 
             if (newSize.Left > src.Width) throw new ArgumentOutOfRangeException(nameof(newSize), $"Left property {newSize.Left} is greater than the image width {src.Width}.");
-            if (newSize.Right > src.Width) throw new ArgumentOutOfRangeException(nameof(newSize), $"Right property {newSize.Left} is greater than the image width {src.Width}.");
-            if (newSize.Top > src.Height) throw new ArgumentOutOfRangeException(nameof(newSize), $"Top property {newSize.Left} is greater than the image height {src.Height}.");
-            if (newSize.Bottom > src.Height) throw new ArgumentOutOfRangeException(nameof(newSize), $"Bottom property {newSize.Left} is greater than the image height {src.Height}.");
+            if (newSize.Right > src.Width) throw new ArgumentOutOfRangeException(nameof(newSize), $"Right property {newSize.Right} is greater than the image width {src.Width}.");
+            if (newSize.Top > src.Height) throw new ArgumentOutOfRangeException(nameof(newSize), $"Top property {newSize.Top} is greater than the image height {src.Height}.");
+            if (newSize.Bottom > src.Height) throw new ArgumentOutOfRangeException(nameof(newSize), $"Bottom property {newSize.Bottom} is greater than the image height {src.Height}.");
 
             if (newSize.Width == 0) throw new ArgumentOutOfRangeException(nameof(newSize), "New width cannot be zero.");
             if (newSize.Height == 0) throw new ArgumentOutOfRangeException(nameof(newSize), "New height cannot be zero.");
