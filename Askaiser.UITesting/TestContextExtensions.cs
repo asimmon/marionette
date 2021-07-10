@@ -223,5 +223,44 @@ namespace Askaiser.UITesting
         }
 
         #endregion
+
+        #region Text-based actions
+
+        public static async Task MoveTo(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        {
+            await MoveTo(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        public static async Task SingleClick(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        {
+            await SingleClick(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        public static async Task DoubleClick(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        {
+            await DoubleClick(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        public static async Task TripleClick(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        {
+            await TripleClick(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        public static async Task RightClick(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        {
+            await RightClick(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        public static async Task DragFrom(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        {
+            await DragFrom(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        public static async Task DropTo(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        {
+            await DropTo(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        #endregion
     }
 }

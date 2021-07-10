@@ -4,10 +4,8 @@ using System.Linq;
 
 using var ctx = TestContext.Create();
 
-var element = new TextElement("Amazon Music", TextOptions.BlackAndWhite | TextOptions.Negative);
-
 var monitors = await ctx.GetMonitors();
 var monitor = monitors.First();
 
-await ctx.SingleClick(monitor.Left, monitor.Bottom);
-await ctx.MoveTo(element, waitFor: TimeSpan.FromSeconds(1), searchRect: monitor.FromBottomLeft(200, 200));
+await ctx.SingleClick("File", waitFor: TimeSpan.FromSeconds(1), searchRect: monitor.FromTopLeft(100, 100), textOptions: TextOptions.BlackAndWhite | TextOptions.Negative);
+await ctx.SingleClick("Settings", waitFor: TimeSpan.FromSeconds(2), searchRect: monitor.FromTopLeft(500, 200), textOptions: TextOptions.BlackAndWhite | TextOptions.Negative);
