@@ -14,10 +14,6 @@ namespace Askaiser.UITesting
             }
         }
 
-        public static string ToCenterString(this IEnumerable<Rectangle> locations) => string.Join(", ", locations.Select(l =>
-        {
-            var (x, y) = l.Center;
-            return $"({x},{y})";
-        }));
+        public static string ToCenterString(this IEnumerable<Rectangle> locations) => string.Join(", ", locations.Select(l => l.Center.ToString()));
     }
 }

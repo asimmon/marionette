@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
-using System.IO;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace Askaiser.UITesting.Tests
 {
-    public class ImageElementRecognizerTests
+    public sealed class ImageElementRecognizerTests : BaseRecognizerTests
     {
         private readonly ImageElementRecognizer _recognizer;
 
@@ -48,24 +46,6 @@ namespace Askaiser.UITesting.Tests
             var result = await this._recognizer.Recognize(screenshot, element).ConfigureAwait(false);
 
             AssertResult(result, new Point(1398, 413), new Point(1464, 413));
-        }
-
-        private static void AssertResult(SearchResult result, params Point[] expectedCenters)
-        {
-            Assert.True(result.Success);
-            Assert.Equal(expectedCenters.Length, result.Areas.Count);
-
-            for (var i = 0; i < expectedCenters.Length; i++)
-            {
-                Assert.Equal(expectedCenters[i], result.Areas[i].Center);
-            }
-        }
-
-        private static async Task<Bitmap> BitmapFromFile(string path)
-        {
-            var bytes = await File.ReadAllBytesAsync(path);
-            await using var stream = new MemoryStream(bytes);
-            return (Bitmap)Image.FromStream(stream);
         }
     }
 }

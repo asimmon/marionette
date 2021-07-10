@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Askaiser.UITesting
 {
@@ -186,5 +187,10 @@ namespace Askaiser.UITesting
             Right = (int)Math.Round(this.Right * factor),
             Bottom = (int)Math.Round(this.Bottom * factor),
         };
+
+        public override string ToString()
+        {
+            return string.Format(CultureInfo.InvariantCulture, "({0},{1},{2},{3})", this.Left, this.Top, this.Right, this.Bottom);
+        }
     }
 }
