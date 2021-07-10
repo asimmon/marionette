@@ -165,7 +165,7 @@ namespace Askaiser.UITesting
         {
             try
             {
-                var result = await context.WaitFor(element, waitFor, searchRect, TimeoutHandling.Ignore).ConfigureAwait(false);
+                var result = await context.WaitFor(element, waitFor, searchRect, NotFoundBehavior.Ignore).ConfigureAwait(false);
                 return result.Success;
             }
             catch (UITestingException)
@@ -178,7 +178,7 @@ namespace Askaiser.UITesting
         {
             try
             {
-                var result = await context.WaitForAny(elements, waitFor, searchRect, TimeoutHandling.Ignore).ConfigureAwait(false);
+                var result = await context.WaitForAny(elements, waitFor, searchRect, NotFoundBehavior.Ignore).ConfigureAwait(false);
                 return result.Success;
             }
             catch (UITestingException)
@@ -191,7 +191,7 @@ namespace Askaiser.UITesting
         {
             try
             {
-                var result = await context.WaitForAll(elements, waitFor, searchRect, TimeoutHandling.Ignore).ConfigureAwait(false);
+                var result = await context.WaitForAll(elements, waitFor, searchRect, NotFoundBehavior.Ignore).ConfigureAwait(false);
                 return result.All(x => x.Success);
             }
             catch (UITestingException)

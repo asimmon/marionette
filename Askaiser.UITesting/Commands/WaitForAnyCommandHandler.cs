@@ -12,13 +12,7 @@ namespace Askaiser.UITesting.Commands
 
         public async Task<SearchResult> Execute(WaitForCommand command)
         {
-            var tasks = command.Elements.Select(async element =>
-            {
-                var result = await this.WaitFor(element, command).ConfigureAwait(false);
-                result.EnsureSingleLocation();
-                return result;
-            });
-
+            var tasks = command.Elements.Select(async x => await this.WaitFor(x, command).ConfigureAwait(false));
             var firstTaskToFinish = await Task.WhenAny(tasks).ConfigureAwait(false);
 
             // Rethrow exception if all the tasks are faulted

@@ -1,8 +1,8 @@
 ﻿namespace Askaiser.UITesting
 {
-    internal enum TimeoutHandling
+    internal enum NotFoundBehavior
     {
         Throw,
-        Ignore,
+        Ignore
     }
 }

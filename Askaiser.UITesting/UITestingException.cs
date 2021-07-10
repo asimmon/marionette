@@ -8,10 +8,5 @@ namespace Askaiser.UITesting
             : base(message)
         {
         }
-
-        protected UITestingException(string message, Exception innerException)
-            : base(message, innerException)
-        {
-        }
     }
 }

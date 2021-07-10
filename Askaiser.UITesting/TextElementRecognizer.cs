@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
@@ -13,11 +15,17 @@ namespace Askaiser.UITesting
     {
         private const int UpscalingRatio = 2;
 
-        private readonly TesseractEngine _tesseract;
+        private readonly Guid _defaultEngineId;
+        private readonly ConcurrentDictionary<Guid, TesseractEngine> _engines;
+        private readonly TestContextOptions _options;
+        private int _activeEngineCount;
 
         public TextElementRecognizer(TestContextOptions options)
         {
-            this._tesseract = new TesseractEngine(options.TesseractDataPath, options.TesseractLanguage, EngineMode.LstmOnly);
+            this._defaultEngineId = Guid.NewGuid();
+            this._engines = new ConcurrentDictionary<Guid, TesseractEngine>();
+            this._options = options;
+            this._activeEngineCount = 0;
         }
 
         public async Task<SearchResult> Recognize(Bitmap screenshot, IElement element)
@@ -32,14 +40,34 @@ namespace Askaiser.UITesting
                     .ConvertAndDispose(BitmapConverter.ToBitmap)
                     .ConvertAndDispose(PixConverter.ToPix);
 
-                using var page = this._tesseract.Process(img);
-                using var iterator = page.GetIterator();
+                Guid engineId = default;
 
-                var areas = TesseractResultHandler.Handle(iterator, textElement);
-                return new SearchResult(element, areas.Select(Downscale));
+                try
+                {
+                    var newActiveEngineCount = Interlocked.Increment(ref this._activeEngineCount);
+                    engineId = newActiveEngineCount > 1 ? Guid.NewGuid() : this._defaultEngineId;
+                    var engine = this._engines.GetOrAdd(engineId, _ => this.CreateEngine());
+
+                    using var page = engine.Process(img);
+                    using var iterator = page.GetIterator();
+                    var areas = TesseractResultHandler.Handle(iterator, textElement);
+
+                    return new SearchResult(element, areas.Select(Downscale));
+                }
+                finally
+                {
+                    Interlocked.Decrement(ref this._activeEngineCount);
+                    if (engineId != this._defaultEngineId && this._engines.TryRemove(engineId, out var engine))
+                        engine.Dispose();
+                }
             }
 
             return await Task.Run(RecognizeInternal).ConfigureAwait(false);
+        }
+
+        private TesseractEngine CreateEngine()
+        {
+            return new TesseractEngine(this._options.TesseractDataPath, this._options.TesseractLanguage, EngineMode.LstmOnly);
         }
 
         private static IEnumerable<Func<Mat, Mat>> GetConverters(TextOptions options)
@@ -203,7 +231,8 @@ namespace Askaiser.UITesting
 
         public void Dispose()
         {
-            this._tesseract.Dispose();
+            foreach (var engine in this._engines.Values)
+                engine.Dispose();
         }
     }
 }

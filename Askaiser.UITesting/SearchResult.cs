@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace Askaiser.UITesting
         {
             get
             {
-                this.EnsureSingleLocation();
+                this.EnsureSingleLocation(TimeSpan.Zero);
                 return this.Areas[0];
             }
         }
@@ -64,13 +65,13 @@ namespace Askaiser.UITesting
             return new SearchResult(element, Enumerable.Empty<Rectangle>());
         }
 
-        public void EnsureSingleLocation()
+        public void EnsureSingleLocation(TimeSpan waitFor)
         {
             if (this.Areas.Count == 1)
                 return;
 
             if (this.Areas.Count == 0)
-                throw new ElementNotFoundException(this.Element);
+                throw new ElementNotFoundException(this.Element, waitFor);
 
             throw new MultipleElementLocationsException(this);
         }

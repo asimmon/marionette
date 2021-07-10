@@ -42,24 +42,29 @@ namespace Askaiser.UITesting.Commands
 
                     var result = await this._elementRecognizer.Recognize(screenshot, element).ConfigureAwait(false);
                     if (result.Success)
-                        return result.AdjustToMonitor(monitor).AdjustToSearchRectangle(command.SearchRectangle);
+                    {
+                        var adjustedResult = result.AdjustToMonitor(monitor).AdjustToSearchRectangle(command.SearchRectangle);
+
+                        if (command.Behavior == NotFoundBehavior.Throw)
+                            adjustedResult.EnsureSingleLocation(command.WaitFor);
+
+                        return adjustedResult;
+                    }
 
                     await Task.Delay(ThrottlingInterval).ConfigureAwait(false);
                     isFirstLoop = false;
                 }
 
-                if (command.TimeoutHandling == TimeoutHandling.Throw && this._options.FailureScreenshotPath != null)
-                {
+                if (command.Behavior == NotFoundBehavior.Throw && this._options.FailureScreenshotPath != null)
                     await this.SaveScreenshot(element, screenshot).ConfigureAwait(false);
-                }
             }
             finally
             {
                 screenshot?.Dispose();
             }
 
-            if (command.TimeoutHandling == TimeoutHandling.Throw)
-                throw new ElementTimeoutException(element, command.WaitFor);
+            if (command.Behavior == NotFoundBehavior.Throw)
+                throw new ElementNotFoundException(element, command.WaitFor);
 
             return SearchResult.NotFound(element);
         }

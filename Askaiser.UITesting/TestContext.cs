@@ -74,43 +74,43 @@ namespace Askaiser.UITesting
             return await this._monitorService.GetMonitors().ConfigureAwait(false);
         }
 
-        internal async Task<SearchResult> WaitFor(IElement element, TimeSpan waitFor, Rectangle searchRect, TimeoutHandling timeoutHandling)
+        internal async Task<SearchResult> WaitFor(IElement element, TimeSpan waitFor, Rectangle searchRect, NotFoundBehavior notFoundBehavior)
         {
             if (element == null) throw new ArgumentNullException(nameof(element));
-            return await this._waitForHandler.Execute(new WaitForCommand(new[] { element }, waitFor, searchRect, this._monitorIndex, timeoutHandling)).ConfigureAwait(false);
+            return await this._waitForHandler.Execute(new WaitForCommand(new[] { element }, waitFor, searchRect, this._monitorIndex, notFoundBehavior)).ConfigureAwait(false);
         }
 
         public async Task<SearchResult> WaitFor(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            return await this.WaitFor(element, waitFor, searchRect, TimeoutHandling.Throw).ConfigureAwait(false);
+            return await this.WaitFor(element, waitFor, searchRect, NotFoundBehavior.Throw).ConfigureAwait(false);
         }
 
-        internal async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect, TimeoutHandling timeoutHandling)
+        internal async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect, NotFoundBehavior notFoundBehavior)
         {
             if (elements == null) throw new ArgumentNullException(nameof(elements));
             var enumeratedElements = new List<IElement>(elements);
 
             if (enumeratedElements.Count == 0) throw new ArgumentException("Elements cannot be empty", nameof(elements));
-            return await this._waitForAnyHandler.Execute(new WaitForCommand(enumeratedElements, waitFor, searchRect, this._monitorIndex, timeoutHandling)).ConfigureAwait(false);
+            return await this._waitForAnyHandler.Execute(new WaitForCommand(enumeratedElements, waitFor, searchRect, this._monitorIndex, notFoundBehavior)).ConfigureAwait(false);
         }
 
         public async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            return await this.WaitForAny(elements, waitFor, searchRect, TimeoutHandling.Throw).ConfigureAwait(false);
+            return await this.WaitForAny(elements, waitFor, searchRect, NotFoundBehavior.Throw).ConfigureAwait(false);
         }
 
-        internal async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect, TimeoutHandling timeoutHandling)
+        internal async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect, NotFoundBehavior notFoundBehavior)
         {
             if (elements == null) throw new ArgumentNullException(nameof(elements));
             var enumeratedElements = new List<IElement>(elements);
 
             if (enumeratedElements.Count == 0) throw new ArgumentException("Elements cannot be empty", nameof(elements));
-            return await this._waitForAllHandler.Execute(new WaitForCommand(enumeratedElements, waitFor, searchRect, this._monitorIndex, timeoutHandling)).ConfigureAwait(false);
+            return await this._waitForAllHandler.Execute(new WaitForCommand(enumeratedElements, waitFor, searchRect, this._monitorIndex, notFoundBehavior)).ConfigureAwait(false);
         }
 
         public async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            return await this.WaitForAll(elements, waitFor, searchRect, TimeoutHandling.Throw).ConfigureAwait(false);
+            return await this.WaitForAll(elements, waitFor, searchRect, NotFoundBehavior.Throw).ConfigureAwait(false);
         }
 
         public async Task MoveTo(int x, int y)
@@ -186,7 +186,7 @@ namespace Askaiser.UITesting
                 await scrollTask.ConfigureAwait(false);
             }
 
-            throw new ElementTimeoutException(element, totalDuration);
+            throw new ElementNotFoundException(element, totalDuration);
         }
 
         public async Task TypeText(string text, TimeSpan sleepAfter = default)
