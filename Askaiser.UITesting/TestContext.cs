@@ -7,7 +7,7 @@ using Askaiser.UITesting.Commands;
 
 namespace Askaiser.UITesting
 {
-    public class TestContext : IDisposable
+    public sealed class TestContext : IDisposable
     {
         private readonly IMonitorService _monitorService;
         private readonly IDisposable[] _disposables;
@@ -30,14 +30,14 @@ namespace Askaiser.UITesting
         private int _monitorIndex;
         private MouseSpeed _mouseSpeed;
 
-        internal TestContext(IMonitorService monitorService, IElementRecognizer elementRecognizer, IMouseController mouseController, IKeyboardController keyboardController, IDisposable[] disposables)
+        internal TestContext(TestContextOptions options, IMonitorService monitorService, IElementRecognizer elementRecognizer, IMouseController mouseController, IKeyboardController keyboardController, IDisposable[] disposables)
         {
             this._monitorService = monitorService;
             this._disposables = disposables;
 
-            this._waitForHandler = new WaitForCommandHandler(monitorService, elementRecognizer);
-            this._waitForAnyHandler = new WaitForAnyCommandHandler(monitorService, elementRecognizer);
-            this._waitForAllHandler = new WaitForAllCommandHandler(monitorService, elementRecognizer);
+            this._waitForHandler = new WaitForCommandHandler(options, monitorService, elementRecognizer);
+            this._waitForAnyHandler = new WaitForAnyCommandHandler(options, monitorService, elementRecognizer);
+            this._waitForAllHandler = new WaitForAllCommandHandler(options, monitorService, elementRecognizer);
             this._moveToLocationHandler = new MoveToLocationCommandHandler(mouseController);
             this._singleClickLocationHandler = new SingleClickLocationCommandHandler(mouseController);
             this._doubleClickLocationHandler = new DoubleClickLocationCommandHandler(mouseController);
@@ -66,7 +66,7 @@ namespace Askaiser.UITesting
             var mouseController = new MouseController();
             var keyboardController = new KeyboardController();
 
-            return new TestContext(monitorService, elementRecognizer, mouseController, keyboardController, new IDisposable[] { textRecognizer });
+            return new TestContext(options, monitorService, elementRecognizer, mouseController, keyboardController, new IDisposable[] { textRecognizer });
         }
 
         public async Task<MonitorDescription[]> GetMonitors()
@@ -74,10 +74,15 @@ namespace Askaiser.UITesting
             return await this._monitorService.GetMonitors().ConfigureAwait(false);
         }
 
-        public async Task<SearchResult> WaitFor(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
+        internal async Task<SearchResult> WaitFor(IElement element, TimeSpan waitFor, Rectangle searchRect, bool ignoreTimeout)
         {
             if (element == null) throw new ArgumentNullException(nameof(element));
-            return await this._waitForHandler.Execute(new WaitForCommand(new[] { element }, waitFor, searchRect, this._monitorIndex)).ConfigureAwait(false);
+            return await this._waitForHandler.Execute(new WaitForCommand(new[] { element }, waitFor, searchRect, this._monitorIndex, ignoreTimeout)).ConfigureAwait(false);
+        }
+
+        public async Task<SearchResult> WaitFor(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
+        {
+            return await this.WaitFor(element, waitFor, searchRect, ignoreTimeout: false).ConfigureAwait(false);
         }
 
         public async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan waitFor = default, Rectangle searchRect = default)
@@ -228,19 +233,10 @@ namespace Askaiser.UITesting
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "It looks more coherent to only use instance methods here.")]
         public Task Sleep(TimeSpan delay) => Task.Delay(delay);
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                foreach (var disposable in this._disposables)
-                    disposable.Dispose();
-            }
-        }
-
         public void Dispose()
         {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
+            foreach (var disposable in this._disposables)
+                disposable.Dispose();
         }
     }
 }

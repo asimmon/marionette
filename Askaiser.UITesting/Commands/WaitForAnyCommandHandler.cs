@@ -5,8 +5,8 @@ namespace Askaiser.UITesting.Commands
 {
     internal class WaitForAnyCommandHandler : BaseWaitForCommandHandler
     {
-        public WaitForAnyCommandHandler(IMonitorService monitorService, IElementRecognizer elementRecognizer)
-            : base(monitorService, elementRecognizer)
+        public WaitForAnyCommandHandler(TestContextOptions options, IMonitorService monitorService, IElementRecognizer elementRecognizer)
+            : base(options, monitorService, elementRecognizer)
         {
         }
 
@@ -14,7 +14,7 @@ namespace Askaiser.UITesting.Commands
         {
             var tasks = command.Elements.Select(async element =>
             {
-                var result = await this.WaitFor(element, command.WaitFor, command.SearchRectangle, command.MonitorIndex).ConfigureAwait(false);
+                var result = await this.WaitFor(element, command).ConfigureAwait(false);
                 result.EnsureSingleLocation();
                 return result;
             });

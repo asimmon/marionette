@@ -164,7 +164,7 @@ namespace Askaiser.UITesting
         {
             try
             {
-                await context.WaitFor(element, waitFor, searchRect).ConfigureAwait(false);
+                await context.WaitFor(element, waitFor, searchRect, ignoreTimeout: true).ConfigureAwait(false);
                 return true;
             }
             catch (WaitForTimeoutException)
@@ -228,6 +228,11 @@ namespace Askaiser.UITesting
 
         #region Text-based actions
 
+        public static async Task WaitFor(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        {
+            await context.WaitFor(new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        }
+
         public static async Task MoveTo(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
         {
             await MoveTo(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
@@ -263,9 +268,19 @@ namespace Askaiser.UITesting
             await DropTo(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
         }
 
+        public static async Task<bool> IsVisible(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        {
+            return await IsVisible(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        }
+
         #endregion
 
         #region System.Drawing.Image-based actions
+
+        public static async Task WaitFor(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+        {
+            await context.WaitFor(new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        }
 
         public static async Task MoveTo(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
         {
@@ -300,6 +315,11 @@ namespace Askaiser.UITesting
         public static async Task DropTo(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
         {
             await DropTo(context, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        public static async Task<bool> IsVisible(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+        {
+            return await IsVisible(context, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
         }
 
         #endregion

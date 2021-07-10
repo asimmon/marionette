@@ -11,7 +11,7 @@ namespace Askaiser.UITesting
 {
     internal sealed class TextElementRecognizer : IElementRecognizer, IDisposable
     {
-        private const int UpscalingRatio = 3;
+        private const int UpscalingRatio = 2;
 
         private readonly TesseractEngine _tesseract;
 

@@ -5,14 +5,14 @@ namespace Askaiser.UITesting.Commands
 {
     internal class WaitForCommandHandler : BaseWaitForCommandHandler
     {
-        public WaitForCommandHandler(IMonitorService monitorService, IElementRecognizer elementRecognizer)
-            : base(monitorService, elementRecognizer)
+        public WaitForCommandHandler(TestContextOptions options, IMonitorService monitorService, IElementRecognizer elementRecognizer)
+            : base(options, monitorService, elementRecognizer)
         {
         }
 
         public async Task<SearchResult> Execute(WaitForCommand command)
         {
-            var result = await this.WaitFor(command.Elements.First(), command.WaitFor, command.SearchRectangle, command.MonitorIndex).ConfigureAwait(false);
+            var result = await this.WaitFor(command.Elements.First(), command).ConfigureAwait(false);
             result.EnsureSingleLocation();
             return result;
         }
