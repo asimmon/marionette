@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Askaiser.UITesting
 {
@@ -12,5 +13,11 @@ namespace Askaiser.UITesting
                     yield return trimmedElement;
             }
         }
+
+        public static string ToCenterString(this IEnumerable<Rectangle> locations) => string.Join(", ", locations.Select(l =>
+        {
+            var (x, y) = l.Center;
+            return $"({x},{y})";
+        }));
     }
 }

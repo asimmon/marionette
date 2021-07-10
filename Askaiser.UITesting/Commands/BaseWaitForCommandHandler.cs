@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Askaiser.UITesting.Commands
@@ -47,11 +48,9 @@ namespace Askaiser.UITesting.Commands
                     isFirstLoop = false;
                 }
 
-                if (!command.IgnoreTimeout && this._options.FailureScreenshotPath != null)
+                if (command.TimeoutHandling == TimeoutHandling.Throw && this._options.FailureScreenshotPath != null)
                 {
-                    var screenshotBytes = screenshot.GetBytes(ImageFormat.Png);
-                    var fileName = string.Format(CultureInfo.InvariantCulture, "{0:yyyy-MM-ddTHH-mm-ss}_{1}.png", DateTime.UtcNow, element);
-                    await File.WriteAllBytesAsync(Path.Combine(this._options.FailureScreenshotPath, fileName), screenshotBytes).ConfigureAwait(false);
+                    await this.SaveScreenshot(element, screenshot).ConfigureAwait(false);
                 }
             }
             finally
@@ -59,7 +58,22 @@ namespace Askaiser.UITesting.Commands
                 screenshot?.Dispose();
             }
 
-            throw new WaitForTimeoutException(element, command.WaitFor);
+            if (command.TimeoutHandling == TimeoutHandling.Throw)
+                throw new ElementTimeoutException(element, command.WaitFor);
+
+            return SearchResult.NotFound(element);
+        }
+
+        private static readonly Regex NotAlphanumericRegex = new Regex("[^a-z0-9\\-]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex WhitespaceRegex = new Regex("\\s+", RegexOptions.Compiled);
+
+        private async Task SaveScreenshot(IElement element, Image screenshot)
+        {
+            var elementDescriptor = NotAlphanumericRegex.Replace(WhitespaceRegex.Replace(element.ToString()?.Trim() ?? "", "-"), "");
+            var fileName = string.Format(CultureInfo.InvariantCulture, "{0:yyyy-MM-dd-HH-mm-ss-ffff}_{1}.png", DateTime.UtcNow, elementDescriptor);
+
+            var screenshotBytes = screenshot.GetBytes(ImageFormat.Png);
+            await File.WriteAllBytesAsync(Path.Combine(this._options.FailureScreenshotPath, fileName), screenshotBytes).ConfigureAwait(false);
         }
 
         private async Task<Bitmap> GetScreenshot(MonitorDescription monitor, Rectangle searchRect)

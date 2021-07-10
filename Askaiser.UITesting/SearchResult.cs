@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
 
 namespace Askaiser.UITesting
 {
@@ -57,21 +56,7 @@ namespace Askaiser.UITesting
 
         public override string ToString()
         {
-            if (!this.Success)
-                return $"Element {this.Element} was not found.";
-
-            var sb = new StringBuilder();
-
-            sb.Append("Element ").Append(this.Element.Name).Append(" was found at location");
-
-            if (this.Areas.Count > 1)
-                sb.Append('s');
-
-            sb.Append(": ");
-            this.SerializeAreasTo(sb);
-            sb.Append('.');
-
-            return sb.ToString();
+            return string.Format(CultureInfo.InvariantCulture, "Search results for '{0}': {1}", this.Element, this.Areas.Count > 0 ? this.Areas.ToCenterString() : "none");
         }
 
         public static SearchResult NotFound(IElement element)
@@ -85,26 +70,9 @@ namespace Askaiser.UITesting
                 return;
 
             if (this.Areas.Count == 0)
-                throw new InvalidOperationException($"No location was found for element {this.Element}.");
+                throw new ElementNotFoundException(this.Element);
 
-            var sb = new StringBuilder("Multiple location were found for element ")
-                .Append(this.Element)
-                .Append(": ");
-
-            this.SerializeAreasTo(sb);
-            throw new InvalidOperationException(sb.ToString());
-        }
-
-        private void SerializeAreasTo(StringBuilder sb)
-        {
-            for (var i = 0; i < this.Areas.Count; i++)
-            {
-                var (x, y) = this.Areas[i].Center;
-                sb.Append('(').Append(x).Append(", ").Append(y).Append(')');
-
-                if (i != this.Areas.Count - 1)
-                    sb.Append(", ");
-            }
+            throw new MultipleElementLocationsException(this);
         }
     }
 }

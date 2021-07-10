@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Askaiser.UITesting
@@ -164,10 +165,10 @@ namespace Askaiser.UITesting
         {
             try
             {
-                await context.WaitFor(element, waitFor, searchRect, ignoreTimeout: true).ConfigureAwait(false);
-                return true;
+                var result = await context.WaitFor(element, waitFor, searchRect, TimeoutHandling.Ignore).ConfigureAwait(false);
+                return result.Success;
             }
-            catch (WaitForTimeoutException)
+            catch (UITestingException)
             {
                 return false;
             }
@@ -177,10 +178,10 @@ namespace Askaiser.UITesting
         {
             try
             {
-                await context.WaitForAny(elements, waitFor, searchRect).ConfigureAwait(false);
-                return true;
+                var result = await context.WaitForAny(elements, waitFor, searchRect, TimeoutHandling.Ignore).ConfigureAwait(false);
+                return result.Success;
             }
-            catch (WaitForTimeoutException)
+            catch (UITestingException)
             {
                 return false;
             }
@@ -190,10 +191,10 @@ namespace Askaiser.UITesting
         {
             try
             {
-                await context.WaitForAll(elements, waitFor, searchRect).ConfigureAwait(false);
-                return true;
+                var result = await context.WaitForAll(elements, waitFor, searchRect, TimeoutHandling.Ignore).ConfigureAwait(false);
+                return result.All(x => x.Success);
             }
-            catch (WaitForTimeoutException)
+            catch (UITestingException)
             {
                 return false;
             }
