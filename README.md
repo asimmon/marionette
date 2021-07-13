@@ -1,1 +1,1 @@
-# An experimental UI testing framework
+# Askaiser.Puppets, an experimental UI testing framework

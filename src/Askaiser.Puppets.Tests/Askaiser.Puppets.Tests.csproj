@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Askaiser.UITesting\Askaiser.UITesting.csproj" />
+    <ProjectReference Include="..\Askaiser.Puppets\Askaiser.Puppets.csproj" />
   </ItemGroup>
 
   <ItemGroup>
