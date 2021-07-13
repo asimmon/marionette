@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using Askaiser.UITesting.Commands;
 
@@ -235,6 +236,17 @@ namespace Askaiser.UITesting
         {
             this._monitorIndex = monitorIndex;
             return this;
+        }
+
+        public TestContext SetMonitor(MonitorDescription monitor)
+        {
+            return this.SetMonitor(monitor.Index);
+        }
+
+        public async Task<MonitorDescription> GetCurrentMonitor()
+        {
+            var monitors = await this.GetMonitors().ConfigureAwait(false);
+            return monitors.FirstOrDefault(x => x.Index == this._monitorIndex);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "It looks more coherent to only use instance methods here.")]

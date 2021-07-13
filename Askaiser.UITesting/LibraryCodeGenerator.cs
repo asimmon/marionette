@@ -130,7 +130,7 @@ namespace Askaiser.UITesting
         private static void GenerateLibraryCode(GeneratedLibrary library, StringBuilder sb)
         {
             sb.AppendLine();
-            sb.Append("    public sealed class ").Append(library.UniqueName).AppendLine("Library : Library");
+            sb.Append("    public partial class ").Append(library.UniqueName).AppendLine("Library : Library");
             sb.AppendLine("    {");
 
             GenerateLibraryConstructorCode(library, sb);
