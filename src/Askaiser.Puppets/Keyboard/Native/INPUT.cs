@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Askaiser.UITesting.Keyboard.Native
+namespace Askaiser.Puppets.Keyboard.Native
 {
 #pragma warning disable 649
     /// <summary>
@@ -14,7 +14,7 @@ namespace Askaiser.UITesting.Keyboard.Native
     internal struct INPUT
     {
         /// <summary>
-        /// Specifies the type of the input event. This member can be one of the following values. 
+        /// Specifies the type of the input event. This member can be one of the following values.
         /// <see cref="InputType.Mouse"/> - The event is a mouse event. Use the mi structure of the union.
         /// <see cref="InputType.Keyboard"/> - The event is a keyboard event. Use the ki structure of the union.
         /// <see cref="InputType.Hardware"/> - Windows 95/98/Me: The event is from input hardware other than a keyboard or mouse. Use the hi structure of the union.

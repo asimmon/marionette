@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     [Flags]
     public enum TextOptions

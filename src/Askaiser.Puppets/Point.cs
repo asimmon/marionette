@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     public record Point(int X, int Y)
     {

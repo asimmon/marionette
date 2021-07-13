@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     public record Rectangle
     {

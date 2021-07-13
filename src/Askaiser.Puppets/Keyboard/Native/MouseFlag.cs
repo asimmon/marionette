@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Askaiser.UITesting.Keyboard.Native
+namespace Askaiser.Puppets.Keyboard.Native
 {
     /// <summary>
     /// The set of MouseFlags for use in the Flags property of the <see cref="MOUSEINPUT"/> structure. (See: http://msdn.microsoft.com/en-us/library/ms646273(VS.85).aspx)
@@ -54,7 +54,7 @@ namespace Askaiser.UITesting.Keyboard.Native
         XUp = 0x0100,
 
         /// <summary>
-        /// Windows NT/2000/XP: Specifies that the wheel was moved, if the mouse has a wheel. The amount of movement is specified in mouseData. 
+        /// Windows NT/2000/XP: Specifies that the wheel was moved, if the mouse has a wheel. The amount of movement is specified in mouseData.
         /// </summary>
         VerticalWheel = 0x0800,
 

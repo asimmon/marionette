@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace Askaiser.UITesting.Tests
+namespace Askaiser.Puppets.Tests
 {
     public class RectangleTests
     {

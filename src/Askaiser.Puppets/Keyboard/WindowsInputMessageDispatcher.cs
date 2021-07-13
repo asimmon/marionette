@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using Askaiser.UITesting.Keyboard.Native;
+using Askaiser.Puppets.Keyboard.Native;
 
-namespace Askaiser.UITesting.Keyboard
+namespace Askaiser.Puppets.Keyboard
 {
     /// <summary>
     /// Implements the <see cref="IInputMessageDispatcher"/> by calling <see cref="NativeMethods.SendInput"/>.

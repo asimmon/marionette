@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Threading.Tasks;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     internal sealed class AggregateElementRecognizer : IElementRecognizer
     {

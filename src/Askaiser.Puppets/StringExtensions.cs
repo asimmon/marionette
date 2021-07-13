@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Linq;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     internal static class StringExtensions
     {

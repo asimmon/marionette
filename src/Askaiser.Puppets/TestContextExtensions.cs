@@ -5,7 +5,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     public static class TestContextExtensions
     {

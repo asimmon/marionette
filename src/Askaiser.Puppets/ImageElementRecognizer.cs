@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     internal sealed class ImageElementRecognizer : IElementRecognizer
     {

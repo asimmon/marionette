@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Askaiser.UITesting.LibraryGenerator
+namespace Askaiser.Puppets.LibraryGenerator
 {
     public static class Program
     {

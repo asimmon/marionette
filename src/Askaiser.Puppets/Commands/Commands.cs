@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Askaiser.UITesting.Commands
+namespace Askaiser.Puppets.Commands
 {
     internal record WaitForCommand(IReadOnlyCollection<IElement> Elements, TimeSpan WaitFor, Rectangle SearchRectangle, int MonitorIndex, NotFoundBehavior Behavior);
 

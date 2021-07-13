@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     public static class ElementCollectionExtensions
     {

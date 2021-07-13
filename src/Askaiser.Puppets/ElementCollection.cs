@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     public sealed class ElementCollection : IEnumerable<IElement>
     {

@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using Askaiser.UITesting.Commands;
+using Askaiser.Puppets.Commands;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     public sealed class TestContext : IDisposable
     {

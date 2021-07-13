@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Askaiser.UITesting.Keyboard
+namespace Askaiser.Puppets.Keyboard
 {
     /// <summary>
     /// The service contract for a keyboard simulator for the Windows platform.

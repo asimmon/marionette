@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Askaiser.UITesting.Keyboard.Native;
+using Askaiser.Puppets.Keyboard.Native;
 
-namespace Askaiser.UITesting.Keyboard
+namespace Askaiser.Puppets.Keyboard
 {
     /// <summary>
     /// A helper class for building a list of <see cref="INPUT"/> messages ready to be sent to the native Windows API.

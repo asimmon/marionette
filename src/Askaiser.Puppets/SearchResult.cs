@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     public sealed class SearchResult : IEnumerable<Rectangle>
     {

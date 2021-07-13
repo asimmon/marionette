@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     internal class KeyboardController : IKeyboardController
     {

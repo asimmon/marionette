@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SharpDX.DXGI;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     internal static class GraphicsScreenshot
     {

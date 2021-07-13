@@ -1,4 +1,4 @@
-﻿namespace Askaiser.UITesting.Keyboard
+﻿namespace Askaiser.Puppets.Keyboard
 {
     /// <summary>
     /// The mouse button

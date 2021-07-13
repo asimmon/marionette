@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     internal interface IKeyboardController
     {

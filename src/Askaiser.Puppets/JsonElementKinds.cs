@@ -1,4 +1,4 @@
-﻿namespace Askaiser.UITesting
+﻿namespace Askaiser.Puppets
 {
     internal static class JsonElementKinds
     {

@@ -1,5 +1,5 @@
 ﻿using System;
-using Askaiser.UITesting;
+using Askaiser.Puppets;
 using System.Linq;
 
 var opts = new TestContextOptions

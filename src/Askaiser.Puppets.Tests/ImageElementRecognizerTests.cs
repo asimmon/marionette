@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Askaiser.UITesting.Tests
+namespace Askaiser.Puppets.Tests
 {
     public sealed class ImageElementRecognizerTests : BaseRecognizerTests
     {

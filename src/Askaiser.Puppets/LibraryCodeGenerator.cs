@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     public sealed class LibraryCodeGenerator
     {
@@ -103,7 +103,7 @@ namespace Askaiser.UITesting
         {
             var sb = new StringBuilder();
 
-            sb.Append("using ").Append(nameof(Askaiser)).Append('.').Append(nameof(UITesting)).AppendLine(";");
+            sb.Append("using ").Append(nameof(Askaiser)).Append('.').Append(nameof(Puppets)).AppendLine(";");
             sb.AppendLine();
             sb.Append("namespace ").AppendLine(this._namespaceName);
             sb.AppendLine("{");

@@ -1,4 +1,4 @@
-﻿namespace Askaiser.UITesting
+﻿namespace Askaiser.Puppets
 {
     public enum MouseSpeed
     {

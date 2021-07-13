@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     internal class GeneratedLibrary
     {

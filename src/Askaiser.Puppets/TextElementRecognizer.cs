@@ -9,7 +9,7 @@ using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using Tesseract;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     internal sealed class TextElementRecognizer : IElementRecognizer, IDisposable
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     [DebuggerDisplay("{Name}")]
     public sealed class ImageElement : IElement

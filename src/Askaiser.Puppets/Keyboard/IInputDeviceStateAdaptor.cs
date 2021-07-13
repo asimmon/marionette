@@ -1,4 +1,4 @@
-﻿namespace Askaiser.UITesting.Keyboard
+﻿namespace Askaiser.Puppets.Keyboard
 {
     /// <summary>
     /// The contract for a service that interprets the state of input devices.

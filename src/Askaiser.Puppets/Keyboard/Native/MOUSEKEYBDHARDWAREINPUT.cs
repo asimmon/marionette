@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Askaiser.UITesting.Keyboard.Native
+namespace Askaiser.Puppets.Keyboard.Native
 {
 #pragma warning disable 649
     /// <summary>

@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     internal class GeneratedImage
     {

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     internal abstract class JsonBaseElement
     {

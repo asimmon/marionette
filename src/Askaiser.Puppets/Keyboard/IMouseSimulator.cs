@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Askaiser.UITesting.Keyboard
+namespace Askaiser.Puppets.Keyboard
 {
     /// <summary>
     /// The service contract for a mouse simulator for the Windows platform.

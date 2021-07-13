@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 
-namespace Askaiser.UITesting.Commands
+namespace Askaiser.Puppets.Commands
 {
     internal class WaitForAllCommandHandler : BaseWaitForCommandHandler
     {

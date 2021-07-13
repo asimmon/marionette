@@ -1,7 +1,7 @@
 ﻿using System;
-using Askaiser.UITesting.Keyboard.Native;
+using Askaiser.Puppets.Keyboard.Native;
 
-namespace Askaiser.UITesting.Keyboard
+namespace Askaiser.Puppets.Keyboard
 {
     /// <summary>
     /// The contract for a service that dispatches <see cref="INPUT"/> messages to the appropriate destination.

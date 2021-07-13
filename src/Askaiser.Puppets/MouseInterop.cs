@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     internal static class MouseInterop
     {

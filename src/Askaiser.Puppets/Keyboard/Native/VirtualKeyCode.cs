@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     /// <summary>
     /// The list of VirtualKeyCodes (see: http://msdn.microsoft.com/en-us/library/ms645540(VS.85).aspx)
@@ -793,7 +793,7 @@ namespace Askaiser.UITesting
         //
 
         /// <summary>
-        /// Used for miscellaneous characters; it can vary by keyboard. Windows 2000/XP: For the US standard keyboard, the ';:' key 
+        /// Used for miscellaneous characters; it can vary by keyboard. Windows 2000/XP: For the US standard keyboard, the ';:' key
         /// </summary>
         OEM_1 = 0xBA,
 
@@ -818,12 +818,12 @@ namespace Askaiser.UITesting
         OEM_PERIOD = 0xBE,
 
         /// <summary>
-        /// Used for miscellaneous characters; it can vary by keyboard. Windows 2000/XP: For the US standard keyboard, the '/?' key 
+        /// Used for miscellaneous characters; it can vary by keyboard. Windows 2000/XP: For the US standard keyboard, the '/?' key
         /// </summary>
         OEM_2 = 0xBF,
 
         /// <summary>
-        /// Used for miscellaneous characters; it can vary by keyboard. Windows 2000/XP: For the US standard keyboard, the '`~' key 
+        /// Used for miscellaneous characters; it can vary by keyboard. Windows 2000/XP: For the US standard keyboard, the '`~' key
         /// </summary>
         OEM_3 = 0xC0,
 

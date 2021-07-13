@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Askaiser.UITesting.Keyboard;
+using Askaiser.Puppets.Keyboard;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     internal static class KeyboardInterop
     {

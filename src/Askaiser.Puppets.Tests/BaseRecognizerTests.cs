@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Askaiser.UITesting.Tests
+namespace Askaiser.Puppets.Tests
 {
     public abstract class BaseRecognizerTests
     {
@@ -13,7 +13,7 @@ namespace Askaiser.UITesting.Tests
             await using var stream = new MemoryStream(bytes);
             return (Bitmap)Image.FromStream(stream);
         }
-        
+
         protected static void AssertResult(SearchResult result, params Point[] expectedCenters)
         {
             Assert.True(result.Success);

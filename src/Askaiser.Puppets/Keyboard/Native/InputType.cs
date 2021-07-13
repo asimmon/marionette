@@ -1,7 +1,7 @@
-﻿namespace Askaiser.UITesting.Keyboard.Native
+﻿namespace Askaiser.Puppets.Keyboard.Native
 {
     /// <summary>
-    /// Specifies the type of the input event. This member can be one of the following values. 
+    /// Specifies the type of the input event. This member can be one of the following values.
     /// </summary>
     internal enum InputType : uint // UInt32
     {

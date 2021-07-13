@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace Askaiser.UITesting
+namespace Askaiser.Puppets
 {
     internal sealed class JsonImageElement : JsonBaseElement
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Askaiser.UITesting.Keyboard.Native
+namespace Askaiser.Puppets.Keyboard.Native
 {
     /// <summary>
     /// Specifies various aspects of a keystroke. This member can be certain combinations of the following values.
