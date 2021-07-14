@@ -88,6 +88,8 @@ public sealed class MetadataTask : FrostingTask<BuildContext>
     {
         context.AddMSBuildProperty("Description", Constants.ProjectName + " is a test automation framework based on image and text recognition.");
         context.AddMSBuildProperty("Authors", "Anthony Simmon");
+        context.AddMSBuildProperty("Owners", "Anthony Simmon");
+        context.AddMSBuildProperty("PackageProjectUrl", "https://github.com/asimmon/askaiser-marionette");
         context.AddMSBuildProperty("Copyright", "Copyright © Anthony Simmon " + DateTime.UtcNow.Year);
         context.AddMSBuildProperty("PackageLicenseExpression", "GPL-3.0-or-later");
     }

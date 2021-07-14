@@ -18,8 +18,8 @@ namespace Askaiser.Marionette
         public async Task<SearchResult> Recognize(Bitmap screenshot, IElement element) => element switch
         {
             null => throw new ArgumentNullException(nameof(element)),
-            ImageElement imageElement => await this._imageElementRecognizer.Recognize(screenshot, imageElement).ConfigureAwait(false),
-            TextElement textElement => await this._textElementRecognizer.Recognize(screenshot, textElement).ConfigureAwait(false),
+            ImageElement => await this._imageElementRecognizer.Recognize(screenshot, element).ConfigureAwait(false),
+            TextElement => await this._textElementRecognizer.Recognize(screenshot, element).ConfigureAwait(false),
             _ => throw new NotSupportedException(element.GetType().FullName)
         };
     }

@@ -5,6 +5,11 @@
     <LangVersion>9</LangVersion>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <AssemblyTitle>Askaiser.Marionette</AssemblyTitle>
+    <PackageId>Askaiser.Marionette</PackageId>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="OpenCvSharp4.Windows" Version="4.5.2.20210404" />
     <PackageReference Include="Tesseract" Version="4.1.1" />
