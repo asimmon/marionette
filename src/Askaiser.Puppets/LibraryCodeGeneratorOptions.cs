@@ -4,15 +4,11 @@ namespace Askaiser.Puppets
 {
     public sealed class LibraryCodeGeneratorOptions
     {
-        private readonly long _maxImageFileSize = 2 * 1024 * 1024;
-
-        public long MaxImageFileSize
-        {
-            get => this._maxImageFileSize;
-            init => this._maxImageFileSize = value > 0 ? value : throw new ArgumentOutOfRangeException(nameof(this.MaxImageFileSize));
-        }
+        public long MaxImageFileSize { get; init; }
 
         public string NamespaceName { get; init; }
+
+        public string ClassName { get; init; }
 
         public string ImageDirectoryPath { get; init; }
 
@@ -23,6 +19,9 @@ namespace Askaiser.Puppets
 
             if (string.IsNullOrWhiteSpace(this.NamespaceName))
                 throw new ArgumentException(nameof(this.NamespaceName));
+
+            if (string.IsNullOrWhiteSpace(this.ClassName))
+                throw new ArgumentException(nameof(this.ClassName));
 
             if (string.IsNullOrWhiteSpace(this.ImageDirectoryPath))
                 throw new ArgumentException(nameof(this.NamespaceName));

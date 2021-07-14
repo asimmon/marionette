@@ -6,8 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.Puppets.Tests", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.Puppets.LibraryGenerator", "src\Askaiser.Puppets.LibraryGenerator\Askaiser.Puppets.LibraryGenerator.csproj", "{93B28651-91BD-4878-9637-C657A5D6ACA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.Puppets.ConsoleApp", "src\Askaiser.Puppets.ConsoleApp\Askaiser.Puppets.ConsoleApp.csproj", "{A8655CA8-A428-4E29-998B-59E652F00089}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|AnyCPU = Release|AnyCPU
@@ -26,9 +24,5 @@ Global
 		{93B28651-91BD-4878-9637-C657A5D6ACA4}.Release|AnyCPU.Build.0 = Release|Any CPU
 		{93B28651-91BD-4878-9637-C657A5D6ACA4}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
 		{93B28651-91BD-4878-9637-C657A5D6ACA4}.Debug|AnyCPU.Build.0 = Debug|Any CPU
-		{A8655CA8-A428-4E29-998B-59E652F00089}.Release|AnyCPU.ActiveCfg = Release|Any CPU
-		{A8655CA8-A428-4E29-998B-59E652F00089}.Release|AnyCPU.Build.0 = Release|Any CPU
-		{A8655CA8-A428-4E29-998B-59E652F00089}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
-		{A8655CA8-A428-4E29-998B-59E652F00089}.Debug|AnyCPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

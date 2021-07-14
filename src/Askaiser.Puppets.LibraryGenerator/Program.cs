@@ -2,17 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Askaiser.Puppets.LibraryGenerator
 {
     public static class Program
     {
-        public static async Task<int> Main(string[] args)
+        public static int Main(string[] args)
         {
             try
             {
-                await UnsafeMain(args).ConfigureAwait(false);
+                UnsafeMain(args);
                 return 0;
             }
             catch (Exception ex)
@@ -22,7 +21,7 @@ namespace Askaiser.Puppets.LibraryGenerator
             }
         }
 
-        private static async Task UnsafeMain(IEnumerable<string> args)
+        private static void UnsafeMain(IEnumerable<string> args)
         {
             var nonEmptyArgs = args.Where(x => (x?.Trim() ?? string.Empty).Length > 0).ToArray();
             if (nonEmptyArgs.Length != 3)
@@ -47,17 +46,18 @@ namespace Askaiser.Puppets.LibraryGenerator
             var options = new LibraryCodeGeneratorOptions
             {
                 ImageDirectoryPath = nonEmptyArgs[0],
-                NamespaceName = nonEmptyArgs[1]
+                NamespaceName = nonEmptyArgs[1],
+                ClassName = "RootLibrary"
             };
 
             var outputFile = new FileInfo(outputFilePath);
 
-            var result = await LibraryCodeGenerator.Generate(options).ConfigureAwait(false);
+            var result = LibraryCodeGenerator.Generate(options);
 
             foreach (var warning in result.Warnings)
                 Console.WriteLine(warning);
 
-            await File.WriteAllTextAsync(outputFile.FullName, result.Code).ConfigureAwait(false);
+            File.WriteAllText(outputFile.FullName, result.Code);
         }
     }
 }

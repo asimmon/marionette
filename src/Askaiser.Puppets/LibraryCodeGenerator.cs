@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Askaiser.Puppets
 {
@@ -17,6 +16,7 @@ namespace Askaiser.Puppets
 
         private readonly long _maxImageFileSize;
         private readonly string _namespaceName;
+        private readonly string _className;
         private readonly GeneratedLibrary _rootLibrary;
         private readonly List<string> _warnings;
 
@@ -24,44 +24,45 @@ namespace Askaiser.Puppets
         {
             this._maxImageFileSize = options.MaxImageFileSize;
             this._namespaceName = options.NamespaceName;
+            this._className = options.ClassName;
             this._rootLibrary = new GeneratedLibrary("root");
             this._warnings = new List<string>();
         }
 
-        public static async Task<CodeGenerationResult> Generate(LibraryCodeGeneratorOptions options)
+        public static CodeGenerationResult Generate(LibraryCodeGeneratorOptions options)
         {
             options.Validate();
-            return await new LibraryCodeGenerator(options).Generate(new DirectoryInfo(options.ImageDirectoryPath)).ConfigureAwait(false);
+            return new LibraryCodeGenerator(options).Generate(new DirectoryInfo(options.ImageDirectoryPath));
         }
 
-        public async Task<CodeGenerationResult> Generate(DirectoryInfo directory)
+        public CodeGenerationResult Generate(DirectoryInfo directory)
         {
-            await this.ProcessImagesInDirectory(directory, this._rootLibrary).ConfigureAwait(false);
+            this.ProcessImagesInDirectory(directory, this._rootLibrary);
             var code = this.GenerateCode();
             return new CodeGenerationResult(code, this._warnings);
         }
 
-        private async Task ProcessImagesInDirectory(DirectoryInfo directory, GeneratedLibrary library)
+        private void ProcessImagesInDirectory(DirectoryInfo directory, GeneratedLibrary library)
         {
             var imageFiles = directory.EnumerateFiles("*.*").Where(x => SupportedImageExtensions.Contains(x.Extension));
 
-            await this.ProcessImages(imageFiles, library).ConfigureAwait(false);
+            this.ProcessImages(imageFiles, library);
 
             foreach (var subDirectory in directory.EnumerateDirectories())
             {
                 var localLibraryRef = library;
                 var subLibrary = library.Libraries.GetOrCreate(subDirectory.Name, x => localLibraryRef.CreateChild(x));
-                await this.ProcessImagesInDirectory(subDirectory, subLibrary).ConfigureAwait(false);
+                this.ProcessImagesInDirectory(subDirectory, subLibrary);
             }
         }
 
-        private async Task ProcessImages(IEnumerable<FileInfo> imageFiles, GeneratedLibrary library)
+        private void ProcessImages(IEnumerable<FileInfo> imageFiles, GeneratedLibrary library)
         {
             foreach (var image in imageFiles)
-                await this.ProcessImage(image, library).ConfigureAwait(false);
+                this.ProcessImage(image, library);
         }
 
-        private async Task ProcessImage(FileInfo imageFile, GeneratedLibrary library)
+        private void ProcessImage(FileInfo imageFile, GeneratedLibrary library)
         {
             if (imageFile.Length > this._maxImageFileSize)
             {
@@ -79,7 +80,7 @@ namespace Askaiser.Puppets
 
             try
             {
-                image = await Task.Run(() => GeneratedImage.Create(imageFile, library)).ConfigureAwait(false);
+                image = GeneratedImage.Create(imageFile, library);
             }
             catch (Exception ex)
             {
@@ -108,7 +109,7 @@ namespace Askaiser.Puppets
             sb.Append("namespace ").AppendLine(this._namespaceName);
             sb.AppendLine("{");
             GenerateBaseLibraryCode(sb);
-            GenerateLibraryCode(this._rootLibrary, sb);
+            this.GenerateLibraryCode(this._rootLibrary, sb);
             sb.AppendLine("}");
 
             return sb.ToString();
@@ -127,10 +128,12 @@ namespace Askaiser.Puppets
             sb.AppendLine("    }");
         }
 
-        private static void GenerateLibraryCode(GeneratedLibrary library, StringBuilder sb)
+        private void GenerateLibraryCode(GeneratedLibrary library, StringBuilder sb)
         {
+            var className = library.Level == 0 ? this._className : library.UniqueName + "Library";
+
             sb.AppendLine();
-            sb.Append("    public partial class ").Append(library.UniqueName).AppendLine("Library : Library");
+            sb.Append("    public partial class ").Append(className).AppendLine(" : Library");
             sb.AppendLine("    {");
 
             GenerateLibraryConstructorCode(library, sb);
