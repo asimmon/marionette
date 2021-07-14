@@ -1,13 +1,46 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using SharpDX.DXGI;
 
 namespace Askaiser.Marionette
 {
     internal static class GraphicsScreenshot
     {
+        [DllImport("user32.dll", EntryPoint = "EnumDisplayMonitors")]
+        private static extern bool EnumDisplayMonitors(
+            [In] IntPtr dcHandle,
+            [In] IntPtr clip,
+            MonitorEnumProcedure callback,
+            IntPtr callbackObject
+        );
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int MonitorEnumProcedure(
+            IntPtr monitorHandle,
+            IntPtr dcHandle,
+            ref RectangleL rect,
+            IntPtr callbackObject
+        );
+
+        [StructLayout(LayoutKind.Sequential)]
+        private readonly struct RectangleL
+        {
+            [MarshalAs(UnmanagedType.U4)]
+            public readonly int Left;
+
+            [MarshalAs(UnmanagedType.U4)]
+            public readonly int Top;
+
+            [MarshalAs(UnmanagedType.U4)]
+            public readonly int Right;
+
+            [MarshalAs(UnmanagedType.U4)]
+            public readonly int Bottom;
+        }
+
         public static Task<MonitorDescription[]> GetMonitors()
         {
             return Task.Run(() => GetMonitorsInternal().ToArray());
@@ -15,28 +48,21 @@ namespace Askaiser.Marionette
 
         private static IEnumerable<MonitorDescription> GetMonitorsInternal()
         {
-            var monitorCount = 0;
+            var monitors = new List<MonitorDescription>();
 
-            using var factory = new Factory1();
-
-            var adapterCount = factory.GetAdapterCount();
-            for (var adapterIndex = 0; adapterIndex < adapterCount; adapterIndex++)
+            var onMonitorCallback = new MonitorEnumProcedure((IntPtr handle, IntPtr dcHandle, ref RectangleL rect, IntPtr callbackObject) =>
             {
-                using var adapter = factory.GetAdapter(adapterIndex);
+                const int temporaryMonitorIndex = 0;
+                monitors.Add(new MonitorDescription(temporaryMonitorIndex, rect.Left, rect.Top, rect.Right, rect.Bottom));
+                return 1;
+            });
 
-                var outputCount = adapter.GetOutputCount();
-                if (outputCount == 0)
-                    continue;
+            EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, onMonitorCallback, IntPtr.Zero);
 
-                using var device = new SharpDX.Direct3D11.Device(adapter);
+            if (monitors.Count == 0)
+                throw new InvalidOperationException("No monitors were found.");
 
-                for (var outputIndex = 0; outputIndex < outputCount; outputIndex++)
-                {
-                    using var output = adapter.GetOutput(outputIndex);
-                    var bounds = output.Description.DesktopBounds;
-                    yield return new MonitorDescription(monitorCount++, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-                }
-            }
+            return monitors.OrderBy(x => x.Left).ThenBy(x => x.Top).Select((monitor, index) => monitor with { Index = index });
         }
 
         public static Task<Bitmap> Take(Rectangle monitor)
