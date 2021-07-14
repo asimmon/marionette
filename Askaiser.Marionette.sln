@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.Marionette", "src\Askaiser.Marionette\Askaiser.Marionette.csproj", "{AA995F64-3903-4069-8BAE-3E38D3CD8F99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.Marionette.Tests", "src\Askaiser.Marionette.Tests\Askaiser.Marionette.Tests.csproj", "{1BFAB1F9-B8B0-4332-834F-9A2830174142}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.Marionette.LibraryGenerator", "src\Askaiser.Marionette.LibraryGenerator\Askaiser.Marionette.LibraryGenerator.csproj", "{93B28651-91BD-4878-9637-C657A5D6ACA4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|AnyCPU = Release|AnyCPU
+		Debug|AnyCPU = Debug|AnyCPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AA995F64-3903-4069-8BAE-3E38D3CD8F99}.Release|AnyCPU.ActiveCfg = Release|Any CPU
+		{AA995F64-3903-4069-8BAE-3E38D3CD8F99}.Release|AnyCPU.Build.0 = Release|Any CPU
+		{AA995F64-3903-4069-8BAE-3E38D3CD8F99}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
+		{AA995F64-3903-4069-8BAE-3E38D3CD8F99}.Debug|AnyCPU.Build.0 = Debug|Any CPU
+		{1BFAB1F9-B8B0-4332-834F-9A2830174142}.Release|AnyCPU.ActiveCfg = Release|Any CPU
+		{1BFAB1F9-B8B0-4332-834F-9A2830174142}.Release|AnyCPU.Build.0 = Release|Any CPU
+		{1BFAB1F9-B8B0-4332-834F-9A2830174142}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
+		{1BFAB1F9-B8B0-4332-834F-9A2830174142}.Debug|AnyCPU.Build.0 = Debug|Any CPU
+		{93B28651-91BD-4878-9637-C657A5D6ACA4}.Release|AnyCPU.ActiveCfg = Release|Any CPU
+		{93B28651-91BD-4878-9637-C657A5D6ACA4}.Release|AnyCPU.Build.0 = Release|Any CPU
+		{93B28651-91BD-4878-9637-C657A5D6ACA4}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
+		{93B28651-91BD-4878-9637-C657A5D6ACA4}.Debug|AnyCPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+EndGlobal

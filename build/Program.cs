@@ -24,7 +24,7 @@ public static class Program
 public static class Constants
 {
     public const string Release = "Release";
-    public const string ProjectName = "Askaiser.Puppets";
+    public const string ProjectName = "Askaiser.Marionette";
 
     public static readonly string SourceDirectoryPath = Path.Combine("..", "src");
     public static readonly string OutputDirectoryPath = Path.Combine("..", "output");
