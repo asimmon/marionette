@@ -66,20 +66,22 @@ public sealed class MetadataTask : FrostingTask<BuildContext>
 
     private static void AddMSBuildAssemblyVersion(BuildContext context)
     {
-        var gitVersion = context.GitVersion();
-        context.Information("Generated assembly version: " + gitVersion.AssemblySemVer);
+        if (context.HasArgument("versioning"))
+        {
+            var gitVersion = context.GitVersion();
+            context.Information("Generated assembly version: " + gitVersion.AssemblySemVer);
 
-        if (context.HasArgument("beta"))
-        {
-            context.AddMSBuildProperty("VersionPrefix", gitVersion.AssemblySemVer);
-            context.AddMSBuildProperty("VersionSuffix", "beta" + gitVersion.BuildMetaData);
+            if (context.HasArgument("alpha"))
+            {
+                context.AddMSBuildProperty("VersionPrefix", gitVersion.AssemblySemVer);
+                context.AddMSBuildProperty("VersionSuffix", "alpha" + gitVersion.BuildMetaData);
+            }
+            else context.AddMSBuildProperty("Version", gitVersion.AssemblySemVer);
         }
-        else if (context.HasArgument("alpha"))
+        else
         {
-            context.AddMSBuildProperty("VersionPrefix", gitVersion.AssemblySemVer);
-            context.AddMSBuildProperty("VersionSuffix", "alpha" + gitVersion.BuildMetaData);
+            context.AddMSBuildProperty("Version", "0.0.1.0");
         }
-        else context.AddMSBuildProperty("Version", gitVersion.AssemblySemVer);
     }
 
     private static void AddMSBuildPackageMetadata(BuildContext context)
