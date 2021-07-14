@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net5.0-windows;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <LangVersion>9</LangVersion>
   </PropertyGroup>
