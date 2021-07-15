@@ -1,33 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
-    <IsPackable>true</IsPackable>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <AssemblyTitle>Askaiser.Marionette</AssemblyTitle>
     <PackageId>Askaiser.Marionette</PackageId>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="OpenCvSharp4.Windows" Version="4.5.2.20210404"/>
-    <PackageReference Include="Tesseract" Version="4.1.1"/>
-    <PackageReference Include="Tesseract.Drawing" Version="4.1.1"/>
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
-    <PackageReference Include="System.Text.Json" Version="5.0.2"/>
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Askaiser.Marionette.SourceGenerator\Askaiser.Marionette.SourceGenerator.csproj" PrivateAssets="All"/>
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="tessdata\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
+    <PackageReference Include="System.Text.Json" Version="5.0.2" Condition=" '$(TargetFramework)' == 'netstandard2.1' "/>
+    <PackageReference Include="OpenCvSharp4.Windows" Version="4.5.2.20210404"/>
+    <PackageReference Include="Tesseract" Version="4.1.1" IncludeAssets="All" PrivateAssets="None"/>
+    <PackageReference Include="Tesseract.Drawing" Version="4.1.1"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="tessdata\**" CopyToOutputDirectory="PreserveNewest" PackageCopyToOutput="True" Pack="True"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -37,16 +28,16 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <!-- Insert custom target to pack our source generator into generated package (https://stackoverflow.com/q/40396161/825695) -->
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
     <ItemGroup>
-      <!-- Filter out unnecessary files -->
       <_ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')->WithMetadataValue('PrivateAssets', 'All'))"/>
     </ItemGroup>
 
-    <!-- Add file to source generators assemblies path juste once because we are targeting multiple frameworks -->
+    <!-- Prevent copying the source generator files multiple times (for each targeted framework) -->
     <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
       <TfmSpecificPackageFile Include="@(_ReferenceCopyLocalPaths)">
         <PackagePath>analyzers/dotnet/cs</PackagePath>

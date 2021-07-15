@@ -168,7 +168,8 @@ public sealed class PackTask : FrostingTask<BuildContext>
         MSBuildSettings = context.SharedMSBuildSettings,
         OutputDirectory = Constants.OutputDirectoryPath,
         NoBuild = false, // required to pack the additional source generator
-        NoLogo = true
+        NoRestore = true,
+        NoLogo = true,
     });
 }
 
