@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -25,8 +24,6 @@ namespace Askaiser.Marionette.SourceGenerator
                 ClassName = receiver.DecoratedClassName,
                 NamespaceName = receiver.DecoratedNamespaceName,
             });
-
-            File.WriteAllText(@"C:\Users\simmo\Desktop\out\code.cs", result.Code);
 
             if (result.Warnings.Count > 0)
             {
