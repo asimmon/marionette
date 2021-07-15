@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Askaiser.Marionette.SourceGenerator
 {
-    internal class LibrarySyntaxReceiver : ISyntaxContextReceiver
+    public class LibrarySyntaxReceiver : ISyntaxContextReceiver
     {
         private const string ExpectedAttributeFullName = "Askaiser.Marionette.ImageLibraryAttribute";
 

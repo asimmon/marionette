@@ -1,4 +1,4 @@
-name: CI
+name: CI Build
 
 on:
   push:
@@ -21,5 +21,5 @@ jobs:
       with:
         dotnet-version: 3.1.x
     - name: Cake default
-      run: .\build.ps1
+      run: .\build.ps1 --package-version="0.0.1.0"
       shell: powershell

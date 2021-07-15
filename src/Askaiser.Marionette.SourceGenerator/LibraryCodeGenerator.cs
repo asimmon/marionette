@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Askaiser.Marionette.SourceGenerator
 {
-    public sealed class LibraryCodeGenerator
+    public class LibraryCodeGenerator
     {
         private static readonly HashSet<string> SupportedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
         {

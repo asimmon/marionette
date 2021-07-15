@@ -66,7 +66,19 @@ public sealed class MetadataTask : FrostingTask<BuildContext>
 
     private static void AddMSBuildAssemblyVersion(BuildContext context)
     {
-        if (context.HasArgument("versioning"))
+        if (context.Argument("package-version", "").Trim() is { Length: > 0 } userVersion)
+        {
+            if (userVersion.Split('-', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) is { Length: 2 } versionParts)
+            {
+                context.AddMSBuildProperty("VersionPrefix", versionParts[0]);
+                context.AddMSBuildProperty("VersionSuffix", versionParts[1]);
+            }
+            else
+            {
+                context.AddMSBuildProperty("Version", context.Argument<string>("package-version"));
+            }
+        }
+        else
         {
             var gitVersion = context.GitVersion();
             context.Information("Generated assembly version: " + gitVersion.AssemblySemVer);
@@ -77,10 +89,6 @@ public sealed class MetadataTask : FrostingTask<BuildContext>
                 context.AddMSBuildProperty("VersionSuffix", "alpha" + gitVersion.BuildMetaData);
             }
             else context.AddMSBuildProperty("Version", gitVersion.AssemblySemVer);
-        }
-        else
-        {
-            context.AddMSBuildProperty("Version", "0.0.1.0");
         }
     }
 
