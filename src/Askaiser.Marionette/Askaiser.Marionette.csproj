@@ -2,7 +2,6 @@
   <PropertyGroup>
     <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
     <IsPackable>true</IsPackable>
-    <LangVersion>9</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -11,13 +10,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenCvSharp4.Windows" Version="4.5.2.20210404" />
-    <PackageReference Include="Tesseract" Version="4.1.1" />
-    <PackageReference Include="Tesseract.Drawing" Version="4.1.1" />
+    <PackageReference Include="OpenCvSharp4.Windows" Version="4.5.2.20210404"/>
+    <PackageReference Include="Tesseract" Version="4.1.1"/>
+    <PackageReference Include="Tesseract.Drawing" Version="4.1.1"/>
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
-    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+    <PackageReference Include="System.Text.Json" Version="5.0.2"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Askaiser.Marionette.SourceGenerator\Askaiser.Marionette.SourceGenerator.csproj" PrivateAssets="All"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -32,4 +35,22 @@
       <_Parameter1>$(MSBuildProjectName).Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+
+  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
+    <ItemGroup>
+      <!-- Filter out unnecessary files -->
+      <_ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')->WithMetadataValue('PrivateAssets', 'All'))"/>
+    </ItemGroup>
+
+    <!-- Add file to source generators assemblies path juste once because we are targeting multiple frameworks -->
+    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
+      <TfmSpecificPackageFile Include="@(_ReferenceCopyLocalPaths)">
+        <PackagePath>analyzers/dotnet/cs</PackagePath>
+      </TfmSpecificPackageFile>
+    </ItemGroup>
+  </Target>
 </Project>
