@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Askaiser.Marionette
+namespace Askaiser.Marionette.SourceGenerator
 {
     internal class GeneratedImage
     {
@@ -16,15 +15,24 @@ namespace Askaiser.Marionette
 
         private GeneratedImage(string fileName, byte[] bytes, GeneratedLibrary rootLibrary)
         {
-            var libsAndElementRawNames = Path.GetFileNameWithoutExtension(fileName).Split("--").TrimAndRemoveEmptyEntries().ToArray();
-            var librariesRawNames = libsAndElementRawNames.SkipLast(1).ToArray();
+            var libsAndElementRawNames = Path.GetFileNameWithoutExtension(fileName)
+                .Split(new [] {"--"}, StringSplitOptions.None)
+                .Select(x => x.Trim())
+                .Where(x => x.Length > 0)
+                .ToArray();
 
-            var elementRawName = libsAndElementRawNames[^1];
-            var elementNameParts = elementRawName.Split('_').TrimAndRemoveEmptyEntries().ToArray();
+            var librariesRawNames = libsAndElementRawNames.ToList();
+            librariesRawNames.RemoveAt(librariesRawNames.Count - 1);
 
-            this.Name = elementNameParts[0].ToPascalCasedPropertyName();
+            var elementRawName = libsAndElementRawNames[libsAndElementRawNames.Length - 1];
+            var elementNameParts = elementRawName.Split('_')
+                .Select(x => x.Trim())
+                .Where(x => x.Length > 0)
+                .ToArray();
+
+            this.Name = elementNameParts[0].ToCSharpPropertyName();
             this.Bytes = bytes;
-            this.Threshold = ImageElement.DefaultThreshold;
+            this.Threshold = 0.95m;
             this.Grayscale = false;
             this.GroupIndex = 0;
 
@@ -44,7 +52,7 @@ namespace Askaiser.Marionette
                     }
                 }
 
-                if (GroupIndexRegex.Match(elementNameParts[^1]) is { Success: true } groupIndexMatch)
+                if (GroupIndexRegex.Match(elementNameParts[elementNameParts.Length - 1]) is { Success: true } groupIndexMatch)
                 {
                     this.GroupIndex = int.Parse(groupIndexMatch.Groups[0].Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
                 }
@@ -67,19 +75,12 @@ namespace Askaiser.Marionette
 
         public string UniqueName
         {
-            get => string.Join('.', this.GetUniqueNameParts());
+            get => string.Join(".", this.GetUniqueNameParts());
         }
 
         public static GeneratedImage Create(FileInfo imageFile, GeneratedLibrary rootLibrary)
         {
-            byte[] bytes;
-            using (var srcBitmap = System.Drawing.Image.FromFile(imageFile.FullName))
-            using (var dstStream = new MemoryStream())
-            {
-                srcBitmap.Save(dstStream, ImageFormat.Png);
-                bytes = dstStream.ToArray();
-            }
-
+            var bytes = File.ReadAllBytes(imageFile.FullName);
             return new GeneratedImage(imageFile.Name, bytes, rootLibrary);
         }
 

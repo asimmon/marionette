@@ -1,16 +1,21 @@
 ﻿using System;
 
-namespace Askaiser.Marionette
+namespace Askaiser.Marionette.SourceGenerator
 {
     public sealed class LibraryCodeGeneratorOptions
     {
-        public long MaxImageFileSize { get; init; }
+        public LibraryCodeGeneratorOptions()
+        {
+            this.MaxImageFileSize = 2 * 1024 * 1024;
+        }
 
-        public string NamespaceName { get; init; }
+        public long MaxImageFileSize { get; set; }
 
-        public string ClassName { get; init; }
+        public string NamespaceName { get; set; }
 
-        public string ImageDirectoryPath { get; init; }
+        public string ClassName { get; set; }
+
+        public string ImageDirectoryPath { get; set; }
 
         public void Validate()
         {

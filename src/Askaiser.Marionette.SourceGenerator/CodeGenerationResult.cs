@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Askaiser.Marionette
+namespace Askaiser.Marionette.SourceGenerator
 {
     public sealed class CodeGenerationResult
     {
@@ -13,6 +13,7 @@ namespace Askaiser.Marionette
 
         public string Code { get; }
 
+        // TODO Add warnings to source generator diagnostic entries
         public IReadOnlyCollection<string> Warnings { get; }
     }
 }

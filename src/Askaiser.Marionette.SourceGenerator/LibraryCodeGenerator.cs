@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Askaiser.Marionette
+namespace Askaiser.Marionette.SourceGenerator
 {
     public sealed class LibraryCodeGenerator
     {
@@ -17,6 +17,7 @@ namespace Askaiser.Marionette
         private readonly long _maxImageFileSize;
         private readonly string _namespaceName;
         private readonly string _className;
+        private readonly DirectoryInfo _imageDirectory;
         private readonly GeneratedLibrary _rootLibrary;
         private readonly List<string> _warnings;
 
@@ -25,6 +26,7 @@ namespace Askaiser.Marionette
             this._maxImageFileSize = options.MaxImageFileSize;
             this._namespaceName = options.NamespaceName;
             this._className = options.ClassName;
+            this._imageDirectory = new DirectoryInfo(options.ImageDirectoryPath);
             this._rootLibrary = new GeneratedLibrary("root");
             this._warnings = new List<string>();
         }
@@ -32,12 +34,12 @@ namespace Askaiser.Marionette
         public static CodeGenerationResult Generate(LibraryCodeGeneratorOptions options)
         {
             options.Validate();
-            return new LibraryCodeGenerator(options).Generate(new DirectoryInfo(options.ImageDirectoryPath));
+            return new LibraryCodeGenerator(options).Generate();
         }
 
-        public CodeGenerationResult Generate(DirectoryInfo directory)
+        private CodeGenerationResult Generate()
         {
-            this.ProcessImagesInDirectory(directory, this._rootLibrary);
+            this.ProcessImagesInDirectory(this._imageDirectory, this._rootLibrary);
             var code = this.GenerateCode();
             return new CodeGenerationResult(code, this._warnings);
         }
@@ -104,6 +106,8 @@ namespace Askaiser.Marionette
         {
             var sb = new StringBuilder();
 
+            sb.Append("// Code generated from the following directory at ").AppendLine(DateTime.UtcNow.ToString("O"));
+            sb.Append("// ").AppendLine(this._imageDirectory.FullName);
             sb.Append("using ").Append(nameof(Askaiser)).Append('.').Append(nameof(Marionette)).AppendLine(";");
             sb.AppendLine();
             sb.Append("namespace ").AppendLine(this._namespaceName);
@@ -119,45 +123,47 @@ namespace Askaiser.Marionette
         {
             sb.AppendLine("    public abstract class Library");
             sb.AppendLine("    {");
+            sb.AppendLine("        protected ElementCollection _elements;");
+            sb.AppendLine();
             sb.AppendLine("        protected Library(ElementCollection elements)");
             sb.AppendLine("        {");
-            sb.AppendLine("            this.Elements = elements;");
+            sb.AppendLine("            this._elements = elements;");
             sb.AppendLine("        }");
-            sb.AppendLine();
-            sb.AppendLine("        protected ElementCollection Elements { get; }");
             sb.AppendLine("    }");
         }
 
         private void GenerateLibraryCode(GeneratedLibrary library, StringBuilder sb)
         {
-            var className = library.Level == 0 ? this._className : library.UniqueName + "Library";
+            var className = library.IsRoot ? this._className : library.UniqueName + "Library";
 
             sb.AppendLine();
             sb.Append("    public partial class ").Append(className).AppendLine(" : Library");
             sb.AppendLine("    {");
 
-            GenerateLibraryConstructorCode(library, sb);
+            this.GenerateLibraryConstructorCode(library, sb);
             GenerateLibraryPropertiesCode(library, sb);
             GenerateLibraryElementCreationCode(library, sb);
 
             sb.AppendLine("    }");
 
-            foreach (var childLibrary in library.Libraries.Values.OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
-                GenerateLibraryCode(childLibrary, sb);
+            foreach (var childLibrary in library.Libraries.Values.Where(x => !x.IsEmpty).OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
+                this.GenerateLibraryCode(childLibrary, sb);
         }
 
-        private static void GenerateLibraryConstructorCode(GeneratedLibrary library, StringBuilder sb)
+        private void GenerateLibraryConstructorCode(GeneratedLibrary library, StringBuilder sb)
         {
+            var className = library.IsRoot ? this._className : library.UniqueName + "Library";
+
             sb.Append("        public ")
-                .Append(library.UniqueName)
-                .AppendLine(library.Level == 0 ? "Library() : base(new ElementCollection())" : "Library(ElementCollection elements) : base(elements)");
+                .Append(className)
+                .AppendLine(library.IsRoot ? "() : base(new ElementCollection())" : "(ElementCollection elements) : base(elements)");
 
             sb.AppendLine("        {");
 
-            foreach (var childLibrary in library.Libraries.Values.OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
-                sb.Append("            this.").Append(childLibrary.Name).Append(" = new ").Append(childLibrary.UniqueName).AppendLine("Library(this.Elements);");
+            foreach (var childLibrary in library.Libraries.Values.Where(x => !x.IsEmpty).OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
+                sb.Append("            this.").Append(childLibrary.Name).Append(" = new ").Append(childLibrary.UniqueName).AppendLine("Library(this._elements);");
 
-            if (library.Level == 0)
+            if (library.IsRoot)
             {
                 if (library.Libraries.Count > 0)
                     sb.AppendLine();
@@ -173,7 +179,7 @@ namespace Askaiser.Marionette
             if (library.Libraries.Count > 0)
                 sb.AppendLine();
 
-            foreach (var childLibrary in library.Libraries.Values)
+            foreach (var childLibrary in library.Libraries.Values.Where(x => !x.IsEmpty).OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
                 sb.Append("        public ").Append(childLibrary.UniqueName).Append("Library ").Append(childLibrary.Name).AppendLine(" { get; }");
 
             if (library.Images.Count > 0)
@@ -183,7 +189,7 @@ namespace Askaiser.Marionette
             {
                 if (imageGroup.Count == 1)
                 {
-                    sb.Append("        public IElement ").Append(imageGroup[0].Name).Append(" => this.Elements[\"").Append(imageGroup[0].UniqueName).AppendLine("\"];");
+                    sb.Append("        public IElement ").Append(imageGroup[0].Name).Append(" => this._elements[\"").Append(imageGroup[0].UniqueName).AppendLine("\"];");
                 }
                 else
                 {
@@ -191,7 +197,7 @@ namespace Askaiser.Marionette
                     sb.AppendLine("        {");
 
                     for (var i = 0; i < imageGroup.Count; i++)
-                        sb.Append("            this.Elements[\"").Append(imageGroup[i].UniqueName).AppendLine(i == imageGroup.Count - 1 ? "\"]" : "\"],");
+                        sb.Append("            this._elements[\"").Append(imageGroup[i].UniqueName).AppendLine(i == imageGroup.Count - 1 ? "\"]" : "\"],");
 
                     sb.AppendLine("        };");
                 }
@@ -209,7 +215,7 @@ namespace Askaiser.Marionette
 
             foreach (var image in library.GetImagesChildren().OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
             {
-                sb.Append("            this.Elements.Add(new ImageElement(\"")
+                sb.Append("            this._elements.Add(new ImageElement(\"")
                     .Append(image.UniqueName)
                     .Append("\", \"")
                     .Append(Convert.ToBase64String(image.Bytes))

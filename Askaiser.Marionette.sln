@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.Marionette", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.Marionette.Tests", "src\Askaiser.Marionette.Tests\Askaiser.Marionette.Tests.csproj", "{1BFAB1F9-B8B0-4332-834F-9A2830174142}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.Marionette.LibraryGenerator", "src\Askaiser.Marionette.LibraryGenerator\Askaiser.Marionette.LibraryGenerator.csproj", "{93B28651-91BD-4878-9637-C657A5D6ACA4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.Marionette.SourceGenerator", "src\Askaiser.Marionette.SourceGenerator\Askaiser.Marionette.SourceGenerator.csproj", "{C91FE924-DEB7-498A-984A-EEF2FEC4366A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,9 +20,9 @@ Global
 		{1BFAB1F9-B8B0-4332-834F-9A2830174142}.Release|AnyCPU.Build.0 = Release|Any CPU
 		{1BFAB1F9-B8B0-4332-834F-9A2830174142}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
 		{1BFAB1F9-B8B0-4332-834F-9A2830174142}.Debug|AnyCPU.Build.0 = Debug|Any CPU
-		{93B28651-91BD-4878-9637-C657A5D6ACA4}.Release|AnyCPU.ActiveCfg = Release|Any CPU
-		{93B28651-91BD-4878-9637-C657A5D6ACA4}.Release|AnyCPU.Build.0 = Release|Any CPU
-		{93B28651-91BD-4878-9637-C657A5D6ACA4}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
-		{93B28651-91BD-4878-9637-C657A5D6ACA4}.Debug|AnyCPU.Build.0 = Debug|Any CPU
+		{C91FE924-DEB7-498A-984A-EEF2FEC4366A}.Release|AnyCPU.ActiveCfg = Release|Any CPU
+		{C91FE924-DEB7-498A-984A-EEF2FEC4366A}.Release|AnyCPU.Build.0 = Release|Any CPU
+		{C91FE924-DEB7-498A-984A-EEF2FEC4366A}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
+		{C91FE924-DEB7-498A-984A-EEF2FEC4366A}.Debug|AnyCPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

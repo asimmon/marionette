@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Askaiser.Marionette
+namespace Askaiser.Marionette.SourceGenerator
 {
     internal static class DictionaryExtensions
     {

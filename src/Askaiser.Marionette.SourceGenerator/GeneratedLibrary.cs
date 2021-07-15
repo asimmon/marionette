@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Askaiser.Marionette
+namespace Askaiser.Marionette.SourceGenerator
 {
     internal class GeneratedLibrary
     {
@@ -13,7 +13,7 @@ namespace Askaiser.Marionette
 
         private GeneratedLibrary(string name, GeneratedLibrary parent)
         {
-            this.Name = name.ToPascalCasedPropertyName();
+            this.Name = name.ToCSharpPropertyName();
             this.Level = parent?.Level + 1 ?? 0;
             this.Parent = parent;
             this.Libraries = new Dictionary<string, GeneratedLibrary>(StringComparer.OrdinalIgnoreCase);
@@ -27,6 +27,16 @@ namespace Askaiser.Marionette
         public string UniqueName
         {
             get => string.Join("", this.GetHierarchy().Reverse().Select(x => x.Name));
+        }
+
+        public bool IsRoot
+        {
+            get => this.Level == 0;
+        }
+
+        public bool IsEmpty
+        {
+            get => this.Images.Count == 0 && this.Libraries.Values.All(x => x.IsEmpty);
         }
 
         private GeneratedLibrary Parent { get; }
