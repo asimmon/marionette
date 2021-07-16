@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Askaiser.Marionette.SourceGenerator
 {
@@ -90,7 +89,7 @@ namespace Askaiser.Marionette.SourceGenerator
                 return;
             }
 
-            var imageGroup = image.Parent.Images.GetOrCreate(image.Name, x => new List<GeneratedImage>());
+            var imageGroup = image.Parent.Images.GetOrCreate(image.Name, _ => new List<GeneratedImage>());
 
             if (imageGroup.Any(x => x.GroupIndex == image.GroupIndex))
             {
@@ -104,128 +103,131 @@ namespace Askaiser.Marionette.SourceGenerator
 
         private string GenerateCode()
         {
-            var sb = new StringBuilder();
+            var cw = new CodeWriter();
 
-            sb.Append("// Code generated from the following directory at ").AppendLine(DateTime.UtcNow.ToString("O"));
-            sb.Append("// ").AppendLine(this._imageDirectory.FullName);
-            sb.Append("using ").Append(nameof(Askaiser)).Append('.').Append(nameof(Marionette)).AppendLine(";");
-            sb.AppendLine();
-            sb.Append("namespace ").AppendLine(this._namespaceName);
-            sb.AppendLine("{");
-            GenerateBaseLibraryCode(sb);
-            this.GenerateLibraryCode(this._rootLibrary, sb);
-            sb.AppendLine("}");
+            cw.Append("// Code generated from the following directory at ").AppendLine(DateTime.UtcNow.ToString("O"));
+            cw.Append("// ").AppendLine(this._imageDirectory.FullName);
+            cw.Append("using ").Append(nameof(Askaiser)).Append(".").Append(nameof(Marionette)).AppendLine(";");
+            cw.AppendLine();
 
-            return sb.ToString();
+            IDisposable ns = null;
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(this._namespaceName))
+                    ns = cw.BeginNamespace(this._namespaceName);
+
+                GenerateBaseLibraryCode(cw);
+                this.GenerateLibraryCode(this._rootLibrary, cw);
+            }
+            finally
+            {
+                ns?.Dispose();
+            }
+
+            return cw.ToString();
         }
 
-        private static void GenerateBaseLibraryCode(StringBuilder sb)
+        private static void GenerateBaseLibraryCode(CodeWriter cw)
         {
-            sb.AppendLine("    public abstract class Library");
-            sb.AppendLine("    {");
-            sb.AppendLine("        protected ElementCollection _elements;");
-            sb.AppendLine();
-            sb.AppendLine("        protected Library(ElementCollection elements)");
-            sb.AppendLine("        {");
-            sb.AppendLine("            this._elements = elements;");
-            sb.AppendLine("        }");
-            sb.AppendLine("    }");
+            using (cw.BeginClass("public abstract", "BaseLibrary"))
+            {
+                cw.AppendLine("protected ElementCollection _elements;");
+                cw.AppendLine();
+                cw.AppendLine("protected BaseLibrary(ElementCollection elements)");
+                using (cw.BeginBlock())
+                    cw.AppendLine("this._elements = elements;");
+            }
         }
 
-        private void GenerateLibraryCode(GeneratedLibrary library, StringBuilder sb)
+        private void GenerateLibraryCode(GeneratedLibrary library, CodeWriter cw)
         {
             var className = library.IsRoot ? this._className : library.UniqueName + "Library";
 
-            sb.AppendLine();
-            sb.Append("    public partial class ").Append(className).AppendLine(" : Library");
-            sb.AppendLine("    {");
-
-            this.GenerateLibraryConstructorCode(library, sb);
-            GenerateLibraryPropertiesCode(library, sb);
-            GenerateLibraryElementCreationCode(library, sb);
-
-            sb.AppendLine("    }");
+            cw.AppendLine();
+            using (cw.BeginClass("public partial", className, "BaseLibrary"))
+            {
+                this.GenerateLibraryConstructorCode(library, cw);
+                GenerateLibraryPropertiesCode(library, cw);
+                GenerateLibraryElementCreationCode(library, cw);
+            }
 
             foreach (var childLibrary in library.Libraries.Values.Where(x => !x.IsEmpty).OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
-                this.GenerateLibraryCode(childLibrary, sb);
+                this.GenerateLibraryCode(childLibrary, cw);
         }
 
-        private void GenerateLibraryConstructorCode(GeneratedLibrary library, StringBuilder sb)
+        private void GenerateLibraryConstructorCode(GeneratedLibrary library, CodeWriter cw)
         {
             var className = library.IsRoot ? this._className : library.UniqueName + "Library";
 
-            sb.Append("        public ")
+            cw.Append("public ")
                 .Append(className)
                 .AppendLine(library.IsRoot ? "() : base(new ElementCollection())" : "(ElementCollection elements) : base(elements)");
 
-            sb.AppendLine("        {");
-
-            foreach (var childLibrary in library.Libraries.Values.Where(x => !x.IsEmpty).OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
-                sb.Append("            this.").Append(childLibrary.Name).Append(" = new ").Append(childLibrary.UniqueName).AppendLine("Library(this._elements);");
-
-            if (library.IsRoot)
+            using (cw.BeginBlock())
             {
-                if (library.Libraries.Count > 0)
-                    sb.AppendLine();
+                foreach (var childLibrary in library.Libraries.Values.Where(x => !x.IsEmpty).OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
+                    cw.Append("this.").Append(childLibrary.Name).Append(" = new ").Append(childLibrary.UniqueName).AppendLine("Library(this._elements);");
 
-                sb.AppendLine("            this.CreateElements();");
+                if (library.IsRoot)
+                {
+                    if (library.Libraries.Count > 0)
+                        cw.AppendLine();
+
+                    cw.AppendLine("this.CreateElements();");
+                }
             }
-
-            sb.AppendLine("        }");
         }
 
-        private static void GenerateLibraryPropertiesCode(GeneratedLibrary library, StringBuilder sb)
+        private static void GenerateLibraryPropertiesCode(GeneratedLibrary library, CodeWriter cw)
         {
             if (library.Libraries.Count > 0)
-                sb.AppendLine();
+                cw.AppendLine();
 
             foreach (var childLibrary in library.Libraries.Values.Where(x => !x.IsEmpty).OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
-                sb.Append("        public ").Append(childLibrary.UniqueName).Append("Library ").Append(childLibrary.Name).AppendLine(" { get; }");
+                cw.Append("public ").Append(childLibrary.UniqueName).Append("Library ").Append(childLibrary.Name).AppendLine(" { get; }");
 
             if (library.Images.Count > 0)
-                sb.AppendLine();
+                cw.AppendLine();
 
             foreach (var imageGroup in library.Images.Values)
             {
                 if (imageGroup.Count == 1)
                 {
-                    sb.Append("        public IElement ").Append(imageGroup[0].Name).Append(" => this._elements[\"").Append(imageGroup[0].UniqueName).AppendLine("\"];");
+                    cw.Append("public IElement ").Append(imageGroup[0].Name).Append(" => this._elements[\"").Append(imageGroup[0].UniqueName).AppendLine("\"];");
                 }
                 else
                 {
-                    sb.Append("        public IElement[] ").Append(imageGroup[0].Name).AppendLine(" => new[]");
-                    sb.AppendLine("        {");
-
-                    for (var i = 0; i < imageGroup.Count; i++)
-                        sb.Append("            this._elements[\"").Append(imageGroup[i].UniqueName).AppendLine(i == imageGroup.Count - 1 ? "\"]" : "\"],");
-
-                    sb.AppendLine("        };");
+                    cw.Append("public IElement[] ").Append(imageGroup[0].Name).AppendLine(" => new[]");
+                    using (cw.BeginBlock(";"))
+                    {
+                        for (var i = 0; i < imageGroup.Count; i++)
+                            cw.Append("this._elements[\"").Append(imageGroup[i].UniqueName).AppendLine(i == imageGroup.Count - 1 ? "\"]" : "\"],");
+                    }
                 }
             }
         }
 
-        private static void GenerateLibraryElementCreationCode(GeneratedLibrary library, StringBuilder sb)
+        private static void GenerateLibraryElementCreationCode(GeneratedLibrary library, CodeWriter cw)
         {
             if (library.Level > 0)
                 return;
 
-            sb.AppendLine();
-            sb.AppendLine("        private void CreateElements()");
-            sb.AppendLine("        {");
-
-            foreach (var image in library.GetImagesChildren().OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
+            cw.AppendLine();
+            cw.AppendLine("private void CreateElements()");
+            using (cw.BeginBlock())
             {
-                sb.Append("            this._elements.Add(new ImageElement(\"")
-                    .Append(image.UniqueName)
-                    .Append("\", \"")
-                    .Append(Convert.ToBase64String(image.Bytes))
-                    .Append("\", ")
-                    .Append(image.Threshold.ToString(CultureInfo.InvariantCulture))
-                    .Append("m, ").Append(image.Grayscale ? "true" : "false")
-                    .AppendLine("));");
+                foreach (var image in library.GetImagesChildren().OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
+                {
+                    cw.Append("this._elements.Add(new ImageElement(\"")
+                        .Append(image.UniqueName)
+                        .Append("\", \"")
+                        .Append(Convert.ToBase64String(image.Bytes))
+                        .Append("\", ")
+                        .Append(image.Threshold.ToString(CultureInfo.InvariantCulture))
+                        .Append("m, ").Append(image.Grayscale ? "true" : "false")
+                        .AppendLine("));");
+                }
             }
-
-            sb.AppendLine("        }");
         }
     }
 }

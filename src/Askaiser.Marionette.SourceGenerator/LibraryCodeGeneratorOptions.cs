@@ -22,9 +22,6 @@ namespace Askaiser.Marionette.SourceGenerator
             if (this.MaxImageFileSize <= 0)
                 throw new ArgumentOutOfRangeException(nameof(this.MaxImageFileSize));
 
-            if (string.IsNullOrWhiteSpace(this.NamespaceName))
-                throw new ArgumentException(nameof(this.NamespaceName));
-
             if (string.IsNullOrWhiteSpace(this.ClassName))
                 throw new ArgumentException(nameof(this.ClassName));
 
