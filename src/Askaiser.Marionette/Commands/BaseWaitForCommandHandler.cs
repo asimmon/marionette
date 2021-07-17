@@ -46,7 +46,7 @@ namespace Askaiser.Marionette.Commands
                     {
                         var adjustedResult = disposableResult.AdjustToMonitor(monitor).AdjustToSearchRectangle(command.SearchRectangle);
 
-                        if (command.Behavior == NotFoundBehavior.Throw)
+                        if (command.Behavior == NoSingleResultBehavior.Throw)
                         {
                             adjustedResult.EnsureSingleLocation(command.WaitFor);
                         }
@@ -58,7 +58,7 @@ namespace Askaiser.Marionette.Commands
                     isFirstLoop = false;
                 }
 
-                if (command.Behavior == NotFoundBehavior.Throw && this._options.FailureScreenshotPath != null)
+                if (command.Behavior == NoSingleResultBehavior.Throw && this._options.FailureScreenshotPath != null)
                 {
                     await this.SaveScreenshot(element, disposableResult.TransformedScreenshot).ConfigureAwait(false);
                 }
@@ -68,7 +68,7 @@ namespace Askaiser.Marionette.Commands
                 disposableResult?.Dispose();
             }
 
-            if (command.Behavior == NotFoundBehavior.Throw)
+            if (command.Behavior == NoSingleResultBehavior.Throw)
             {
                 throw new ElementNotFoundException(element, command.WaitFor);
             }

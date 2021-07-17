@@ -85,22 +85,22 @@ namespace Askaiser.Marionette
             return await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
         }
 
-        internal async Task<SearchResult> WaitFor(IElement element, TimeSpan waitFor, Rectangle searchRect, NotFoundBehavior notFoundBehavior)
+        internal async Task<SearchResult> WaitFor(IElement element, TimeSpan waitFor, Rectangle searchRect, NoSingleResultBehavior noSingleResultBehavior)
         {
             if (element == null)
             {
                 throw new ArgumentNullException(nameof(element));
             }
 
-            return await this._waitForHandler.Execute(new WaitForCommand(new[] { element }, waitFor, searchRect, this._monitorIndex, notFoundBehavior)).ConfigureAwait(false);
+            return await this._waitForHandler.Execute(new WaitForCommand(new[] { element }, waitFor, searchRect, this._monitorIndex, noSingleResultBehavior)).ConfigureAwait(false);
         }
 
         public async Task<SearchResult> WaitFor(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            return await this.WaitFor(element, waitFor, searchRect, NotFoundBehavior.Throw).ConfigureAwait(false);
+            return await this.WaitFor(element, waitFor, searchRect, NoSingleResultBehavior.Throw).ConfigureAwait(false);
         }
 
-        internal async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect, NotFoundBehavior notFoundBehavior)
+        internal async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect, NoSingleResultBehavior noSingleResultBehavior)
         {
             if (elements == null)
             {
@@ -114,15 +114,15 @@ namespace Askaiser.Marionette
                 throw new ArgumentException("Elements cannot be empty", nameof(elements));
             }
 
-            return await this._waitForAnyHandler.Execute(new WaitForCommand(enumeratedElements, waitFor, searchRect, this._monitorIndex, notFoundBehavior)).ConfigureAwait(false);
+            return await this._waitForAnyHandler.Execute(new WaitForCommand(enumeratedElements, waitFor, searchRect, this._monitorIndex, noSingleResultBehavior)).ConfigureAwait(false);
         }
 
         public async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            return await this.WaitForAny(elements, waitFor, searchRect, NotFoundBehavior.Throw).ConfigureAwait(false);
+            return await this.WaitForAny(elements, waitFor, searchRect, NoSingleResultBehavior.Throw).ConfigureAwait(false);
         }
 
-        internal async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect, NotFoundBehavior notFoundBehavior)
+        internal async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect, NoSingleResultBehavior noSingleResultBehavior)
         {
             if (elements == null)
             {
@@ -136,12 +136,12 @@ namespace Askaiser.Marionette
                 throw new ArgumentException("Elements cannot be empty", nameof(elements));
             }
 
-            return await this._waitForAllHandler.Execute(new WaitForCommand(enumeratedElements, waitFor, searchRect, this._monitorIndex, notFoundBehavior)).ConfigureAwait(false);
+            return await this._waitForAllHandler.Execute(new WaitForCommand(enumeratedElements, waitFor, searchRect, this._monitorIndex, noSingleResultBehavior)).ConfigureAwait(false);
         }
 
         public async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            return await this.WaitForAll(elements, waitFor, searchRect, NotFoundBehavior.Throw).ConfigureAwait(false);
+            return await this.WaitForAll(elements, waitFor, searchRect, NoSingleResultBehavior.Throw).ConfigureAwait(false);
         }
 
         public async Task MoveTo(int x, int y)

@@ -171,7 +171,7 @@ namespace Askaiser.Marionette
         {
             try
             {
-                var result = await context.WaitFor(element, waitFor, searchRect, NotFoundBehavior.Ignore).ConfigureAwait(false);
+                var result = await context.WaitFor(element, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
                 return result.Success;
             }
             catch (UITestingException)
@@ -184,7 +184,7 @@ namespace Askaiser.Marionette
         {
             try
             {
-                var result = await context.WaitForAny(elements, waitFor, searchRect, NotFoundBehavior.Ignore).ConfigureAwait(false);
+                var result = await context.WaitForAny(elements, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
                 return result.Success;
             }
             catch (UITestingException)
@@ -197,7 +197,7 @@ namespace Askaiser.Marionette
         {
             try
             {
-                var result = await context.WaitForAll(elements, waitFor, searchRect, NotFoundBehavior.Ignore).ConfigureAwait(false);
+                var result = await context.WaitForAll(elements, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
                 return result.All(x => x.Success);
             }
             catch (UITestingException)
@@ -333,6 +333,26 @@ namespace Askaiser.Marionette
         public static async Task<bool> IsVisible(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
         {
             return await IsVisible(context, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        #endregion
+
+        #region Finding elements locations without throwing exceptions
+
+        public static async Task<Rectangle[]> FindLocations(this TestContext context, IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
+        {
+            var result = await context.WaitFor(element, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
+            return result.Areas.ToArray();
+        }
+
+        public static async Task<Rectangle[]> FindLocations(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
+        {
+            return await FindLocations(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        }
+
+        public static async Task<Rectangle[]> FindLocations(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+        {
+            return await FindLocations(context, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
         }
 
         #endregion

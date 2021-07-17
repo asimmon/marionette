@@ -1,6 +1,6 @@
 ﻿namespace Askaiser.Marionette
 {
-    internal enum NotFoundBehavior
+    internal enum NoSingleResultBehavior
     {
         Throw,
         Ignore,
