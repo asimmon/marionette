@@ -19,8 +19,8 @@ namespace Askaiser.Marionette
                     .ConvertAndDispose(x => x.ToMat())
                     .ConvertAndDispose(x => imageElement.Grayscale ? x.CvtColor(ColorConversionCodes.BGRA2GRAY) : x);
 
-                using var screenshotMat = screenshot.ToMat()
-                    .ConvertAndDispose(x => imageElement.Grayscale ? x.CvtColor(ColorConversionCodes.BGRA2GRAY) : x)
+                using var preprocessedScreenshotMat = screenshot.ToMat().ConvertAndDispose(x => imageElement.Grayscale ? x.CvtColor(ColorConversionCodes.BGRA2GRAY) : x);
+                using var workingScreenshotMat = preprocessedScreenshotMat
                     .MatchTemplate(elementTemplate, TemplateMatchModes.CCoeffNormed)
                     .ConvertAndDispose(x => x.Threshold((double)imageElement.Threshold, 1d, ThresholdTypes.Tozero));
 
@@ -31,17 +31,17 @@ namespace Askaiser.Marionette
 
                 while (true)
                 {
-                    screenshotMat.MinMaxLoc(out _, out var maxval, out _, out var maxloc);
+                    workingScreenshotMat.MinMaxLoc(out _, out var maxval, out _, out var maxloc);
 
                     var notFound = maxval < (double)imageElement.Threshold;
                     if (notFound)
                     {
-                        var transformedScreenshot = screenshotMat.ToBitmap();
+                        var transformedScreenshot = preprocessedScreenshotMat.ToBitmap();
                         return new RecognizerSearchResult(transformedScreenshot, element, areas);
                     }
 
                     areas.Add(new Rectangle(maxloc.X, maxloc.Y, maxloc.X + elementTemplate.Width, maxloc.Y + elementTemplate.Height));
-                    screenshotMat.FloodFill(maxloc, new Scalar(0), out _, loDiff, upDiff);
+                    workingScreenshotMat.FloodFill(maxloc, new Scalar(0), out _, loDiff, upDiff);
                 }
             }
 
