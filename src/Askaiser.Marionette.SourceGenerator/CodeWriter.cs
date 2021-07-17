@@ -42,10 +42,9 @@ namespace Askaiser.Marionette.SourceGenerator
             return this;
         }
 
-        public IDisposable BeginBlock() => this.BeginBlock(null);
-        public IDisposable BeginBlock(string appendText)
+        public IDisposable BeginBlock()
         {
-            return new CodeBlock(this, appendText);
+            return new CodeBlock(this);
         }
 
         public IDisposable BeginClass(string modifier, string name, string inherits = null)
@@ -89,12 +88,10 @@ namespace Askaiser.Marionette.SourceGenerator
         private sealed class CodeBlock : IDisposable
         {
             private readonly CodeWriter _writer;
-            private readonly string _appendText;
 
-            public CodeBlock(CodeWriter writer, string appendText = null)
+            public CodeBlock(CodeWriter writer)
             {
                 this._writer = writer;
-                _appendText = appendText;
                 this._writer.AppendLine("{");
                 this._writer.IncreaseIndentation();
             }
@@ -102,11 +99,7 @@ namespace Askaiser.Marionette.SourceGenerator
             public void Dispose()
             {
                 this._writer.DecreaseIndentation();
-
-                if (this._appendText == null)
-                    this._writer.AppendLine("}");
-                else
-                    this._writer.Append("}").AppendLine(this._appendText);
+                this._writer.AppendLine("}");
             }
         }
     }

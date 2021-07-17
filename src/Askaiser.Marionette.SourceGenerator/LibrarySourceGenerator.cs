@@ -15,22 +15,19 @@ namespace Askaiser.Marionette.SourceGenerator
 
         public void Execute(GeneratorExecutionContext context)
         {
-            if (context.SyntaxContextReceiver is not LibrarySyntaxReceiver { Success: true } receiver)
+            if (context.SyntaxContextReceiver is not LibrarySyntaxReceiver receiver)
                 return;
 
-            var result = LibraryCodeGenerator.Generate(new LibraryCodeGeneratorOptions
-            {
-                ImageDirectoryPath = receiver.ImageLibraryDirectoryPath,
-                ClassName = receiver.DecoratedClassName,
-                NamespaceName = receiver.DecoratedNamespaceName,
-            });
+            foreach (var targetedClass in receiver.TargetedClasses)
+                AddSource(context, LibraryCodeGenerator.Generate(targetedClass));
+        }
 
+        private static void AddSource(GeneratorExecutionContext context, CodeGeneratorResult result)
+        {
             if (result.Warnings.Count > 0)
-            {
                 throw new Exception(string.Join(", ", result.Warnings));
-            }
 
-            context.AddSource(nameof(LibrarySourceGenerator), SourceText.From(result.Code, Encoding.UTF8));
+            context.AddSource(result.Filename, SourceText.From(result.Code, Encoding.UTF8));
         }
     }
 }
