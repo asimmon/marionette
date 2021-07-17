@@ -10,7 +10,7 @@ namespace Askaiser.Marionette.Commands
             this.MouseController = mouseController;
         }
 
-        protected  IMouseController MouseController { get; }
+        protected IMouseController MouseController { get; }
 
         public abstract Task Execute(MouseLocationCommand command);
 

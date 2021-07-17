@@ -25,10 +25,14 @@ namespace Askaiser.Marionette.SourceGenerator
         public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
         {
             if (context.Node is not ClassDeclarationSyntax classSyntax)
+            {
                 return;
+            }
 
             if (context.SemanticModel.GetDeclaredSymbol(classSyntax) is not { } classModel)
+            {
                 return;
+            }
 
             foreach (var attribute in classModel.GetAttributes())
             {
@@ -47,7 +51,7 @@ namespace Askaiser.Marionette.SourceGenerator
                     {
                         ClassName = classModel.Name,
                         NamespaceName = classModel.GetNamespace(),
-                        ImageDirectoryPath = validImageDirPath
+                        ImageDirectoryPath = validImageDirPath,
                     });
 
                     return;
@@ -60,7 +64,9 @@ namespace Askaiser.Marionette.SourceGenerator
             validPath = null;
 
             if (rawPath.Trim() is not { Length: > 0 } trimmedPath)
+            {
                 return false;
+            }
 
             try
             {

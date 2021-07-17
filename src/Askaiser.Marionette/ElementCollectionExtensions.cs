@@ -36,10 +36,14 @@ namespace Askaiser.Marionette
                     };
 
                     if (string.IsNullOrWhiteSpace(element.Name))
+                    {
                         throw new ArgumentException("An element cannot have a null or empty name.");
+                    }
 
                     if (elements.Contains(element))
+                    {
                         throw new ArgumentException($"An element with the name '{element.Name}' already exists.");
+                    }
 
                     elements.Add(element);
                 }
@@ -54,7 +58,10 @@ namespace Askaiser.Marionette
         {
             var stream = File.OpenRead(filePath);
             await using (stream.ConfigureAwait(false))
+            {
                 await LoadAsync(elements, stream).ConfigureAwait(false);
+            }
+
             return elements;
         }
 
@@ -76,7 +83,7 @@ namespace Askaiser.Marionette
 
             var jsonSerializerOptions = new JsonSerializerOptions
             {
-                WriteIndented = true
+                WriteIndented = true,
             };
 
             await using (destinationStream.ConfigureAwait(false))
@@ -91,14 +98,19 @@ namespace Askaiser.Marionette
         {
             var destinationStream = File.Create(filePath);
             await using (destinationStream.ConfigureAwait(false))
+            {
                 await SaveAsync(elements, destinationStream).ConfigureAwait(false);
+            }
         }
 
         private static T Deserialize<T>(JsonElement element)
         {
             var bufferWriter = new ArrayBufferWriter<byte>();
             using (var writer = new Utf8JsonWriter(bufferWriter))
+            {
                 element.WriteTo(writer);
+            }
+
             return JsonSerializer.Deserialize<T>(bufferWriter.WrittenSpan);
         }
     }

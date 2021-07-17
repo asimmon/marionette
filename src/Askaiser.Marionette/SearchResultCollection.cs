@@ -10,15 +10,22 @@ namespace Askaiser.Marionette
 
         internal SearchResultCollection(IEnumerable<SearchResult> results)
         {
-            if (results == null) throw new ArgumentNullException(nameof(results));
+            if (results == null)
+            {
+                throw new ArgumentNullException(nameof(results));
+            }
 
             this._results = new Dictionary<string, SearchResult>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var result in results)
+            {
                 this._results.Add(result.Element.Name, result);
+            }
 
             if (this._results.Count == 0)
+            {
                 throw new ArgumentException("Results cannot be empty.", nameof(results));
+            }
         }
 
         public int Count

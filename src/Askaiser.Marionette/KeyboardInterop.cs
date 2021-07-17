@@ -8,9 +8,9 @@ namespace Askaiser.Marionette
 {
     internal static class KeyboardInterop
     {
-        private static readonly Lazy<InputSimulator> LazyInputSimulator = new(() => new InputSimulator());
+        private static readonly Lazy<InputSimulator> LazyInputSimulator = new Lazy<InputSimulator>(() => new InputSimulator());
 
-        private static readonly HashSet<VirtualKeyCode> KnownModifiers = new()
+        private static readonly HashSet<VirtualKeyCode> KnownModifiers = new ()
         {
             VirtualKeyCode.LSHIFT,
             VirtualKeyCode.LSHIFT,
@@ -34,10 +34,13 @@ namespace Askaiser.Marionette
         {
             await Task.Run(() =>
             {
-                HashSet<VirtualKeyCode> modifiers = new(), otherKeyCodes = new();
+                var modifiers = new HashSet<VirtualKeyCode>();
+                var otherKeyCodes = new HashSet<VirtualKeyCode>();
 
                 foreach (var keyCode in keyCodes)
+                {
                     (KnownModifiers.Contains(keyCode) ? modifiers : otherKeyCodes).Add(keyCode);
+                }
 
                 _ = modifiers.Count > 0
                     ? LazyInputSimulator.Value.Keyboard.ModifiedKeyStroke(modifiers, otherKeyCodes)

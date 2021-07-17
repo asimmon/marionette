@@ -104,11 +104,17 @@ namespace Askaiser.Marionette
         #region Mouse interaction with search result
 
         public static async Task MoveTo(this TestContext context, SearchResult searchResult) => await MoveTo(context, searchResult.Area.Center).ConfigureAwait(false);
+
         public static async Task SingleClick(this TestContext context, SearchResult searchResult) => await SingleClick(context, searchResult.Area.Center).ConfigureAwait(false);
+
         public static async Task DoubleClick(this TestContext context, SearchResult searchResult) => await DoubleClick(context, searchResult.Area.Center).ConfigureAwait(false);
+
         public static async Task TripleClick(this TestContext context, SearchResult searchResult) => await TripleClick(context, searchResult.Area.Center).ConfigureAwait(false);
+
         public static async Task RightClick(this TestContext context, SearchResult searchResult) => await RightClick(context, searchResult.Area.Center).ConfigureAwait(false);
+
         public static async Task DragFrom(this TestContext context, SearchResult searchResult) => await DragFrom(context, searchResult.Area.Center).ConfigureAwait(false);
+
         public static async Task DropTo(this TestContext context, SearchResult searchResult) => await DropTo(context, searchResult.Area.Center).ConfigureAwait(false);
 
         #endregion
@@ -208,21 +214,27 @@ namespace Askaiser.Marionette
         {
             await context.KeyPress(keyCodes).ConfigureAwait(false);
             if (sleepAfter > TimeSpan.Zero)
+            {
                 await context.Sleep(sleepAfter).ConfigureAwait(false);
+            }
         }
 
         public static async Task KeyDown(this TestContext context, VirtualKeyCode[] keyCodes, TimeSpan sleepAfter = default)
         {
             await context.KeyDown(keyCodes).ConfigureAwait(false);
             if (sleepAfter > TimeSpan.Zero)
+            {
                 await context.Sleep(sleepAfter).ConfigureAwait(false);
+            }
         }
 
         public static async Task KeyUp(this TestContext context, VirtualKeyCode[] keyCodes, TimeSpan sleepAfter = default)
         {
             await context.KeyUp(keyCodes).ConfigureAwait(false);
             if (sleepAfter > TimeSpan.Zero)
+            {
                 await context.Sleep(sleepAfter).ConfigureAwait(false);
+            }
         }
 
         #endregion

@@ -11,7 +11,7 @@ namespace Askaiser.Marionette
     [SuppressMessage("Microsoft.Naming", "CA1720", Justification = "We use the same values as the original constants.")]
     [SuppressMessage("Microsoft.Naming", "CA1712", Justification = "We use the same values as the original constants.")]
     [SuppressMessage("Microsoft.Naming", "CA1069", Justification = "We use the same values as the original constants.")]
-    public enum VirtualKeyCode //: UInt16
+    public enum VirtualKeyCode
     {
         /// <summary>
         /// Left mouse button
@@ -43,8 +43,6 @@ namespace Askaiser.Marionette
         /// </summary>
         XBUTTON2 = 0x06,
 
-        // 0x07 : Undefined
-
         /// <summary>
         /// BACKSPACE key
         /// </summary>
@@ -55,8 +53,6 @@ namespace Askaiser.Marionette
         /// </summary>
         TAB = 0x09,
 
-        // 0x0A - 0x0B : Reserved
-
         /// <summary>
         /// CLEAR key
         /// </summary>
@@ -66,8 +62,6 @@ namespace Askaiser.Marionette
         /// ENTER key
         /// </summary>
         RETURN = 0x0D,
-
-        // 0x0E - 0x0F : Undefined
 
         /// <summary>
         /// SHIFT key
@@ -109,8 +103,6 @@ namespace Askaiser.Marionette
         /// </summary>
         HANGUL = 0x15,
 
-        // 0x16 : Undefined
-
         /// <summary>
         /// IME Junja mode
         /// </summary>
@@ -130,8 +122,6 @@ namespace Askaiser.Marionette
         /// IME Kanji mode
         /// </summary>
         KANJI = 0x19,
-
-        // 0x1A : Undefined
 
         /// <summary>
         /// ESC key
@@ -288,10 +278,6 @@ namespace Askaiser.Marionette
         /// </summary>
         VK_9 = 0x39,
 
-        //
-        // 0x3A - 0x40 : Udefined
-        //
-
         /// <summary>
         /// A key
         /// </summary>
@@ -436,8 +422,6 @@ namespace Askaiser.Marionette
         /// Applications key (Natural keyboard)
         /// </summary>
         APPS = 0x5D,
-
-        // 0x5E : reserved
 
         /// <summary>
         /// Computer Sleep key
@@ -644,10 +628,6 @@ namespace Askaiser.Marionette
         /// </summary>
         F24 = 0x87,
 
-        //
-        // 0x88 - 0x8F : Unassigned
-        //
-
         /// <summary>
         /// NUM LOCK key
         /// </summary>
@@ -657,16 +637,6 @@ namespace Askaiser.Marionette
         /// SCROLL LOCK key
         /// </summary>
         SCROLL = 0x91,
-
-        // 0x92 - 0x96 : OEM Specific
-
-        // 0x97 - 0x9F : Unassigned
-
-        //
-        // L* & R* - left and right Alt, Ctrl and Shift virtual keys.
-        // Used only as parameters to GetAsyncKeyState() and GetKeyState().
-        // No other API or message will distinguish left and right keys in this way.
-        //
 
         /// <summary>
         /// Left SHIFT key - Used only as parameters to GetAsyncKeyState() and GetKeyState()
@@ -788,10 +758,6 @@ namespace Askaiser.Marionette
         /// </summary>
         LAUNCH_APP2 = 0xB7,
 
-        //
-        // 0xB8 - 0xB9 : Reserved
-        //
-
         /// <summary>
         /// Used for miscellaneous characters; it can vary by keyboard. Windows 2000/XP: For the US standard keyboard, the ';:' key
         /// </summary>
@@ -827,14 +793,6 @@ namespace Askaiser.Marionette
         /// </summary>
         OEM_3 = 0xC0,
 
-        //
-        // 0xC1 - 0xD7 : Reserved
-        //
-
-        //
-        // 0xD8 - 0xDA : Unassigned
-        //
-
         /// <summary>
         /// Used for miscellaneous characters; it can vary by keyboard. Windows 2000/XP: For the US standard keyboard, the '[{' key
         /// </summary>
@@ -860,44 +818,20 @@ namespace Askaiser.Marionette
         /// </summary>
         OEM_8 = 0xDF,
 
-        //
-        // 0xE0 : Reserved
-        //
-
-        //
-        // 0xE1 : OEM Specific
-        //
-
         /// <summary>
         /// Windows 2000/XP: Either the angle bracket key or the backslash key on the RT 102-key keyboard
         /// </summary>
         OEM_102 = 0xE2,
-
-        //
-        // (0xE3-E4) : OEM specific
-        //
 
         /// <summary>
         /// Windows 95/98/Me, Windows NT 4.0, Windows 2000/XP: IME PROCESS key
         /// </summary>
         PROCESSKEY = 0xE5,
 
-        //
-        // 0xE6 : OEM specific
-        //
-
         /// <summary>
         /// Windows 2000/XP: Used to pass Unicode characters as if they were keystrokes. The PACKET key is the low word of a 32-bit Virtual Key value used for non-keyboard input methods. For more information, see Remark in KEYBDINPUT, SendInput, WM_KEYDOWN, and WM_KEYUP
         /// </summary>
         PACKET = 0xE7,
-
-        //
-        // 0xE8 : Unassigned
-        //
-
-        //
-        // 0xE9-F5 : OEM specific
-        //
 
         /// <summary>
         /// Attn key

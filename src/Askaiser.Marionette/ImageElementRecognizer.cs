@@ -35,7 +35,9 @@ namespace Askaiser.Marionette
 
                     var notFound = maxval < (double)imageElement.Threshold;
                     if (notFound)
+                    {
                         return new SearchResult(element, areas);
+                    }
 
                     areas.Add(new Rectangle(maxloc.X, maxloc.Y, maxloc.X + tpl.Width, maxloc.Y + tpl.Height));
                     res.FloodFill(maxloc, new Scalar(0), out _, loDiff, upDiff);

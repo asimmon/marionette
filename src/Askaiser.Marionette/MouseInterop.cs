@@ -42,6 +42,7 @@ namespace Askaiser.Marionette
         }
 
         public static void MouseWheelEventUp() => MouseWheelEvent(true);
+
         public static void MouseWheelEventDown() => MouseWheelEvent(false);
 
         private static void MouseWheelEvent(bool isUp)
@@ -61,13 +62,13 @@ namespace Askaiser.Marionette
         [Flags]
         internal enum MouseEventFlags
         {
-            LeftDown =   0x00000002,
-            LeftUp =     0x00000004,
-            RightDown =  0x00000008,
-            RightUp =    0x00000010,
+            LeftDown = 0x00000002,
+            LeftUp = 0x00000004,
+            RightDown = 0x00000008,
+            RightUp = 0x00000010,
             MiddleDown = 0x00000020,
-            MiddleUp =   0x00000040,
-            Wheel =      0x00000800,
+            MiddleUp = 0x00000040,
+            Wheel = 0x00000800,
         }
     }
 }

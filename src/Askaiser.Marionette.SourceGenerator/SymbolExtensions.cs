@@ -9,7 +9,7 @@ namespace Askaiser.Marionette.SourceGenerator
         public static string GetFullName(this INamedTypeSymbol symbol)
         {
             var namespaceName = GetNamespace(symbol);
-            var genericTypes = symbol.Arity > 0 ? "<" + string.Join(",", symbol.TypeArguments.OfType<INamedTypeSymbol>().Select(GetFullName)) + ">" : "";
+            var genericTypes = symbol.Arity > 0 ? "<" + string.Join(",", symbol.TypeArguments.OfType<INamedTypeSymbol>().Select(GetFullName)) + ">" : string.Empty;
             return namespaceName.Length > 0 ? namespaceName + "." + symbol.Name + genericTypes : symbol.Name + genericTypes;
         }
 
@@ -21,7 +21,9 @@ namespace Askaiser.Marionette.SourceGenerator
             while (iterator != null)
             {
                 if (!string.IsNullOrEmpty(iterator.Name))
+                {
                     parts.Push(iterator.Name);
+                }
 
                 iterator = iterator.ContainingNamespace;
             }

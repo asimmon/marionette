@@ -18,10 +18,15 @@ namespace Askaiser.Marionette.SourceGenerator
 
         public CodeWriter Append(string text)
         {
-            if (text is null) throw new ArgumentException(nameof(text));
+            if (text is null)
+            {
+                throw new ArgumentException(nameof(text));
+            }
 
             if (text.Length == 0)
+            {
                 return this;
+            }
 
             if (this._isAtBeginningOfNewLine)
             {
@@ -34,6 +39,7 @@ namespace Askaiser.Marionette.SourceGenerator
         }
 
         public CodeWriter AppendLine() => this.AppendLine(string.Empty);
+
         public CodeWriter AppendLine(string text)
         {
             this.Append(text);
@@ -49,13 +55,22 @@ namespace Askaiser.Marionette.SourceGenerator
 
         public IDisposable BeginClass(string modifier, string name, string inherits = null)
         {
-            if ((modifier = modifier?.Trim()) is not { Length: > 0 }) throw new ArgumentException(nameof(modifier));
-            if ((name = name?.Trim()) is not { Length: > 0 }) throw new ArgumentException(nameof(name));
+            if ((modifier = modifier?.Trim()) is not { Length: > 0 })
+            {
+                throw new ArgumentException(nameof(modifier));
+            }
+
+            if ((name = name?.Trim()) is not { Length: > 0 })
+            {
+                throw new ArgumentException(nameof(name));
+            }
 
             this.Append(modifier).Append(" class ").Append(name);
 
             if (!string.IsNullOrEmpty(inherits))
+            {
                 this.Append(" : ").Append(inherits);
+            }
 
             this.AppendLine();
 
@@ -64,7 +79,10 @@ namespace Askaiser.Marionette.SourceGenerator
 
         public IDisposable BeginNamespace(string name)
         {
-            if ((name = name?.Trim()) is not { Length: > 0 }) throw new ArgumentException(nameof(name));
+            if ((name = name?.Trim()) is not { Length: > 0 })
+            {
+                throw new ArgumentException(nameof(name));
+            }
 
             this.Append("namespace ").AppendLine(name);
             return new CodeBlock(this);

@@ -20,13 +20,21 @@ namespace Askaiser.Marionette
 
         public void Add(IElement element)
         {
-            if (element == null) throw new ArgumentNullException(nameof(element));
+            if (element == null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
             this._elements.Add(element.Name, element);
         }
 
         public void Remove(IElement element)
         {
-            if (element == null) throw new ArgumentNullException(nameof(element));
+            if (element == null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
             this._elements.Remove(element.Name);
         }
 
@@ -37,7 +45,11 @@ namespace Askaiser.Marionette
 
         public bool Contains(IElement element)
         {
-            if (element == null) throw new ArgumentNullException(nameof(element));
+            if (element == null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
             return this.TryGetValue(element.Name, out _);
         }
 

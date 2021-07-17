@@ -16,7 +16,7 @@ namespace Askaiser.Marionette.SourceGenerator
         private GeneratedImage(string fileName, byte[] bytes, GeneratedLibrary rootLibrary)
         {
             var libsAndElementRawNames = Path.GetFileNameWithoutExtension(fileName)
-                .Split(new [] {"--"}, StringSplitOptions.None)
+                .Split(new[] { "--" }, StringSplitOptions.None)
                 .Select(x => x.Trim())
                 .Where(x => x.Length > 0)
                 .ToArray();
@@ -98,7 +98,9 @@ namespace Askaiser.Marionette.SourceGenerator
         private IEnumerable<string> GetUniqueNameParts()
         {
             foreach (var parent in this.Parent.GetHierarchy().Reverse())
+            {
                 yield return parent.Name;
+            }
 
             yield return this.Name;
 

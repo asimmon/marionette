@@ -3,6 +3,6 @@
     internal enum NotFoundBehavior
     {
         Throw,
-        Ignore
+        Ignore,
     }
 }

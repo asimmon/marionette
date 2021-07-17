@@ -58,7 +58,9 @@ namespace Askaiser.Marionette
                 {
                     Interlocked.Decrement(ref this._activeEngineCount);
                     if (engineId != this._defaultEngineId && this._engines.TryRemove(engineId, out var engine))
+                    {
                         engine.Dispose();
+                    }
                 }
             }
 
@@ -73,16 +75,24 @@ namespace Askaiser.Marionette
         private static IEnumerable<Func<Mat, Mat>> GetConverters(TextOptions options)
         {
             if (options == TextOptions.None)
+            {
                 yield break;
+            }
 
             if (options.HasFlag(TextOptions.Grayscale))
+            {
                 yield return Grayscale;
+            }
 
             if (options.HasFlag(TextOptions.BlackAndWhite))
+            {
                 yield return Binarize;
+            }
 
             if (options.HasFlag(TextOptions.Negative))
+            {
                 yield return Negate;
+            }
         }
 
         private static Mat Upscale(Mat mat)
@@ -153,9 +163,13 @@ namespace Askaiser.Marionette
             private IEnumerable<Rectangle> Handle()
             {
                 do
+                {
                     do
+                    {
                         this.HandleIteration();
+                    }
                     while (this._iterator.Next(PageIteratorLevel.Word, PageIteratorLevel.Symbol));
+                }
                 while (this._iterator.Next(PageIteratorLevel.Word));
 
                 return this._confirmedResults;
@@ -166,9 +180,13 @@ namespace Askaiser.Marionette
                 this.HandleBeginningOfNewWord();
 
                 if (this.TryGetNextSymbolRectangle(out var symbolRectangle))
+                {
                     this.AppendSymbolRectangleToCurrentResult(symbolRectangle);
+                }
                 else if (this._characterIndex > 0)
+                {
                     this.ResetCurrentResult();
+                }
             }
 
             private void HandleBeginningOfNewWord()
@@ -178,7 +196,9 @@ namespace Askaiser.Marionette
                 {
                     var isAlsoAtBeginningOfWordInSearchText = this._searchedText[this._characterIndex++] == ' ';
                     if (!isAlsoAtBeginningOfWordInSearchText)
+                    {
                         this.ResetCurrentResult();
+                    }
                 }
             }
 
@@ -193,21 +213,29 @@ namespace Askaiser.Marionette
                 symbolRectangle = default;
 
                 if (!this._iterator.IsAtBeginningOf(PageIteratorLevel.Symbol))
+                {
                     return false;
+                }
 
                 var symbol = this._iterator.GetText(PageIteratorLevel.Symbol);
                 if (symbol is { Length: 0 })
+                {
                     return false;
+                }
 
                 for (var i = 0; i < symbol.Length && i < this._searchedText.Length; i++)
                 {
                     var character = symbol[i];
                     if (!this._charEquals(character, this._searchedText[this._characterIndex++]))
+                    {
                         return false;
+                    }
                 }
 
                 if (!this._iterator.TryGetBoundingBox(PageIteratorLevel.Symbol, out var symbolBounds))
+                {
                     return false;
+                }
 
                 symbolRectangle = new Rectangle(symbolBounds.X1, symbolBounds.Y1, symbolBounds.X2, symbolBounds.Y2);
                 return true;
@@ -226,13 +254,16 @@ namespace Askaiser.Marionette
             }
 
             private static bool AreEqualOrdinalIgnoreCase(char x, char y) => char.ToUpperInvariant(x) == char.ToUpperInvariant(y);
+
             private static bool AreEqualOrdinal(char x, char y) => x == y;
         }
 
         public void Dispose()
         {
             foreach (var engine in this._engines.Values)
+            {
                 engine.Dispose();
+            }
         }
     }
 }

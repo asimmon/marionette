@@ -31,12 +31,16 @@ namespace Askaiser.Marionette
         public async Task<MonitorDescription[]> GetMonitors()
         {
             if (this._monitors != null)
+            {
                 return this._monitors;
+            }
 
             using (await SemaphoreWaiter.EnterAsync(this._monitorsMutex).ConfigureAwait(false))
             {
                 if (this._monitors != null)
+                {
                     return this._monitors;
+                }
 
                 this._monitors = await GraphicsScreenshot.GetMonitors().ConfigureAwait(false);
             }
@@ -50,7 +54,9 @@ namespace Askaiser.Marionette
 
             var monitor = monitors.FirstOrDefault(x => x.Index == index);
             if (monitor == null)
+            {
                 throw new InvalidOperationException($"Requested monitor index {index} not found.");
+            }
 
             return monitor;
         }
@@ -58,12 +64,16 @@ namespace Askaiser.Marionette
         public async Task<Bitmap> GetScreenshot(MonitorDescription monitor)
         {
             if (this.TryGetNonExpiredCachedBitmapClone(out var cachedScreenshot))
+            {
                 return cachedScreenshot;
+            }
 
             using (await SemaphoreWaiter.EnterAsync(this._screenshotMutex).ConfigureAwait(false))
             {
                 if (this.TryGetNonExpiredCachedBitmapClone(out cachedScreenshot))
+                {
                     return cachedScreenshot;
+                }
 
                 var screenshot = await GraphicsScreenshot.Take(monitor).ConfigureAwait(false);
 
@@ -83,11 +93,15 @@ namespace Askaiser.Marionette
             bitmap = default;
 
             if (!this._cacheDate.HasValue)
+            {
                 return false;
+            }
 
             var cacheAge = DateTime.UtcNow - this._cacheDate.Value;
             if (cacheAge > this._cacheDuration)
+            {
                 return false;
+            }
 
             using var bitmapStream = new MemoryStream(this._cachedBitmapBytes);
             bitmap = new Bitmap(bitmapStream);

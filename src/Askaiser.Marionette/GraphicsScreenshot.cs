@@ -14,16 +14,14 @@ namespace Askaiser.Marionette
             [In] IntPtr dcHandle,
             [In] IntPtr clip,
             MonitorEnumProcedure callback,
-            IntPtr callbackObject
-        );
+            IntPtr callbackObject);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private delegate int MonitorEnumProcedure(
             IntPtr monitorHandle,
             IntPtr dcHandle,
             ref RectangleL rect,
-            IntPtr callbackObject
-        );
+            IntPtr callbackObject);
 
         [StructLayout(LayoutKind.Sequential)]
         private readonly struct RectangleL
@@ -60,7 +58,9 @@ namespace Askaiser.Marionette
             EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, onMonitorCallback, IntPtr.Zero);
 
             if (monitors.Count == 0)
+            {
                 throw new InvalidOperationException("No monitors were found.");
+            }
 
             return monitors.OrderBy(x => x.Left).ThenBy(x => x.Top).Select((monitor, index) => monitor with { Index = index });
         }
@@ -74,7 +74,9 @@ namespace Askaiser.Marionette
         {
             var bitmap = new Bitmap(monitor.Width, monitor.Height);
             using (var graphics = Graphics.FromImage(bitmap))
+            {
                 graphics.CopyFromScreen(monitor.Left, monitor.Top, 0, 0, bitmap.Size, CopyPixelOperation.SourceCopy);
+            }
 
             return bitmap;
         }

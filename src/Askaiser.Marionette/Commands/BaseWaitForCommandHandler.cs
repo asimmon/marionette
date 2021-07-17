@@ -27,7 +27,9 @@ namespace Askaiser.Marionette.Commands
         protected async Task<SearchResult> WaitFor(IElement element, WaitForCommand command)
         {
             if (command.WaitFor < TimeSpan.Zero)
+            {
                 throw new ArgumentOutOfRangeException(nameof(command.WaitFor), "WaitFor duration must be greater or equal to zero");
+            }
 
             var monitor = await this._monitorService.GetMonitor(command.MonitorIndex).ConfigureAwait(false);
 
@@ -46,7 +48,9 @@ namespace Askaiser.Marionette.Commands
                         var adjustedResult = result.AdjustToMonitor(monitor).AdjustToSearchRectangle(command.SearchRectangle);
 
                         if (command.Behavior == NotFoundBehavior.Throw)
+                        {
                             adjustedResult.EnsureSingleLocation(command.WaitFor);
+                        }
 
                         return adjustedResult;
                     }
@@ -56,7 +60,9 @@ namespace Askaiser.Marionette.Commands
                 }
 
                 if (command.Behavior == NotFoundBehavior.Throw && this._options.FailureScreenshotPath != null)
+                {
                     await this.SaveScreenshot(element, screenshot).ConfigureAwait(false);
+                }
             }
             finally
             {
@@ -64,7 +70,9 @@ namespace Askaiser.Marionette.Commands
             }
 
             if (command.Behavior == NotFoundBehavior.Throw)
+            {
                 throw new ElementNotFoundException(element, command.WaitFor);
+            }
 
             return SearchResult.NotFound(element);
         }
@@ -73,10 +81,14 @@ namespace Askaiser.Marionette.Commands
         {
             var screenshot = await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
             if (searchRect == null)
+            {
                 return screenshot;
+            }
 
             using (screenshot)
+            {
                 return screenshot.Crop(searchRect);
+            }
         }
 
         private static readonly Regex NotAlphanumericRegex = new Regex("[^a-z0-9\\-]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -84,7 +96,7 @@ namespace Askaiser.Marionette.Commands
 
         private async Task SaveScreenshot(IElement element, Image screenshot)
         {
-            var elementDescriptor = NotAlphanumericRegex.Replace(WhitespaceRegex.Replace(element.ToString()?.Trim() ?? "", "-"), "");
+            var elementDescriptor = NotAlphanumericRegex.Replace(WhitespaceRegex.Replace(element.ToString()?.Trim() ?? string.Empty, "-"), string.Empty);
             var fileName = string.Format(CultureInfo.InvariantCulture, "{0:yyyy-MM-dd-HH-mm-ss-ffff}_{1}.png", DateTime.UtcNow, elementDescriptor);
 
             var screenshotBytes = screenshot.GetBytes(ImageFormat.Png);

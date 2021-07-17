@@ -100,6 +100,7 @@ public sealed class MetadataTask : FrostingTask<BuildContext>
         context.AddMSBuildProperty("PackageProjectUrl", "https://github.com/asimmon/askaiser-marionette");
         context.AddMSBuildProperty("Copyright", "Copyright © Anthony Simmon " + DateTime.UtcNow.Year);
         context.AddMSBuildProperty("PackageLicenseExpression", "GPL-3.0-or-later");
+        context.AddMSBuildProperty("TreatWarningsAsErrors", "True");
     }
 }
 

@@ -62,10 +62,7 @@ namespace Askaiser.Marionette.Keyboard
         /// <value>The <see cref="INPUT"/> message at the specified position.</value>
         public INPUT this[int position]
         {
-            get
-            {
-                return this._inputList[position];
-            }
+            get { return this._inputList[position]; }
         }
 
         /// <summary>
@@ -117,21 +114,20 @@ namespace Askaiser.Marionette.Keyboard
         {
             var down =
                 new INPUT
+                {
+                    Type = (uint)InputType.Keyboard,
+                    Data =
                     {
-                        Type = (uint) InputType.Keyboard,
-                        Data =
-                            {
-                                Keyboard =
-                                    new KEYBDINPUT
-                                        {
-                                            KeyCode = (ushort) keyCode,
-                                            Scan = (ushort)(NativeMethods.MapVirtualKey((uint)keyCode, 0) & 0xFFU),
-                                            Flags = IsExtendedKey(keyCode) ? (uint) KeyboardFlag.ExtendedKey : 0,
-                                            Time = 0,
-                                            ExtraInfo = IntPtr.Zero
-                                        }
-                            }
-                    };
+                        Keyboard = new KEYBDINPUT
+                        {
+                            KeyCode = (ushort)keyCode,
+                            Scan = (ushort)(NativeMethods.MapVirtualKey((uint)keyCode, 0) & 0xFFU),
+                            Flags = IsExtendedKey(keyCode) ? (uint)KeyboardFlag.ExtendedKey : 0,
+                            Time = 0,
+                            ExtraInfo = IntPtr.Zero,
+                        },
+                    },
+                };
 
             this._inputList.Add(down);
             return this;
@@ -146,23 +142,22 @@ namespace Askaiser.Marionette.Keyboard
         {
             var up =
                 new INPUT
+                {
+                    Type = (uint)InputType.Keyboard,
+                    Data =
                     {
-                        Type = (uint) InputType.Keyboard,
-                        Data =
-                            {
-                                Keyboard =
-                                    new KEYBDINPUT
-                                        {
-                                            KeyCode = (ushort) keyCode,
-                                            Scan = (ushort)(NativeMethods.MapVirtualKey((uint)keyCode, 0) & 0xFFU),
-                                            Flags = (uint) (IsExtendedKey(keyCode)
-                                                                  ? KeyboardFlag.KeyUp | KeyboardFlag.ExtendedKey
-                                                                  : KeyboardFlag.KeyUp),
-                                            Time = 0,
-                                            ExtraInfo = IntPtr.Zero
-                                        }
-                            }
-                    };
+                        Keyboard = new KEYBDINPUT
+                        {
+                            KeyCode = (ushort)keyCode,
+                            Scan = (ushort)(NativeMethods.MapVirtualKey((uint)keyCode, 0) & 0xFFU),
+                            Flags = (uint)(IsExtendedKey(keyCode)
+                                ? KeyboardFlag.KeyUp | KeyboardFlag.ExtendedKey
+                                : KeyboardFlag.KeyUp),
+                            Time = 0,
+                            ExtraInfo = IntPtr.Zero,
+                        },
+                    },
+                };
 
             this._inputList.Add(up);
             return this;
@@ -183,46 +178,44 @@ namespace Askaiser.Marionette.Keyboard
         /// <summary>
         /// Adds the character to the list of <see cref="INPUT"/> messages.
         /// </summary>
-        /// <param name="character">The <see cref="System.Char"/> to be added to the list of <see cref="INPUT"/> messages.</param>
+        /// <param name="character">The <see cref="char"/> to be added to the list of <see cref="INPUT"/> messages.</param>
         /// <returns>This <see cref="InputBuilder"/> instance.</returns>
         public InputBuilder AddCharacter(char character)
         {
             ushort scanCode = character;
 
             var down = new INPUT
-                           {
-                               Type = (uint)InputType.Keyboard,
-                               Data =
-                                   {
-                                       Keyboard =
-                                           new KEYBDINPUT
-                                               {
-                                                   KeyCode = 0,
-                                                   Scan = scanCode,
-                                                   Flags = (uint)KeyboardFlag.Unicode,
-                                                   Time = 0,
-                                                   ExtraInfo = IntPtr.Zero
-                                               }
-                                   }
-                           };
+            {
+                Type = (uint)InputType.Keyboard,
+                Data =
+                {
+                    Keyboard = new KEYBDINPUT
+                    {
+                        KeyCode = 0,
+                        Scan = scanCode,
+                        Flags = (uint)KeyboardFlag.Unicode,
+                        Time = 0,
+                        ExtraInfo = IntPtr.Zero,
+                    },
+                },
+            };
 
             var up = new INPUT
-                         {
-                             Type = (uint)InputType.Keyboard,
-                             Data =
-                                 {
-                                     Keyboard =
-                                         new KEYBDINPUT
-                                             {
-                                                 KeyCode = 0,
-                                                 Scan = scanCode,
-                                                 Flags =
-                                                     (uint)(KeyboardFlag.KeyUp | KeyboardFlag.Unicode),
-                                                 Time = 0,
-                                                 ExtraInfo = IntPtr.Zero
-                                             }
-                                 }
-                         };
+            {
+                Type = (uint)InputType.Keyboard,
+                Data =
+                {
+                    Keyboard = new KEYBDINPUT
+                    {
+                        KeyCode = 0,
+                        Scan = scanCode,
+                        Flags =
+                            (uint)(KeyboardFlag.KeyUp | KeyboardFlag.Unicode),
+                        Time = 0,
+                        ExtraInfo = IntPtr.Zero,
+                    },
+                },
+            };
 
             // Handle extended keys:
             // If the scan code is preceded by a prefix byte that has the value 0xE0 (224),
@@ -249,6 +242,7 @@ namespace Askaiser.Marionette.Keyboard
             {
                 this.AddCharacter(character);
             }
+
             return this;
         }
 

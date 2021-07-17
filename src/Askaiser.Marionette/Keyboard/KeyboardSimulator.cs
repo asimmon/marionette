@@ -24,7 +24,10 @@ namespace Askaiser.Marionette.Keyboard
         /// <param name="inputSimulator">The <see cref="IInputSimulator"/> that owns this instance.</param>
         public KeyboardSimulator(IInputSimulator inputSimulator)
         {
-            if (inputSimulator == null) throw new ArgumentNullException(nameof(inputSimulator));
+            if (inputSimulator == null)
+            {
+                throw new ArgumentNullException(nameof(inputSimulator));
+            }
 
             this._inputSimulator = inputSimulator;
             this._messageDispatcher = new WindowsInputMessageDispatcher();
@@ -38,10 +41,15 @@ namespace Askaiser.Marionette.Keyboard
         /// <exception cref="InvalidOperationException">If null is passed as the <paramref name="messageDispatcher"/>.</exception>
         internal KeyboardSimulator(IInputSimulator inputSimulator, IInputMessageDispatcher messageDispatcher)
         {
-            if (inputSimulator == null) throw new ArgumentNullException(nameof(inputSimulator));
+            if (inputSimulator == null)
+            {
+                throw new ArgumentNullException(nameof(inputSimulator));
+            }
 
             if (messageDispatcher == null)
+            {
                 throw new InvalidOperationException($"The {nameof(KeyboardSimulator)} cannot operate with a null {nameof(IInputMessageDispatcher)}. Please provide a valid {nameof(IInputMessageDispatcher)} instance to use for dispatching {nameof(INPUT)} messages.");
+            }
 
             this._inputSimulator = inputSimulator;
             this._messageDispatcher = messageDispatcher;
@@ -51,27 +59,50 @@ namespace Askaiser.Marionette.Keyboard
         /// Gets the <see cref="IMouseSimulator"/> instance for simulating Mouse input.
         /// </summary>
         /// <value>The <see cref="IMouseSimulator"/> instance.</value>
-        public IMouseSimulator Mouse { get { return this._inputSimulator.Mouse; } }
+        public IMouseSimulator Mouse
+        {
+            get { return this._inputSimulator.Mouse; }
+        }
 
         private static void ModifiersDown(InputBuilder builder, IEnumerable<VirtualKeyCode> modifierKeyCodes)
         {
-            if (modifierKeyCodes == null) return;
-            foreach (var key in modifierKeyCodes) builder.AddKeyDown(key);
+            if (modifierKeyCodes == null)
+            {
+                return;
+            }
+
+            foreach (var key in modifierKeyCodes)
+            {
+                builder.AddKeyDown(key);
+            }
         }
 
         private static void ModifiersUp(InputBuilder builder, IEnumerable<VirtualKeyCode> modifierKeyCodes)
         {
-            if (modifierKeyCodes == null) return;
+            if (modifierKeyCodes == null)
+            {
+                return;
+            }
 
             // Key up in reverse (I miss LINQ)
             var stack = new Stack<VirtualKeyCode>(modifierKeyCodes);
-            while (stack.Count > 0) builder.AddKeyUp(stack.Pop());
+            while (stack.Count > 0)
+            {
+                builder.AddKeyUp(stack.Pop());
+            }
         }
 
         private static void KeysPress(InputBuilder builder, IEnumerable<VirtualKeyCode> keyCodes)
         {
-            if (keyCodes == null) return;
-            foreach (var key in keyCodes) builder.AddKeyPress(key);
+            if (keyCodes == null)
+            {
+                return;
+            }
+
+            foreach (var key in keyCodes)
+            {
+                builder.AddKeyPress(key);
+            }
         }
 
         /// <summary>
@@ -148,7 +179,7 @@ namespace Askaiser.Marionette.Keyboard
         /// <param name="keyCode">The key to simulate</param>
         public IKeyboardSimulator ModifiedKeyStroke(IEnumerable<VirtualKeyCode> modifierKeyCodes, VirtualKeyCode keyCode)
         {
-            this.ModifiedKeyStroke(modifierKeyCodes, new[] {keyCode});
+            this.ModifiedKeyStroke(modifierKeyCodes, new[] { keyCode });
             return this;
         }
 
@@ -160,7 +191,7 @@ namespace Askaiser.Marionette.Keyboard
         /// <param name="keyCodes">The list of keys to simulate</param>
         public IKeyboardSimulator ModifiedKeyStroke(VirtualKeyCode modifierKey, IEnumerable<VirtualKeyCode> keyCodes)
         {
-            this.ModifiedKeyStroke(new [] {modifierKey}, keyCodes);
+            this.ModifiedKeyStroke(new[] { modifierKey }, keyCodes);
             return this;
         }
 
@@ -188,7 +219,11 @@ namespace Askaiser.Marionette.Keyboard
         /// <param name="text">The text to be simulated.</param>
         public IKeyboardSimulator TextEntry(string text)
         {
-            if (text.Length > uint.MaxValue / 2) throw new ArgumentException($"The text parameter is too long. It must be less than {uint.MaxValue / 2} characters.", nameof(text));
+            if (text.Length > uint.MaxValue / 2)
+            {
+                throw new ArgumentException($"The text parameter is too long. It must be less than {uint.MaxValue / 2} characters.", nameof(text));
+            }
+
             var inputList = new InputBuilder().AddCharacters(text).ToArray();
             this.SendSimulatedInput(inputList);
             return this;

@@ -10,7 +10,7 @@ namespace Askaiser.Marionette
         private const int AverageHumanDoubleClickDuration = 70;
         private const int DelayBeforeFirstClickAction = 100;
 
-        private static readonly Dictionary<MouseSpeed, int> MouseSpeedSteps = new()
+        private static readonly Dictionary<MouseSpeed, int> MouseSpeedSteps = new Dictionary<MouseSpeed, int>()
         {
             [MouseSpeed.Immediate] = 0,
             [MouseSpeed.Fast] = 60,

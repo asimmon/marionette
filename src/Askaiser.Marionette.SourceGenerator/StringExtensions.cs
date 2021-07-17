@@ -13,7 +13,7 @@ namespace Askaiser.Marionette.SourceGenerator
             return string.Join(string.Empty, text
                 .Split('-').TrimAndRemoveEmptyEntries().ToArray()
                 .Select(x => x.ToLowerInvariant())
-                .Select(x => NonAlphanumericalRegex.Replace(x, ""))
+                .Select(x => NonAlphanumericalRegex.Replace(x, string.Empty))
                 .Select(x =>
                 {
                     return x.Length > 1

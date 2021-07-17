@@ -10,7 +10,9 @@ namespace Askaiser.Marionette
             foreach (var element in elements)
             {
                 if (element.Trim() is { Length: > 0 } trimmedElement)
+                {
                     yield return trimmedElement;
+                }
             }
         }
 

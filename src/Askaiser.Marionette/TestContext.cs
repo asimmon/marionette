@@ -80,7 +80,11 @@ namespace Askaiser.Marionette
 
         internal async Task<SearchResult> WaitFor(IElement element, TimeSpan waitFor, Rectangle searchRect, NotFoundBehavior notFoundBehavior)
         {
-            if (element == null) throw new ArgumentNullException(nameof(element));
+            if (element == null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
             return await this._waitForHandler.Execute(new WaitForCommand(new[] { element }, waitFor, searchRect, this._monitorIndex, notFoundBehavior)).ConfigureAwait(false);
         }
 
@@ -91,10 +95,18 @@ namespace Askaiser.Marionette
 
         internal async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect, NotFoundBehavior notFoundBehavior)
         {
-            if (elements == null) throw new ArgumentNullException(nameof(elements));
+            if (elements == null)
+            {
+                throw new ArgumentNullException(nameof(elements));
+            }
+
             var enumeratedElements = new List<IElement>(elements);
 
-            if (enumeratedElements.Count == 0) throw new ArgumentException("Elements cannot be empty", nameof(elements));
+            if (enumeratedElements.Count == 0)
+            {
+                throw new ArgumentException("Elements cannot be empty", nameof(elements));
+            }
+
             return await this._waitForAnyHandler.Execute(new WaitForCommand(enumeratedElements, waitFor, searchRect, this._monitorIndex, notFoundBehavior)).ConfigureAwait(false);
         }
 
@@ -105,10 +117,18 @@ namespace Askaiser.Marionette
 
         internal async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect, NotFoundBehavior notFoundBehavior)
         {
-            if (elements == null) throw new ArgumentNullException(nameof(elements));
+            if (elements == null)
+            {
+                throw new ArgumentNullException(nameof(elements));
+            }
+
             var enumeratedElements = new List<IElement>(elements);
 
-            if (enumeratedElements.Count == 0) throw new ArgumentException("Elements cannot be empty", nameof(elements));
+            if (enumeratedElements.Count == 0)
+            {
+                throw new ArgumentException("Elements cannot be empty", nameof(elements));
+            }
+
             return await this._waitForAllHandler.Execute(new WaitForCommand(enumeratedElements, waitFor, searchRect, this._monitorIndex, notFoundBehavior)).ConfigureAwait(false);
         }
 
@@ -154,16 +174,28 @@ namespace Askaiser.Marionette
 
         public async Task ScrollUp(int scrollTicks = 1)
         {
-            if (scrollTicks <= 0) throw new ArgumentOutOfRangeException(nameof(scrollTicks), "Scroll ticks must be a positive integer.");
+            if (scrollTicks <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(scrollTicks), "Scroll ticks must be a positive integer.");
+            }
+
             for (var i = 0; i < scrollTicks; i++)
+            {
                 await this._mouseWheelHandler.Execute(new MouseWheelCommand(IsUp: true)).ConfigureAwait(false);
+            }
         }
 
         public async Task ScrollDown(int scrollTicks = 1)
         {
-            if (scrollTicks <= 0) throw new ArgumentOutOfRangeException(nameof(scrollTicks), "Scroll ticks must be a positive integer.");
+            if (scrollTicks <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(scrollTicks), "Scroll ticks must be a positive integer.");
+            }
+
             for (var i = 0; i < scrollTicks; i++)
+            {
                 await this._mouseWheelHandler.Execute(new MouseWheelCommand(IsUp: false)).ConfigureAwait(false);
+            }
         }
 
         public Task ScrollUpUntilVisible(IElement element, TimeSpan totalDuration, int scrollTicks = 1, Rectangle searchRect = default)
@@ -179,12 +211,16 @@ namespace Askaiser.Marionette
         private async Task ScrollUntilVisible(IElement element, TimeSpan totalDuration, bool isUp, int scrollTicks, Rectangle searchRect)
         {
             if (totalDuration <= TimeSpan.Zero)
+            {
                 throw new ArgumentException("Total duration must be greater than zero.", nameof(totalDuration));
+            }
 
             for (var sw = Stopwatch.StartNew(); sw.Elapsed < totalDuration;)
             {
                 if (await this.IsVisible(element, TimeSpan.Zero, searchRect).ConfigureAwait(false))
+                {
                     return;
+                }
 
                 var scrollTask = isUp ? this.ScrollUp(scrollTicks) : this.ScrollDown(scrollTicks);
                 await scrollTask.ConfigureAwait(false);
@@ -195,13 +231,19 @@ namespace Askaiser.Marionette
 
         public async Task TypeText(string text, TimeSpan sleepAfter = default)
         {
-            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (text == null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+
             if (text.Length > 0)
             {
                 await this._typeTextHandler.Execute(new KeyboardTextCommand(text)).ConfigureAwait(false);
 
                 if (sleepAfter > TimeSpan.Zero)
+                {
                     await this.Sleep(sleepAfter).ConfigureAwait(false);
+                }
             }
         }
 
@@ -225,8 +267,15 @@ namespace Askaiser.Marionette
 
         private static void EnsureNotNullOrEmpty(params VirtualKeyCode[] keyCodes)
         {
-            if (keyCodes == null) throw new ArgumentNullException(nameof(keyCodes));
-            if (keyCodes.Length == 0) throw new ArgumentException("Key codes cannot be empty", nameof(keyCodes));
+            if (keyCodes == null)
+            {
+                throw new ArgumentNullException(nameof(keyCodes));
+            }
+
+            if (keyCodes.Length == 0)
+            {
+                throw new ArgumentException("Key codes cannot be empty", nameof(keyCodes));
+            }
         }
 
         public TestContext SetMouseSpeed(MouseSpeed speed)
@@ -261,7 +310,9 @@ namespace Askaiser.Marionette
         public void Dispose()
         {
             foreach (var disposable in this._disposables)
+            {
                 disposable.Dispose();
+            }
         }
     }
 }

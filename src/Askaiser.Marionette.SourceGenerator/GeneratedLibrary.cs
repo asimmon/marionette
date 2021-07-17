@@ -6,6 +6,8 @@ namespace Askaiser.Marionette.SourceGenerator
 {
     internal class GeneratedLibrary
     {
+        private readonly GeneratedLibrary _parent;
+
         public GeneratedLibrary(string name)
             : this(name, null)
         {
@@ -15,7 +17,7 @@ namespace Askaiser.Marionette.SourceGenerator
         {
             this.Name = name.ToCSharpPropertyName();
             this.Level = parent?.Level + 1 ?? 0;
-            this.Parent = parent;
+            this._parent = parent;
             this.Libraries = new Dictionary<string, GeneratedLibrary>(StringComparer.OrdinalIgnoreCase);
             this.Images = new Dictionary<string, List<GeneratedImage>>(StringComparer.OrdinalIgnoreCase);
         }
@@ -26,7 +28,7 @@ namespace Askaiser.Marionette.SourceGenerator
 
         public string UniqueName
         {
-            get => string.Join("", this.GetHierarchy().Reverse().Select(x => x.Name));
+            get => string.Join(string.Empty, this.GetHierarchy().Reverse().Select(x => x.Name));
         }
 
         public bool IsRoot
@@ -38,8 +40,6 @@ namespace Askaiser.Marionette.SourceGenerator
         {
             get => this.Images.Count == 0 && this.Libraries.Values.All(x => x.IsEmpty);
         }
-
-        private GeneratedLibrary Parent { get; }
 
         public Dictionary<string, GeneratedLibrary> Libraries { get; }
 
@@ -54,7 +54,7 @@ namespace Askaiser.Marionette.SourceGenerator
         {
             yield return this;
 
-            for (var parent = this.Parent; parent != null; parent = parent.Parent)
+            for (var parent = this._parent; parent != null; parent = parent._parent)
             {
                 yield return parent;
             }
@@ -63,12 +63,20 @@ namespace Askaiser.Marionette.SourceGenerator
         public IEnumerable<GeneratedImage> GetImagesChildren()
         {
             foreach (var imageGroup in this.Images.Values)
-            foreach (var image in imageGroup.OrderBy(x => x.GroupIndex))
-                yield return image;
+            {
+                foreach (var image in imageGroup.OrderBy(x => x.GroupIndex))
+                {
+                    yield return image;
+                }
+            }
 
             foreach (var library in this.Libraries.Values)
-            foreach (var image in library.GetImagesChildren())
-                yield return image;
+            {
+                foreach (var image in library.GetImagesChildren())
+                {
+                    yield return image;
+                }
+            }
         }
     }
 }

@@ -8,9 +8,6 @@ namespace Askaiser.Marionette.Tests
 {
     public class ElementCollectionTests
     {
-        private static readonly ImageElement ImageElement = new ImageElement("logo", Encoding.UTF8.GetBytes("Hello"), 0.9m, false);
-        private static readonly TextElement TextElement = new TextElement("lorem", "Lorem ipsum", TextOptions.BlackAndWhite);
-
         private const string ValidJsonCollection = @"[
   {
     ""threshold"": 0.9,
@@ -29,6 +26,9 @@ namespace Askaiser.Marionette.Tests
 ]";
 
         private const string InvalidJsonCollection = @"[{""kind"": ""unknown"", ""name"": ""yolo""}]";
+
+        private static readonly ImageElement ImageElement = new ImageElement("logo", Encoding.UTF8.GetBytes("Hello"), 0.9m, false);
+        private static readonly TextElement TextElement = new TextElement("lorem", "Lorem ipsum", TextOptions.BlackAndWhite);
 
         [Fact]
         public void TryGetValue_WhenExists_ReturnsTrue()

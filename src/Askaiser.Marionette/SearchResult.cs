@@ -49,7 +49,9 @@ namespace Askaiser.Marionette
         internal SearchResult AdjustToSearchRectangle(Rectangle rect)
         {
             if (rect == null)
+            {
                 return this;
+            }
 
             var newAreas = this.Areas.Select(x => x.AddOffset(rect.Left, rect.Top));
             return new SearchResult(this.Element, newAreas);
@@ -68,10 +70,14 @@ namespace Askaiser.Marionette
         public void EnsureSingleLocation(TimeSpan waitFor)
         {
             if (this.Areas.Count == 1)
+            {
                 return;
+            }
 
             if (this.Areas.Count == 0)
+            {
                 throw new ElementNotFoundException(this.Element, waitFor);
+            }
 
             throw new MultipleElementLocationsException(this);
         }

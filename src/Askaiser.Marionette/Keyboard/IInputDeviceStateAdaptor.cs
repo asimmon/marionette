@@ -10,7 +10,7 @@
         /// </summary>
         /// <param name="keyCode">The <see cref="VirtualKeyCode"/> for the key.</param>
         /// <returns>
-        /// 	<c>true</c> if the key is down; otherwise, <c>false</c>.
+        /// <c>true</c> if the key is down; otherwise, <c>false</c>.
         /// </returns>
         bool IsKeyDown(VirtualKeyCode keyCode);
 
@@ -19,7 +19,7 @@
         /// </summary>
         /// <param name="keyCode">The <see cref="VirtualKeyCode"/> for the key.</param>
         /// <returns>
-        /// 	<c>true</c> if the key is up; otherwise, <c>false</c>.
+        /// <c>true</c> if the key is up; otherwise, <c>false</c>.
         /// </returns>
         bool IsKeyUp(VirtualKeyCode keyCode);
 
@@ -28,7 +28,7 @@
         /// </summary>
         /// <param name="keyCode">The <see cref="VirtualKeyCode"/> for the key.</param>
         /// <returns>
-        /// 	<c>true</c> if the key is down; otherwise, <c>false</c>.
+        /// <c>true</c> if the key is down; otherwise, <c>false</c>.
         /// </returns>
         bool IsHardwareKeyDown(VirtualKeyCode keyCode);
 
@@ -37,7 +37,7 @@
         /// </summary>
         /// <param name="keyCode">The <see cref="VirtualKeyCode"/> for the key.</param>
         /// <returns>
-        /// 	<c>true</c> if the key is up; otherwise, <c>false</c>.
+        /// <c>true</c> if the key is up; otherwise, <c>false</c>.
         /// </returns>
         bool IsHardwareKeyUp(VirtualKeyCode keyCode);
 
@@ -46,7 +46,7 @@
         /// </summary>
         /// <param name="keyCode">The <see cref="VirtualKeyCode"/> for the key.</param>
         /// <returns>
-        /// 	<c>true</c> if the toggling key is toggled on (in-effect); otherwise, <c>false</c>.
+        /// <c>true</c> if the toggling key is toggled on (in-effect); otherwise, <c>false</c>.
         /// </returns>
         bool IsTogglingKeyInEffect(VirtualKeyCode keyCode);
     }

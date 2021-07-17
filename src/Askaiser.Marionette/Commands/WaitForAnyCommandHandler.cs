@@ -17,7 +17,9 @@ namespace Askaiser.Marionette.Commands
 
             // Rethrow exception if all the tasks are faulted
             if (firstTaskToFinish.IsFaulted)
+            {
                 await firstTaskToFinish.ConfigureAwait(false);
+            }
 
             return firstTaskToFinish.Result;
         }
