@@ -78,7 +78,12 @@ namespace Askaiser.Marionette
                 var screenshot = await GraphicsScreenshot.Take(monitor).ConfigureAwait(false);
 
                 var screenshotStream = new MemoryStream();
+
+#if NETSTANDARD2_0
+                using (screenshotStream)
+#else
                 await using (screenshotStream.ConfigureAwait(false))
+#endif
                 {
                     screenshot.Save(screenshotStream, ImageFormat.Png);
                     this._cachedBitmapBytes = screenshotStream.ToArray();

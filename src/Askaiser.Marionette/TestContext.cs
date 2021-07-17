@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -34,7 +35,7 @@ namespace Askaiser.Marionette
         private int _monitorIndex;
         private MouseSpeed _mouseSpeed;
 
-        internal TestContext(TestContextOptions options, IMonitorService monitorService, IElementRecognizer elementRecognizer, IMouseController mouseController, IKeyboardController keyboardController, IDisposable[] disposables)
+        private TestContext(TestContextOptions options, IMonitorService monitorService, IElementRecognizer elementRecognizer, IMouseController mouseController, IKeyboardController keyboardController, IDisposable[] disposables)
         {
             this._monitorService = monitorService;
             this._disposables = disposables;
@@ -59,7 +60,7 @@ namespace Askaiser.Marionette
             this._mouseSpeed = MouseSpeed.Immediate;
         }
 
-        public static TestContext Create(TestContextOptions options = null)
+        public static TestContext Create(TestContextOptions options = default)
         {
             options ??= new TestContextOptions();
 
@@ -76,6 +77,12 @@ namespace Askaiser.Marionette
         public async Task<MonitorDescription[]> GetMonitors()
         {
             return await this._monitorService.GetMonitors().ConfigureAwait(false);
+        }
+
+        public async Task<Bitmap> GetScreenshot()
+        {
+            var monitor = await this.GetCurrentMonitor().ConfigureAwait(false);
+            return await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
         }
 
         internal async Task<SearchResult> WaitFor(IElement element, TimeSpan waitFor, Rectangle searchRect, NotFoundBehavior notFoundBehavior)
@@ -286,6 +293,11 @@ namespace Askaiser.Marionette
 
         public TestContext SetMonitor(int monitorIndex)
         {
+            if (monitorIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(monitorIndex));
+            }
+
             this._monitorIndex = monitorIndex;
             return this;
         }

@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
     <AssemblyTitle>Askaiser.Marionette</AssemblyTitle>
     <PackageId>Askaiser.Marionette</PackageId>
-    <IsPackable>true</IsPackable>
     <CodeAnalysisRuleSet>..\..\stylecop.ruleset</CodeAnalysisRuleSet>
+    <IsPackable>True</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,18 +12,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenCvSharp4.Windows" Version="4.5.2.20210404"/>
+    <PackageReference Include="OpenCvSharp4" Version="4.5.2.20210404"/>
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.5.2.20210404"/>
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Text.Json" Version="5.0.2" Condition=" '$(TargetFramework)' == 'netstandard2.1' "/>
+    <PackageReference Include="System.Text.Json" Version="5.0.2" Condition=" '$(TargetFramework)' != 'net5.0' "/>
     <PackageReference Include="Tesseract" Version="4.1.1" IncludeAssets="All" PrivateAssets="None"/>
     <PackageReference Include="Tesseract.Drawing" Version="4.1.1"/>
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="tessdata\**" CopyToOutputDirectory="PreserveNewest" PackageCopyToOutput="True" Pack="True"/>
+    <None Include="tessdata\**" CopyToOutputDirectory="PreserveNewest">
+      <PackageCopyToOutput>True</PackageCopyToOutput>
+      <Pack>True</Pack>
+    </None>
   </ItemGroup>
 
   <PropertyGroup>
@@ -37,7 +41,7 @@
     </ItemGroup>
 
     <!-- Prevent copying the source generator files multiple times (for each targeted framework) -->
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
+    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
       <TfmSpecificPackageFile Include="@(_ReferenceCopyLocalPaths)">
         <PackagePath>analyzers/dotnet/cs</PackagePath>
       </TfmSpecificPackageFile>

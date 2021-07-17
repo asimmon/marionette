@@ -9,9 +9,14 @@ namespace Askaiser.Marionette.Tests
     {
         protected static async Task<Bitmap> BitmapFromFile(string path)
         {
+#if NETFRAMEWORK
+            await Task.Yield();
+            var bytes = File.ReadAllBytes(path);
+#else
             var bytes = await File.ReadAllBytesAsync(path);
-            await using var stream = new MemoryStream(bytes);
-            return (Bitmap)Image.FromStream(stream);
+#endif
+            using var ms = new MemoryStream(bytes);
+            return (Bitmap)Image.FromStream(ms);
         }
 
         protected static void AssertResult(SearchResult result, params Point[] expectedCenters)

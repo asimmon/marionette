@@ -148,7 +148,7 @@ namespace Askaiser.Marionette
             private TesseractResultHandler(ResultIterator iterator, TextElement element)
             {
                 this._iterator = iterator;
-                this._searchedText = string.Join(' ', element.Content.Split().TrimAndRemoveEmptyEntries());
+                this._searchedText = string.Join(" ", element.Content.Split().TrimAndRemoveEmptyEntries());
                 this._charEquals = element.IgnoreCase ? AreEqualOrdinalIgnoreCase : AreEqualOrdinal;
                 this._confirmedResults = new List<Rectangle>();
                 this._currentResult = null;

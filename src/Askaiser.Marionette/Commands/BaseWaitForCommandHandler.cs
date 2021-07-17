@@ -100,7 +100,18 @@ namespace Askaiser.Marionette.Commands
             var fileName = string.Format(CultureInfo.InvariantCulture, "{0:yyyy-MM-dd-HH-mm-ss-ffff}_{1}.png", DateTime.UtcNow, elementDescriptor);
 
             var screenshotBytes = screenshot.GetBytes(ImageFormat.Png);
-            await File.WriteAllBytesAsync(Path.Combine(this._options.FailureScreenshotPath, fileName.ToLowerInvariant()), screenshotBytes).ConfigureAwait(false);
+
+#if NETSTANDARD2_0
+            using (var fileStream = File.Open(Path.Combine(this._options.FailureScreenshotPath, fileName.ToLowerInvariant()), FileMode.Create))
+            {
+                await fileStream.WriteAsync(screenshotBytes, 0, screenshotBytes.Length).ConfigureAwait(false);
+            }
+#else
+            await using (var fileStream = File.Open(Path.Combine(this._options.FailureScreenshotPath, fileName.ToLowerInvariant()), FileMode.Create))
+            {
+                await fileStream.WriteAsync(screenshotBytes).ConfigureAwait(false);
+            }
+#endif
         }
     }
 }

@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net5.0;netcoreapp3.1</TargetFrameworks>
-    <IsPackable>false</IsPackable>
+    <TargetFrameworks>net461;netcoreapp3.1;net5.0</TargetFrameworks>
     <CodeAnalysisRuleSet>..\..\stylecop.ruleset</CodeAnalysisRuleSet>
+    <IsPackable>False</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,6 +11,8 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+    <PackageReference Include="OpenCvSharp4" Version="4.5.2.20210404" Condition=" '$(TargetFramework)' == 'net461' "/>
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.5.2.20210404" Condition=" '$(TargetFramework)' == 'net461' "/>
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

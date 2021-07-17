@@ -74,7 +74,7 @@ namespace Askaiser.Marionette.Tests
             collection.Add(ImageElement);
             collection.Add(TextElement);
 
-            await using var stream = new MemoryStream();
+            using var stream = new MemoryStream();
             await collection.SaveAsync(stream);
 
             var actualJson = Encoding.UTF8.GetString(stream.ToArray());
@@ -84,8 +84,8 @@ namespace Askaiser.Marionette.Tests
         [Fact]
         public async Task LoadAsync_WhenSupportedElements_Works()
         {
-            await using (var stream = new MemoryStream())
-            await using (var writer = new StreamWriter(stream))
+            using (var stream = new MemoryStream())
+            using (var writer = new StreamWriter(stream))
             {
                 await writer.WriteAsync(ValidJsonCollection);
                 await writer.FlushAsync();
@@ -119,15 +119,15 @@ namespace Askaiser.Marionette.Tests
             var collection = new ElementCollection();
             collection.Add(new UnknownElement("yolo"));
 
-            await using var stream = new MemoryStream();
+            using var stream = new MemoryStream();
             await Assert.ThrowsAsync<NotSupportedException>(async () => await collection.SaveAsync(stream));
         }
 
         [Fact]
         public async Task LoadAsync_WhenNotSupportedElements_Works()
         {
-            await using (var stream = new MemoryStream())
-            await using (var writer = new StreamWriter(stream))
+            using (var stream = new MemoryStream())
+            using (var writer = new StreamWriter(stream))
             {
                 await writer.WriteAsync(InvalidJsonCollection);
                 await writer.FlushAsync();

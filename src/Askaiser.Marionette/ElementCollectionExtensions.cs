@@ -16,7 +16,11 @@ namespace Askaiser.Marionette
 
             try
             {
+#if NETSTANDARD2_0
+                using (stream)
+#else
                 await using (stream.ConfigureAwait(false))
+#endif
                 {
                     jsonDocument = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
                 }
@@ -57,7 +61,12 @@ namespace Askaiser.Marionette
         public static async Task<ElementCollection> LoadAsync(this ElementCollection elements, string filePath)
         {
             var stream = File.OpenRead(filePath);
+
+#if NETSTANDARD2_0
+            using (stream)
+#else
             await using (stream.ConfigureAwait(false))
+#endif
             {
                 await LoadAsync(elements, stream).ConfigureAwait(false);
             }
@@ -86,7 +95,11 @@ namespace Askaiser.Marionette
                 WriteIndented = true,
             };
 
+#if NETSTANDARD2_0
+            using (destinationStream)
+#else
             await using (destinationStream.ConfigureAwait(false))
+#endif
             {
                 await JsonSerializer.SerializeAsync(destinationStream, jsonElements, jsonSerializerOptions).ConfigureAwait(false);
             }
@@ -97,7 +110,12 @@ namespace Askaiser.Marionette
         public static async Task SaveAsync(this ElementCollection elements, string filePath)
         {
             var destinationStream = File.Create(filePath);
+
+#if NETSTANDARD2_0
+            using (destinationStream)
+#else
             await using (destinationStream.ConfigureAwait(false))
+#endif
             {
                 await SaveAsync(elements, destinationStream).ConfigureAwait(false);
             }
@@ -105,6 +123,10 @@ namespace Askaiser.Marionette
 
         private static T Deserialize<T>(JsonElement element)
         {
+#if NETSTANDARD2_0
+            var json = element.GetRawText();
+            return JsonSerializer.Deserialize<T>(json);
+#else
             var bufferWriter = new ArrayBufferWriter<byte>();
             using (var writer = new Utf8JsonWriter(bufferWriter))
             {
@@ -112,6 +134,7 @@ namespace Askaiser.Marionette
             }
 
             return JsonSerializer.Deserialize<T>(bufferWriter.WrittenSpan);
+#endif
         }
     }
 }
