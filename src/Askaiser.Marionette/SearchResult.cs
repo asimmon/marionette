@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Askaiser.Marionette
 {
-    public sealed class SearchResult : IEnumerable<Rectangle>
+    public class SearchResult : IEnumerable<Rectangle>
     {
         public IElement Element { get; }
 

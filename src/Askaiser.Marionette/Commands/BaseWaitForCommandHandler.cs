@@ -33,19 +33,18 @@ namespace Askaiser.Marionette.Commands
 
             var monitor = await this._monitorService.GetMonitor(command.MonitorIndex).ConfigureAwait(false);
 
-            Bitmap screenshot = null;
+            RecognizerSearchResult disposableResult = null;
             try
             {
                 var isFirstLoop = true;
                 for (var sw = Stopwatch.StartNew(); sw.Elapsed < command.WaitFor || isFirstLoop;)
                 {
-                    screenshot?.Dispose();
-                    screenshot = await this.GetScreenshot(monitor, command.SearchRectangle).ConfigureAwait(false);
+                    using var screenshot = await this.GetScreenshot(monitor, command.SearchRectangle).ConfigureAwait(false);
 
-                    var result = await this._elementRecognizer.Recognize(screenshot, element).ConfigureAwait(false);
-                    if (result.Success)
+                    disposableResult = await this._elementRecognizer.Recognize(screenshot, element).ConfigureAwait(false);
+                    if (disposableResult.Success)
                     {
-                        var adjustedResult = result.AdjustToMonitor(monitor).AdjustToSearchRectangle(command.SearchRectangle);
+                        var adjustedResult = disposableResult.AdjustToMonitor(monitor).AdjustToSearchRectangle(command.SearchRectangle);
 
                         if (command.Behavior == NotFoundBehavior.Throw)
                         {
@@ -61,12 +60,12 @@ namespace Askaiser.Marionette.Commands
 
                 if (command.Behavior == NotFoundBehavior.Throw && this._options.FailureScreenshotPath != null)
                 {
-                    await this.SaveScreenshot(element, screenshot).ConfigureAwait(false);
+                    await this.SaveScreenshot(element, disposableResult.TransformedScreenshot).ConfigureAwait(false);
                 }
             }
             finally
             {
-                screenshot?.Dispose();
+                disposableResult?.Dispose();
             }
 
             if (command.Behavior == NotFoundBehavior.Throw)

@@ -15,7 +15,7 @@ namespace Askaiser.Marionette
             this._textElementRecognizer = textElementRecognizer;
         }
 
-        public async Task<SearchResult> Recognize(Bitmap screenshot, IElement element) => element switch
+        public async Task<RecognizerSearchResult> Recognize(Bitmap screenshot, IElement element) => element switch
         {
             null => throw new ArgumentNullException(nameof(element)),
             ImageElement => await this._imageElementRecognizer.Recognize(screenshot, element).ConfigureAwait(false),

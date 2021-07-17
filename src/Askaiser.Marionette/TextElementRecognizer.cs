@@ -28,13 +28,13 @@ namespace Askaiser.Marionette
             this._activeEngineCount = 0;
         }
 
-        public async Task<SearchResult> Recognize(Bitmap screenshot, IElement element)
+        public async Task<RecognizerSearchResult> Recognize(Bitmap screenshot, IElement element)
         {
-            SearchResult RecognizeInternal()
+            RecognizerSearchResult RecognizeInternal()
             {
                 var textElement = (TextElement)element;
 
-                using var img = screenshot.ToMat()
+                using var screenshotMat = screenshot.ToMat()
                     .ConvertAndDispose(Upscale)
                     .ConvertAndDispose(GetConverters(textElement.Options))
                     .ConvertAndDispose(BitmapConverter.ToBitmap)
@@ -48,11 +48,12 @@ namespace Askaiser.Marionette
                     engineId = newActiveEngineCount > 1 ? Guid.NewGuid() : this._defaultEngineId;
                     var engine = this._engines.GetOrAdd(engineId, _ => this.CreateEngine());
 
-                    using var page = engine.Process(img);
+                    using var page = engine.Process(screenshotMat);
                     using var iterator = page.GetIterator();
                     var areas = TesseractResultHandler.Handle(iterator, textElement);
 
-                    return new SearchResult(element, areas.Select(Downscale));
+                    var transformedScreenshot = PixConverter.ToBitmap(screenshotMat);
+                    return new RecognizerSearchResult(transformedScreenshot, element, areas.Select(Downscale));
                 }
                 finally
                 {

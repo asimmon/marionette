@@ -8,20 +8,20 @@ namespace Askaiser.Marionette
 {
     internal sealed class ImageElementRecognizer : IElementRecognizer
     {
-        public async Task<SearchResult> Recognize(Bitmap screenshot, IElement element)
+        public async Task<RecognizerSearchResult> Recognize(Bitmap screenshot, IElement element)
         {
-            SearchResult RecognizeInternal()
+            RecognizerSearchResult RecognizeInternal()
             {
                 var imageElement = (ImageElement)element;
 
                 // https://stackoverflow.com/a/35346975/825695
-                using var tpl = imageElement.ToBitmap()
+                using var elementTemplate = imageElement.ToBitmap()
                     .ConvertAndDispose(x => x.ToMat())
                     .ConvertAndDispose(x => imageElement.Grayscale ? x.CvtColor(ColorConversionCodes.BGRA2GRAY) : x);
 
-                using var res = screenshot.ToMat()
+                using var screenshotMat = screenshot.ToMat()
                     .ConvertAndDispose(x => imageElement.Grayscale ? x.CvtColor(ColorConversionCodes.BGRA2GRAY) : x)
-                    .MatchTemplate(tpl, TemplateMatchModes.CCoeffNormed)
+                    .MatchTemplate(elementTemplate, TemplateMatchModes.CCoeffNormed)
                     .ConvertAndDispose(x => x.Threshold((double)imageElement.Threshold, 1d, ThresholdTypes.Tozero));
 
                 var areas = new List<Rectangle>();
@@ -31,16 +31,17 @@ namespace Askaiser.Marionette
 
                 while (true)
                 {
-                    res.MinMaxLoc(out _, out var maxval, out _, out var maxloc);
+                    screenshotMat.MinMaxLoc(out _, out var maxval, out _, out var maxloc);
 
                     var notFound = maxval < (double)imageElement.Threshold;
                     if (notFound)
                     {
-                        return new SearchResult(element, areas);
+                        var transformedScreenshot = screenshotMat.ToBitmap();
+                        return new RecognizerSearchResult(transformedScreenshot, element, areas);
                     }
 
-                    areas.Add(new Rectangle(maxloc.X, maxloc.Y, maxloc.X + tpl.Width, maxloc.Y + tpl.Height));
-                    res.FloodFill(maxloc, new Scalar(0), out _, loDiff, upDiff);
+                    areas.Add(new Rectangle(maxloc.X, maxloc.Y, maxloc.X + elementTemplate.Width, maxloc.Y + elementTemplate.Height));
+                    screenshotMat.FloodFill(maxloc, new Scalar(0), out _, loDiff, upDiff);
                 }
             }
 

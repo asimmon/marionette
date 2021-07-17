@@ -241,47 +241,47 @@ namespace Askaiser.Marionette
 
         #region Text-based actions
 
-        public static async Task WaitFor(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        public static async Task<SearchResult> WaitFor(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
         {
-            await context.WaitFor(new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+            return await context.WaitFor(new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
         }
 
-        public static async Task MoveTo(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        public static async Task MoveTo(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
         {
             await MoveTo(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
         }
 
-        public static async Task SingleClick(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        public static async Task SingleClick(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
         {
             await SingleClick(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
         }
 
-        public static async Task DoubleClick(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        public static async Task DoubleClick(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
         {
             await DoubleClick(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
         }
 
-        public static async Task TripleClick(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        public static async Task TripleClick(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
         {
             await TripleClick(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
         }
 
-        public static async Task RightClick(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        public static async Task RightClick(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
         {
             await RightClick(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
         }
 
-        public static async Task DragFrom(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        public static async Task DragFrom(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
         {
             await DragFrom(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
         }
 
-        public static async Task DropTo(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        public static async Task DropTo(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
         {
             await DropTo(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
         }
 
-        public static async Task<bool> IsVisible(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = default)
+        public static async Task<bool> IsVisible(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
         {
             return await IsVisible(context, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
         }
@@ -290,9 +290,9 @@ namespace Askaiser.Marionette
 
         #region System.Drawing.Image-based actions
 
-        public static async Task WaitFor(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+        public static async Task<SearchResult> WaitFor(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
         {
-            await context.WaitFor(new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+            return await context.WaitFor(new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
         }
 
         public static async Task MoveTo(this TestContext context, Image image, TimeSpan waitFor = default, Rectangle searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
