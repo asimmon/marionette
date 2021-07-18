@@ -108,7 +108,7 @@ namespace Askaiser.Marionette.SourceGenerator
             var cw = new CodeWriter();
 
             cw.Append("// Code generated at ").AppendLine(this._dateTimeProvider.Now.ToString("O"));
-            cw.Append("// From the directory: ").AppendLine(this._target.ImageDirectoryPath);
+            cw.Append("// From directory: ").AppendLine(this._target.ImageDirectoryPath);
             cw.Append("using ").Append(ParentNamespace).AppendLine(";");
             cw.AppendLine();
 
@@ -212,15 +212,14 @@ namespace Askaiser.Marionette.SourceGenerator
                 else
                 {
                     cw.Append("public IElement[] ").Append(imageGroup[0].Name).AppendLine(" => new[]");
-                    using (cw.BeginBlock())
+                    cw.AppendLine("{");
+
+                    for (var i = 0; i < imageGroup.Count; i++)
                     {
-                        for (var i = 0; i < imageGroup.Count; i++)
-                        {
-                            cw.Append("this._elements[\"").Append(imageGroup[i].UniqueName).AppendLine(i == imageGroup.Count - 1 ? "\"]" : "\"],");
-                        }
+                        cw.Append("    this._elements[\"").Append(imageGroup[i].UniqueName).AppendLine(i == imageGroup.Count - 1 ? "\"]" : "\"],");
                     }
 
-                    cw.AppendLine(";");
+                    cw.AppendLine("};");
                 }
             }
         }

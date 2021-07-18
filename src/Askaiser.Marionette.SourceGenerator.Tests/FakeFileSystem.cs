@@ -47,7 +47,7 @@ namespace Askaiser.Marionette.SourceGenerator.Tests
                 return;
             }
 
-            var pathParts = entry.Split(Slashes, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var pathParts = entry.Split(Slashes, StringSplitOptions.RemoveEmptyEntries);
             if (pathParts.Length == 0)
             {
                 return;
