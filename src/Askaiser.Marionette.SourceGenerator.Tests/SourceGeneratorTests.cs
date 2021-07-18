@@ -110,7 +110,7 @@ namespace MyCode
 {
     public partial class MyLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public MyLibrary()
         {
@@ -157,7 +157,7 @@ namespace MyCode
 {
     public partial class MyLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public MyLibrary()
         {
@@ -204,7 +204,7 @@ namespace MyCode
 {
     public partial class MyLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public MyLibrary()
         {
@@ -251,7 +251,7 @@ namespace MyCode
 {
     public partial class MyLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public MyLibrary()
         {
@@ -296,7 +296,7 @@ using Askaiser.Marionette;
 
 public partial class MyLibrary
 {
-    protected readonly ElementCollection _elements;
+    private readonly ElementCollection _elements;
 
     public MyLibrary()
     {
@@ -346,7 +346,7 @@ namespace MyCode
 {
     public partial class MyLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public MyLibrary()
         {
@@ -355,6 +355,7 @@ namespace MyCode
         }
 
         public IElement Logo => this._elements[""Root.Logo.0""];
+
         public IElement Sidebar => this._elements[""Root.Sidebar.0""];
 
         private void CreateElements()
@@ -399,7 +400,7 @@ namespace MyCode
 {
     public partial class MyLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public MyLibrary()
         {
@@ -411,6 +412,7 @@ namespace MyCode
         }
 
         public RootBarLibrary Bar { get; }
+
         public RootFooLibrary Foo { get; }
 
         private void CreateElements()
@@ -422,7 +424,7 @@ namespace MyCode
 
     public partial class RootBarLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public RootBarLibrary(ElementCollection elements)
         {
@@ -434,7 +436,7 @@ namespace MyCode
 
     public partial class RootFooLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public RootFooLibrary(ElementCollection elements)
         {
@@ -479,7 +481,7 @@ namespace MyCode
 {
     public partial class MyLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public MyLibrary()
         {
@@ -537,7 +539,7 @@ namespace MyCode
 {
     public partial class MyLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public MyLibrary()
         {
@@ -557,13 +559,12 @@ namespace MyCode
 
     public partial class RootFooLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public RootFooLibrary(ElementCollection elements)
         {
             this._elements = elements;
         }
-
 
         public IElement Logo => this._elements[""Root.Foo.Logo.0""];
     }
@@ -603,7 +604,7 @@ namespace MyCode
 {
     public partial class MyLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public MyLibrary()
         {
@@ -615,6 +616,7 @@ namespace MyCode
         }
 
         public RootFooLibrary Foo { get; }
+
         public RootQuxLibrary Qux { get; }
 
         private void CreateElements()
@@ -626,7 +628,7 @@ namespace MyCode
 
     public partial class RootFooLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public RootFooLibrary(ElementCollection elements)
         {
@@ -639,7 +641,7 @@ namespace MyCode
 
     public partial class RootFooBarLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public RootFooBarLibrary(ElementCollection elements)
         {
@@ -651,7 +653,7 @@ namespace MyCode
 
     public partial class RootQuxLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public RootQuxLibrary(ElementCollection elements)
         {
@@ -664,7 +666,7 @@ namespace MyCode
 
     public partial class RootQuxBazLibrary
     {
-        protected readonly ElementCollection _elements;
+        private readonly ElementCollection _elements;
 
         public RootQuxBazLibrary(ElementCollection elements)
         {

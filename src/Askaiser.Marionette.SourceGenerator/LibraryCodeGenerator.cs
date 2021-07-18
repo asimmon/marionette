@@ -141,7 +141,7 @@ namespace Askaiser.Marionette.SourceGenerator
 
             using (cw.BeginClass("public partial", className))
             {
-                cw.AppendLine("protected readonly ElementCollection _elements;");
+                cw.AppendLine("private readonly ElementCollection _elements;");
                 cw.AppendLine();
                 this.GenerateLibraryConstructorCode(library, cw);
                 GenerateLibraryPropertiesCode(library, cw);
@@ -188,23 +188,16 @@ namespace Askaiser.Marionette.SourceGenerator
 
         private static void GenerateLibraryPropertiesCode(GeneratedLibrary library, CodeWriter cw)
         {
-            if (library.Libraries.Count > 0)
-            {
-                cw.AppendLine();
-            }
-
             foreach (var childLibrary in library.Libraries.Values.Where(x => !x.IsEmpty).OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
             {
-                cw.Append("public ").Append(childLibrary.UniqueName).Append("Library ").Append(childLibrary.Name).AppendLine(" { get; }");
-            }
-
-            if (library.Images.Count > 0)
-            {
                 cw.AppendLine();
+                cw.Append("public ").Append(childLibrary.UniqueName).Append("Library ").Append(childLibrary.Name).AppendLine(" { get; }");
             }
 
             foreach (var imageGroup in library.Images.Values)
             {
+                cw.AppendLine();
+
                 if (imageGroup.Count == 1)
                 {
                     cw.Append("public IElement ").Append(imageGroup[0].Name).Append(" => this._elements[\"").Append(imageGroup[0].UniqueName).AppendLine("\"];");
@@ -214,9 +207,9 @@ namespace Askaiser.Marionette.SourceGenerator
                     cw.Append("public IElement[] ").Append(imageGroup[0].Name).AppendLine(" => new[]");
                     cw.AppendLine("{");
 
-                    for (var i = 0; i < imageGroup.Count; i++)
+                    for (var j = 0; j < imageGroup.Count; j++)
                     {
-                        cw.Append("    this._elements[\"").Append(imageGroup[i].UniqueName).AppendLine(i == imageGroup.Count - 1 ? "\"]" : "\"],");
+                        cw.Append("    this._elements[\"").Append(imageGroup[j].UniqueName).AppendLine(j == imageGroup.Count - 1 ? "\"]" : "\"],");
                     }
 
                     cw.AppendLine("};");

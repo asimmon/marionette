@@ -57,7 +57,7 @@ namespace Askaiser.Marionette
             this._keyUpHandler = new KeyUpCommandHandler(keyboardController);
 
             this._monitorIndex = 0;
-            this._mouseSpeed = MouseSpeed.Immediate;
+            this._mouseSpeed = MouseSpeed.Fast;
         }
 
         public static TestContext Create(TestContextOptions options = default)
