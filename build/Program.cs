@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Cake.Common;
 using Cake.Common.Diagnostics;
@@ -12,6 +13,8 @@ using Cake.Common.Tools.DotNetCore.Test;
 using Cake.Common.Tools.GitVersion;
 using Cake.Core;
 using Cake.Frosting;
+
+[assembly: SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleType", Justification = "Multiple tasks classes in a single file improves readability.")]
 
 public static class Program
 {
@@ -34,13 +37,15 @@ public static class Constants
 
 public class BuildContext : FrostingContext
 {
-    public BuildContext(ICakeContext context) : base(context)
+    public BuildContext(ICakeContext context)
+        : base(context)
     {
         this.MsBuildConfiguration = context.Argument("configuration", Constants.Release);
         this.SharedMSBuildSettings = new DotNetCoreMSBuildSettings();
     }
 
     public string MsBuildConfiguration { get; }
+
     public DotNetCoreMSBuildSettings SharedMSBuildSettings { get; }
 
     public void AddMSBuildProperty(string name, string value)
@@ -66,7 +71,7 @@ public sealed class MetadataTask : FrostingTask<BuildContext>
 
     private static void AddMSBuildAssemblyVersion(BuildContext context)
     {
-        if (context.Argument("package-version", "").Trim() is { Length: > 0 } userVersion)
+        if (context.Argument("package-version", string.Empty).Trim() is { Length: > 0 } userVersion)
         {
             if (userVersion.Split('-', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) is { Length: 2 } versionParts)
             {
@@ -88,7 +93,10 @@ public sealed class MetadataTask : FrostingTask<BuildContext>
                 context.AddMSBuildProperty("VersionPrefix", gitVersion.AssemblySemVer);
                 context.AddMSBuildProperty("VersionSuffix", "alpha" + gitVersion.BuildMetaData);
             }
-            else context.AddMSBuildProperty("Version", gitVersion.AssemblySemVer);
+            else
+            {
+                context.AddMSBuildProperty("Version", gitVersion.AssemblySemVer);
+            }
         }
     }
 
@@ -126,7 +134,7 @@ public sealed class RestoreTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context) => context.DotNetCoreRestore(Constants.SolutionPath, new DotNetCoreRestoreSettings
     {
-        MSBuildSettings = context.SharedMSBuildSettings
+        MSBuildSettings = context.SharedMSBuildSettings,
     });
 }
 
@@ -141,7 +149,7 @@ public sealed class BuildTask : FrostingTask<BuildContext>
         Configuration = context.MsBuildConfiguration,
         MSBuildSettings = context.SharedMSBuildSettings,
         NoRestore = true,
-        NoLogo = true
+        NoLogo = true,
     });
 }
 

@@ -4,8 +4,8 @@ namespace Askaiser.Marionette.SourceGenerator.Tests
     {
         public GeneratedSourceFile(string filename, string code)
         {
-            Filename = filename;
-            Code = code;
+            this.Filename = filename;
+            this.Code = code;
         }
 
         public string Filename { get; }
