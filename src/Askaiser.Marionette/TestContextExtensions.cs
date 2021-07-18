@@ -103,19 +103,19 @@ namespace Askaiser.Marionette
 
         #region Mouse interaction with search result
 
-        public static async Task MoveTo(this TestContext context, SearchResult searchResult) => await MoveTo(context, searchResult.Area.Center).ConfigureAwait(false);
+        public static async Task MoveTo(this TestContext context, SearchResult searchResult) => await MoveTo(context, searchResult.Location.Center).ConfigureAwait(false);
 
-        public static async Task SingleClick(this TestContext context, SearchResult searchResult) => await SingleClick(context, searchResult.Area.Center).ConfigureAwait(false);
+        public static async Task SingleClick(this TestContext context, SearchResult searchResult) => await SingleClick(context, searchResult.Location.Center).ConfigureAwait(false);
 
-        public static async Task DoubleClick(this TestContext context, SearchResult searchResult) => await DoubleClick(context, searchResult.Area.Center).ConfigureAwait(false);
+        public static async Task DoubleClick(this TestContext context, SearchResult searchResult) => await DoubleClick(context, searchResult.Location.Center).ConfigureAwait(false);
 
-        public static async Task TripleClick(this TestContext context, SearchResult searchResult) => await TripleClick(context, searchResult.Area.Center).ConfigureAwait(false);
+        public static async Task TripleClick(this TestContext context, SearchResult searchResult) => await TripleClick(context, searchResult.Location.Center).ConfigureAwait(false);
 
-        public static async Task RightClick(this TestContext context, SearchResult searchResult) => await RightClick(context, searchResult.Area.Center).ConfigureAwait(false);
+        public static async Task RightClick(this TestContext context, SearchResult searchResult) => await RightClick(context, searchResult.Location.Center).ConfigureAwait(false);
 
-        public static async Task DragFrom(this TestContext context, SearchResult searchResult) => await DragFrom(context, searchResult.Area.Center).ConfigureAwait(false);
+        public static async Task DragFrom(this TestContext context, SearchResult searchResult) => await DragFrom(context, searchResult.Location.Center).ConfigureAwait(false);
 
-        public static async Task DropTo(this TestContext context, SearchResult searchResult) => await DropTo(context, searchResult.Area.Center).ConfigureAwait(false);
+        public static async Task DropTo(this TestContext context, SearchResult searchResult) => await DropTo(context, searchResult.Location.Center).ConfigureAwait(false);
 
         #endregion
 
@@ -342,7 +342,7 @@ namespace Askaiser.Marionette
         public static async Task<Rectangle[]> FindLocations(this TestContext context, IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
             var result = await context.WaitFor(element, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
-            return result.Areas.ToArray();
+            return result.Locations.ToArray();
         }
 
         public static async Task<Rectangle[]> FindLocations(this TestContext context, string text, TimeSpan waitFor = default, Rectangle searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)

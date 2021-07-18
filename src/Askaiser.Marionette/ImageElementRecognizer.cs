@@ -24,7 +24,7 @@ namespace Askaiser.Marionette
                     .MatchTemplate(elementTemplate, TemplateMatchModes.CCoeffNormed)
                     .ConvertAndDispose(x => x.Threshold((double)imageElement.Threshold, 1d, ThresholdTypes.Tozero));
 
-                var areas = new List<Rectangle>();
+                var locations = new List<Rectangle>();
 
                 var loDiff = new Scalar(0.1);
                 var upDiff = new Scalar(1.0);
@@ -37,10 +37,10 @@ namespace Askaiser.Marionette
                     if (notFound)
                     {
                         var transformedScreenshot = preprocessedScreenshotMat.ToBitmap();
-                        return new RecognizerSearchResult(transformedScreenshot, element, areas);
+                        return new RecognizerSearchResult(transformedScreenshot, element, locations);
                     }
 
-                    areas.Add(new Rectangle(maxloc.X, maxloc.Y, maxloc.X + elementTemplate.Width, maxloc.Y + elementTemplate.Height));
+                    locations.Add(new Rectangle(maxloc.X, maxloc.Y, maxloc.X + elementTemplate.Width, maxloc.Y + elementTemplate.Height));
                     workingScreenshotMat.FloodFill(maxloc, new Scalar(0), out _, loDiff, upDiff);
                 }
             }

@@ -10,29 +10,29 @@ namespace Askaiser.Marionette
     {
         public IElement Element { get; }
 
-        public IReadOnlyList<Rectangle> Areas { get; }
+        public IReadOnlyList<Rectangle> Locations { get; }
 
         public bool Success { get; }
 
-        public Rectangle Area
+        public Rectangle Location
         {
             get
             {
                 this.EnsureSingleLocation(TimeSpan.Zero);
-                return this.Areas[0];
+                return this.Locations[0];
             }
         }
 
-        internal SearchResult(IElement element, IEnumerable<Rectangle> areas)
+        internal SearchResult(IElement element, IEnumerable<Rectangle> locations)
         {
             this.Element = element;
-            this.Areas = new List<Rectangle>(areas);
-            this.Success = this.Areas.Count > 0;
+            this.Locations = new List<Rectangle>(locations);
+            this.Success = this.Locations.Count > 0;
         }
 
         public IEnumerator<Rectangle> GetEnumerator()
         {
-            return this.Areas.GetEnumerator();
+            return this.Locations.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -42,8 +42,8 @@ namespace Askaiser.Marionette
 
         internal SearchResult AdjustToMonitor(MonitorDescription monitor)
         {
-            var newAreas = this.Areas.Select(x => x.AddOffset(monitor.Left, monitor.Top));
-            return new SearchResult(this.Element, newAreas);
+            var newLocations = this.Locations.Select(x => x.AddOffset(monitor.Left, monitor.Top));
+            return new SearchResult(this.Element, newLocations);
         }
 
         internal SearchResult AdjustToSearchRectangle(Rectangle rect)
@@ -53,13 +53,13 @@ namespace Askaiser.Marionette
                 return this;
             }
 
-            var newAreas = this.Areas.Select(x => x.AddOffset(rect.Left, rect.Top));
-            return new SearchResult(this.Element, newAreas);
+            var newLocations = this.Locations.Select(x => x.AddOffset(rect.Left, rect.Top));
+            return new SearchResult(this.Element, newLocations);
         }
 
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, "Search results for '{0}': {1}", this.Element, this.Areas.Count > 0 ? this.Areas.ToCenterString() : "none");
+            return string.Format(CultureInfo.InvariantCulture, "Search results for '{0}': {1}", this.Element, this.Locations.Count > 0 ? this.Locations.ToCenterString() : "none");
         }
 
         public static SearchResult NotFound(IElement element)
@@ -69,12 +69,12 @@ namespace Askaiser.Marionette
 
         public void EnsureSingleLocation(TimeSpan waitFor)
         {
-            if (this.Areas.Count == 1)
+            if (this.Locations.Count == 1)
             {
                 return;
             }
 
-            if (this.Areas.Count == 0)
+            if (this.Locations.Count == 0)
             {
                 throw new ElementNotFoundException(this.Element, waitFor);
             }

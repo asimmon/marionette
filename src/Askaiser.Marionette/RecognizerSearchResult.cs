@@ -7,8 +7,8 @@ namespace Askaiser.Marionette
 {
     internal sealed class RecognizerSearchResult : SearchResult, IDisposable
     {
-        public RecognizerSearchResult(Bitmap transformedScreenshot, IElement element, IEnumerable<Rectangle> areas)
-            : base(element, areas)
+        public RecognizerSearchResult(Bitmap transformedScreenshot, IElement element, IEnumerable<Rectangle> locations)
+            : base(element, locations)
         {
             this.TransformedScreenshot = transformedScreenshot;
         }

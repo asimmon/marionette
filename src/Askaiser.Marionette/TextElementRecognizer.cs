@@ -50,10 +50,10 @@ namespace Askaiser.Marionette
 
                     using var page = engine.Process(screenshotMat);
                     using var iterator = page.GetIterator();
-                    var areas = TesseractResultHandler.Handle(iterator, textElement);
+                    var locations = TesseractResultHandler.Handle(iterator, textElement);
 
                     var transformedScreenshot = PixConverter.ToBitmap(screenshotMat);
-                    return new RecognizerSearchResult(transformedScreenshot, element, areas.Select(Downscale));
+                    return new RecognizerSearchResult(transformedScreenshot, element, locations.Select(Downscale));
                 }
                 finally
                 {
