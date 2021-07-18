@@ -7,8 +7,8 @@ namespace Askaiser.Marionette.SourceGenerator.Tests
     {
         private readonly List<GeneratedSourceFile> _generatedSources;
 
-        internal TestableLibrarySourceGenerator(IFileSystem fileSystem)
-            : base(fileSystem)
+        internal TestableLibrarySourceGenerator(IFileSystem fileSystem, IDateTimeProvider dateTimeProvider)
+            : base(fileSystem, dateTimeProvider)
         {
             this._generatedSources = new List<GeneratedSourceFile>();
         }

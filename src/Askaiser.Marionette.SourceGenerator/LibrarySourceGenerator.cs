@@ -12,14 +12,16 @@ namespace Askaiser.Marionette.SourceGenerator
     public class LibrarySourceGenerator : ISourceGenerator
     {
         private readonly IFileSystem _fileSystem;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
-        internal LibrarySourceGenerator(IFileSystem fileSystem)
+        internal LibrarySourceGenerator(IFileSystem fileSystem, IDateTimeProvider dateTimeProvider)
         {
             this._fileSystem = fileSystem;
+            this._dateTimeProvider = dateTimeProvider;
         }
 
         public LibrarySourceGenerator()
-            : this(new FileSystem())
+            : this(new FileSystem(), new UtcDateTimeProvider())
         {
         }
 
@@ -37,7 +39,7 @@ namespace Askaiser.Marionette.SourceGenerator
 
             foreach (var targetedClass in receiver.TargetedClasses)
             {
-                this.AddSource(context, new LibraryCodeGenerator(this._fileSystem, targetedClass).Generate());
+                this.AddSource(context, new LibraryCodeGenerator(this._fileSystem, this._dateTimeProvider, targetedClass).Generate());
             }
         }
 

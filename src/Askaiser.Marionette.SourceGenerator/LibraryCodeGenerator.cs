@@ -16,13 +16,15 @@ namespace Askaiser.Marionette.SourceGenerator
         };
 
         private readonly IFileSystem _fileSystem;
+        private readonly IDateTimeProvider _dateTimeProvider;
         private readonly TargetedClassInfo _target;
         private readonly GeneratedLibrary _rootLibrary;
         private readonly List<string> _warnings;
 
-        internal LibraryCodeGenerator(IFileSystem fileSystem, TargetedClassInfo target)
+        internal LibraryCodeGenerator(IFileSystem fileSystem, IDateTimeProvider dateTimeProvider, TargetedClassInfo target)
         {
             this._fileSystem = fileSystem;
+            this._dateTimeProvider = dateTimeProvider;
             this._target = target;
             this._rootLibrary = new GeneratedLibrary("root");
             this._warnings = new List<string>();
@@ -105,7 +107,7 @@ namespace Askaiser.Marionette.SourceGenerator
         {
             var cw = new CodeWriter();
 
-            cw.Append("// Code generated at ").AppendLine(DateTime.UtcNow.ToString("O"));
+            cw.Append("// Code generated at ").AppendLine(this._dateTimeProvider.Now.ToString("O"));
             cw.Append("// From the directory: ").AppendLine(this._target.ImageDirectoryPath);
             cw.Append("using ").Append(ParentNamespace).AppendLine(";");
             cw.AppendLine();

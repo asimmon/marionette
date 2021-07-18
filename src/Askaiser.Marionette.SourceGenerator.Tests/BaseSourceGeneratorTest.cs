@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
@@ -13,10 +14,13 @@ namespace Askaiser.Marionette.SourceGenerator.Tests
         protected BaseSourceGeneratorTest()
         {
             this.FileSystem = new FakeFileSystem();
-            this.SourceGenerator = new TestableLibrarySourceGenerator(this.FileSystem);
+            this.DateTimeProvider = new FakeDateTimeProvider(DateTime.Parse("2021-01-01T00:00:00", DateTimeFormatInfo.InvariantInfo));
+            this.SourceGenerator = new TestableLibrarySourceGenerator(this.FileSystem, this.DateTimeProvider);
         }
 
         protected FakeFileSystem FileSystem { get; }
+
+        public FakeDateTimeProvider DateTimeProvider { get; }
 
         protected TestableLibrarySourceGenerator SourceGenerator { get; }
 

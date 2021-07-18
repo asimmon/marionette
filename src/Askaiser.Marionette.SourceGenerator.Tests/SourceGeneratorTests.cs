@@ -18,10 +18,10 @@ namespace Askaiser.Marionette.SourceGenerator.Tests
         public void PartialClassWithoutAttribute_GeneratesNothing()
         {
             const string userSource = @"
-            namespace MyCode
-            {
-                public partial class MyLibrary { }
-            }";
+namespace MyCode
+{
+    public partial class MyLibrary { }
+}";
 
             var result = this.Compile(userSource);
 
@@ -34,11 +34,11 @@ namespace Askaiser.Marionette.SourceGenerator.Tests
         public void NotPartialClassWithAttribute_GeneratesNothing()
         {
             const string userSource = @"
-            namespace MyCode
-            {
-                [Askaiser.Marionette.ImageLibraryAttribute(""ignored"")]
-                public class MyLibrary { }
-            }";
+namespace MyCode
+{
+    [Askaiser.Marionette.ImageLibraryAttribute(""ignored"")]
+    public class MyLibrary { }
+}";
 
             var result = this.Compile(userSource);
 
@@ -51,11 +51,11 @@ namespace Askaiser.Marionette.SourceGenerator.Tests
         public void WhenNullImageLibraryPath_GeneratesNothing()
         {
             const string userSource = @"
-            namespace MyCode
-            {
-                [Askaiser.Marionette.ImageLibraryAttribute(null)]
-                public partial class MyLibrary { }
-            }";
+namespace MyCode
+{
+    [Askaiser.Marionette.ImageLibraryAttribute(null)]
+    public partial class MyLibrary { }
+}";
 
             var result = this.Compile(userSource);
 
@@ -68,11 +68,11 @@ namespace Askaiser.Marionette.SourceGenerator.Tests
         public void WhenEmptyImageLibraryPath_GeneratesNothing()
         {
             const string userSource = @"
-            namespace MyCode
-            {
-                [Askaiser.Marionette.ImageLibraryAttribute("""")]
-                public partial class MyLibrary { }
-            }";
+namespace MyCode
+{
+    [Askaiser.Marionette.ImageLibraryAttribute("""")]
+    public partial class MyLibrary { }
+}";
 
             var result = this.Compile(userSource);
 
@@ -85,11 +85,11 @@ namespace Askaiser.Marionette.SourceGenerator.Tests
         public void WhenNoImagesInCurrentDirectory_GeneratesEmptyLibrary()
         {
             const string userSource = @"
-            namespace MyCode
-            {
-                [Askaiser.Marionette.ImageLibraryAttribute(""."")]
-                public partial class MyLibrary { }
-            }";
+namespace MyCode
+{
+    [Askaiser.Marionette.ImageLibraryAttribute(""."")]
+    public partial class MyLibrary { }
+}";
 
             var result = this.Compile(userSource);
 
@@ -99,6 +99,31 @@ namespace Askaiser.Marionette.SourceGenerator.Tests
             var sourceFile = Assert.Single(result.SourceFiles);
             Assert.NotNull(sourceFile);
             Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
+
+            const string expectedSource =
+@"// Code generated at 2021-01-01T00:00:00.0000000
+// From the directory: .
+using Askaiser.Marionette;
+
+namespace MyCode
+{
+    public partial class MyLibrary
+    {
+        protected readonly ElementCollection _elements;
+
+        public MyLibrary()
+        {
+            this._elements = new ElementCollection();
+            this.CreateElements();
+        }
+
+        private void CreateElements()
+        {
+        }
+    }
+}
+";
+            Assert.Equal(expectedSource, sourceFile.Code);
         }
     }
 }
