@@ -13,7 +13,7 @@ namespace Askaiser.Marionette.SourceGenerator
         private static readonly Regex ThresholdRegex = new Regex("^(1\\.0|0\\.[0-9]{1,4})$", RegexOptions.Compiled | RegexOptions.Singleline);
         private static readonly Regex GroupIndexRegex = new Regex("^[1-9][0-9]*$", RegexOptions.Compiled | RegexOptions.Singleline);
 
-        private GeneratedImage(string fileName, byte[] bytes, GeneratedLibrary rootLibrary)
+        public GeneratedImage(string fileName, byte[] bytes, GeneratedLibrary rootLibrary)
         {
             var libsAndElementRawNames = Path.GetFileNameWithoutExtension(fileName)
                 .Split(new[] { "--" }, StringSplitOptions.None)
@@ -76,12 +76,6 @@ namespace Askaiser.Marionette.SourceGenerator
         public string UniqueName
         {
             get => string.Join(".", this.GetUniqueNameParts());
-        }
-
-        public static GeneratedImage Create(FileInfo imageFile, GeneratedLibrary rootLibrary)
-        {
-            var bytes = File.ReadAllBytes(imageFile.FullName);
-            return new GeneratedImage(imageFile.Name, bytes, rootLibrary);
         }
 
         private static GeneratedLibrary EnsureLibraryHierarchy(GeneratedLibrary library, IEnumerable<string> librariesRawNames)

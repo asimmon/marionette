@@ -1,13 +1,28 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+
+[assembly: InternalsVisibleTo("Askaiser.Marionette.SourceGenerator.Tests")]
 
 namespace Askaiser.Marionette.SourceGenerator
 {
     [Generator]
     public class LibrarySourceGenerator : ISourceGenerator
     {
+        private readonly IFileSystem _fileSystem;
+
+        internal LibrarySourceGenerator(IFileSystem fileSystem)
+        {
+            this._fileSystem = fileSystem;
+        }
+
+        public LibrarySourceGenerator()
+            : this(new FileSystem())
+        {
+        }
+
         public void Initialize(GeneratorInitializationContext context)
         {
             context.RegisterForSyntaxNotifications(() => new LibrarySyntaxReceiver());
@@ -22,11 +37,11 @@ namespace Askaiser.Marionette.SourceGenerator
 
             foreach (var targetedClass in receiver.TargetedClasses)
             {
-                AddSource(context, LibraryCodeGenerator.Generate(targetedClass));
+                this.AddSource(context, new LibraryCodeGenerator(this._fileSystem, targetedClass).Generate());
             }
         }
 
-        private static void AddSource(GeneratorExecutionContext context, CodeGeneratorResult result)
+        protected virtual void AddSource(GeneratorExecutionContext context, CodeGeneratorResult result)
         {
             if (result.Warnings.Count > 0)
             {

@@ -15,64 +15,64 @@ namespace Askaiser.Marionette.SourceGenerator
             ".PNG", ".JPEG", ".JPG", ".BMP",
         };
 
+        private readonly IFileSystem _fileSystem;
         private readonly TargetedClassInfo _target;
-        private readonly DirectoryInfo _imageDirectory;
         private readonly GeneratedLibrary _rootLibrary;
         private readonly List<string> _warnings;
 
-        private LibraryCodeGenerator(TargetedClassInfo target)
+        internal LibraryCodeGenerator(IFileSystem fileSystem, TargetedClassInfo target)
         {
+            this._fileSystem = fileSystem;
             this._target = target;
-            this._imageDirectory = new DirectoryInfo(target.ImageDirectoryPath);
             this._rootLibrary = new GeneratedLibrary("root");
             this._warnings = new List<string>();
         }
 
-        public static CodeGeneratorResult Generate(TargetedClassInfo options)
+        public CodeGeneratorResult Generate()
         {
-            return new LibraryCodeGenerator(options).Generate();
-        }
-
-        private CodeGeneratorResult Generate()
-        {
-            this.ProcessImagesInDirectory(this._imageDirectory, this._rootLibrary);
+            this.ProcessImagesInDirectory(this._target.ImageDirectoryPath, this._rootLibrary);
             var filename = $"{this._target.NamespaceName}.{this._target.ClassName}.images.cs".TrimStart('.');
             return new CodeGeneratorResult(filename, this.GenerateCode(), this._warnings);
         }
 
-        private void ProcessImagesInDirectory(DirectoryInfo directory, GeneratedLibrary library)
+        private void ProcessImagesInDirectory(string directoryPath, GeneratedLibrary library)
         {
-            var imageFiles = directory.EnumerateFiles("*.*").Where(x => SupportedImageExtensions.Contains(x.Extension));
+            var imageFiles = this._fileSystem.EnumerateFiles(directoryPath).Where(EndsWithImageExtension);
 
             this.ProcessImages(imageFiles, library);
 
-            foreach (var subDirectory in directory.EnumerateDirectories())
+            foreach (var subDirectoryPath in this._fileSystem.EnumerateDirectories(directoryPath))
             {
                 var localLibraryRef = library;
-                var subLibrary = library.Libraries.GetOrCreate(subDirectory.Name, x => localLibraryRef.CreateChild(x));
-                this.ProcessImagesInDirectory(subDirectory, subLibrary);
+                var subLibrary = library.Libraries.GetOrCreate(Path.GetFileName(subDirectoryPath), x => localLibraryRef.CreateChild(x));
+                this.ProcessImagesInDirectory(subDirectoryPath, subLibrary);
             }
         }
 
-        private void ProcessImages(IEnumerable<FileInfo> imageFiles, GeneratedLibrary library)
+        private static bool EndsWithImageExtension(string path)
         {
-            foreach (var image in imageFiles)
+            return SupportedImageExtensions.Any(x => path.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private void ProcessImages(IEnumerable<string> imageFilePaths, GeneratedLibrary library)
+        {
+            foreach (var imageFilePath in imageFilePaths)
             {
-                this.ProcessImage(image, library);
+                this.ProcessImage(imageFilePath, library);
             }
         }
 
-        private void ProcessImage(FileInfo imageFile, GeneratedLibrary library)
+        private void ProcessImage(string imageFilePath, GeneratedLibrary library)
         {
-            if (imageFile.Length > this._target.MaxImageSize)
+            var imageFileSize = this._fileSystem.GetFileSize(imageFilePath);
+            if (imageFileSize > this._target.MaxImageSize)
             {
-                this._warnings.Add($"The file '{imageFile.FullName}' size is greater than the supported maximum {this._target.MaxImageSize} bytes.");
+                this._warnings.Add($"The file '{imageFilePath}' size is greater than the supported maximum {this._target.MaxImageSize} bytes.");
                 return;
             }
 
-            if (imageFile.Length == 0)
+            if (imageFileSize == 0)
             {
-                this._warnings.Add($"The file '{imageFile.FullName}' is empty.");
                 return;
             }
 
@@ -80,11 +80,12 @@ namespace Askaiser.Marionette.SourceGenerator
 
             try
             {
-                image = GeneratedImage.Create(imageFile, library);
+                var bytes = this._fileSystem.GetFileBytes(imageFilePath);
+                image = new GeneratedImage(Path.GetFileName(imageFilePath), bytes, library);
             }
             catch (Exception ex)
             {
-                this._warnings.Add($"An error occurred while processing image '{imageFile.FullName}': {ex}");
+                this._warnings.Add($"An error occurred while processing image '{imageFilePath}': {ex}");
                 return;
             }
 
@@ -92,7 +93,7 @@ namespace Askaiser.Marionette.SourceGenerator
 
             if (imageGroup.Any(x => x.GroupIndex == image.GroupIndex))
             {
-                this._warnings.Add($"An image named '{image.UniqueName}' already exists, therefore the image {imageFile.FullName} will be skipped.");
+                this._warnings.Add($"An image named '{image.UniqueName}' already exists, therefore the image {imageFilePath} will be skipped.");
             }
             else
             {
@@ -104,8 +105,8 @@ namespace Askaiser.Marionette.SourceGenerator
         {
             var cw = new CodeWriter();
 
-            cw.Append("// Code generated from the following directory at ").AppendLine(DateTime.UtcNow.ToString("O"));
-            cw.Append("// ").AppendLine(this._imageDirectory.FullName);
+            cw.Append("// Code generated at ").AppendLine(DateTime.UtcNow.ToString("O"));
+            cw.Append("// From the directory: ").AppendLine(this._target.ImageDirectoryPath);
             cw.Append("using ").Append(ParentNamespace).AppendLine(";");
             cw.AppendLine();
 
@@ -131,10 +132,14 @@ namespace Askaiser.Marionette.SourceGenerator
         {
             var className = library.IsRoot ? this._target.ClassName : library.UniqueName + "Library";
 
-            cw.AppendLine();
+            if (!library.IsRoot)
+            {
+                cw.AppendLine();
+            }
+
             using (cw.BeginClass("public partial", className))
             {
-                cw.AppendLine("protected ElementCollection _elements;");
+                cw.AppendLine("protected readonly ElementCollection _elements;");
                 cw.AppendLine();
                 this.GenerateLibraryConstructorCode(library, cw);
                 GenerateLibraryPropertiesCode(library, cw);

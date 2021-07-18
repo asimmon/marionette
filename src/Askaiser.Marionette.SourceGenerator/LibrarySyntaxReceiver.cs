@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Askaiser.Marionette.SourceGenerator
@@ -29,7 +30,12 @@ namespace Askaiser.Marionette.SourceGenerator
                 return;
             }
 
-            if (context.SemanticModel.GetDeclaredSymbol(classSyntax) is not { } classModel)
+            if (ModelExtensions.GetDeclaredSymbol(context.SemanticModel, classSyntax) is not { } classModel)
+            {
+                return;
+            }
+
+            if (!classSyntax.Modifiers.Any(SyntaxKind.PartialKeyword))
             {
                 return;
             }
