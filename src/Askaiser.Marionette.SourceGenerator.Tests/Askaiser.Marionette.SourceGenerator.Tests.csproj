@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461;netcoreapp3.1;net5.0</TargetFrameworks>
-    <IsPackable>False</IsPackable>
+    <TargetFramework>net5.0</TargetFramework>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,9 +9,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.9.0" PrivateAssets="all"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.0"/>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1"/>
-    <PackageReference Include="OpenCvSharp4" Version="4.5.2.20210404" Condition=" '$(TargetFramework)' == 'net461' "/>
-    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.5.2.20210404" Condition=" '$(TargetFramework)' == 'net461' "/>
     <PackageReference Include="xunit" Version="2.4.1"/>
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -20,12 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Askaiser.Marionette.SourceGenerator\Askaiser.Marionette.SourceGenerator.csproj"/>
     <ProjectReference Include="..\Askaiser.Marionette\Askaiser.Marionette.csproj"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="images\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 </Project>

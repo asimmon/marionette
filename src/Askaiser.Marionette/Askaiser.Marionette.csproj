@@ -3,7 +3,6 @@
     <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
     <AssemblyTitle>Askaiser.Marionette</AssemblyTitle>
     <PackageId>Askaiser.Marionette</PackageId>
-    <CodeAnalysisRuleSet>..\..\stylecop.ruleset</CodeAnalysisRuleSet>
     <IsPackable>True</IsPackable>
   </PropertyGroup>
 
@@ -14,10 +13,6 @@
   <ItemGroup>
     <PackageReference Include="OpenCvSharp4" Version="4.5.2.20210404"/>
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.5.2.20210404"/>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="System.Text.Json" Version="5.0.2" Condition=" '$(TargetFramework)' != 'net5.0' "/>
     <PackageReference Include="Tesseract" Version="4.1.1" IncludeAssets="All" PrivateAssets="None"/>
     <PackageReference Include="Tesseract.Drawing" Version="4.1.1"/>

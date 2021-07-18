@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.Marionette.SourceG
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.Marionette.Tests", "src\Askaiser.Marionette.Tests\Askaiser.Marionette.Tests.csproj", "{C2F4D552-7B7C-40E9-BA7E-109F36992F3E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askaiser.Marionette.SourceGenerator.Tests", "src\Askaiser.Marionette.SourceGenerator.Tests\Askaiser.Marionette.SourceGenerator.Tests.csproj", "{11BB5319-85F4-45B6-9A47-E04F3C0B5790}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,5 +60,17 @@ Global
 		{C2F4D552-7B7C-40E9-BA7E-109F36992F3E}.Release|x64.Build.0 = Release|Any CPU
 		{C2F4D552-7B7C-40E9-BA7E-109F36992F3E}.Release|x86.ActiveCfg = Release|Any CPU
 		{C2F4D552-7B7C-40E9-BA7E-109F36992F3E}.Release|x86.Build.0 = Release|Any CPU
+		{11BB5319-85F4-45B6-9A47-E04F3C0B5790}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11BB5319-85F4-45B6-9A47-E04F3C0B5790}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11BB5319-85F4-45B6-9A47-E04F3C0B5790}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{11BB5319-85F4-45B6-9A47-E04F3C0B5790}.Debug|x64.Build.0 = Debug|Any CPU
+		{11BB5319-85F4-45B6-9A47-E04F3C0B5790}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{11BB5319-85F4-45B6-9A47-E04F3C0B5790}.Debug|x86.Build.0 = Debug|Any CPU
+		{11BB5319-85F4-45B6-9A47-E04F3C0B5790}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11BB5319-85F4-45B6-9A47-E04F3C0B5790}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11BB5319-85F4-45B6-9A47-E04F3C0B5790}.Release|x64.ActiveCfg = Release|Any CPU
+		{11BB5319-85F4-45B6-9A47-E04F3C0B5790}.Release|x64.Build.0 = Release|Any CPU
+		{11BB5319-85F4-45B6-9A47-E04F3C0B5790}.Release|x86.ActiveCfg = Release|Any CPU
+		{11BB5319-85F4-45B6-9A47-E04F3C0B5790}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

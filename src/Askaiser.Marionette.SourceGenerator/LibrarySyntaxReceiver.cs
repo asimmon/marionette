@@ -36,11 +36,22 @@ namespace Askaiser.Marionette.SourceGenerator
 
             foreach (var attribute in classModel.GetAttributes())
             {
-                if (attribute.AttributeClass is { } attributeClass &&
-                    ExpectedAttributeFullName.Equals(attributeClass.GetFullName(), StringComparison.Ordinal) &&
-                    attribute.ConstructorArguments is { Length: > 0 } constructorArguments &&
-                    constructorArguments[0].Value is string rawImageDirPath &&
-                    TryValidatePath(rawImageDirPath, out var validImageDirPath))
+                if (attribute.AttributeClass is null)
+                {
+                    continue;
+                }
+
+                if (!ExpectedAttributeFullName.Equals(attribute.AttributeClass.GetFullName(), StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                if (attribute.ConstructorArguments.Length == 0)
+                {
+                    continue;
+                }
+
+                if (attribute.ConstructorArguments[0].Value is string rawImageDirPath && TryValidatePath(rawImageDirPath, out var validImageDirPath))
                 {
                     if (!Path.IsPathRooted(validImageDirPath) && classSyntax.SyntaxTree.FilePath is { Length: > 0 } codeFilePath && Path.GetDirectoryName(codeFilePath) is { Length: > 0 } codeDirPath)
                     {
