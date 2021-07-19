@@ -42,16 +42,16 @@ namespace Askaiser.Marionette.SourceGenerator
                 context.ReportDiagnostic(diagnostic);
             }
 
-            try
+            foreach (var targetedClass in receiver.TargetedClasses)
             {
-                foreach (var targetedClass in receiver.TargetedClasses)
+                try
                 {
                     this.AddSource(context, new LibraryCodeGenerator(this._fileSystem, this._dateTimeProvider, targetedClass).Generate());
                 }
-            }
-            catch (Exception ex)
-            {
-                context.ReportDiagnostic(Diagnostic.Create(DiagnosticsDescriptors.UnexpectedException, Location.None, ex.ToString()));
+                catch (Exception ex)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticsDescriptors.UnexpectedException, targetedClass.SyntaxNode.GetLocation(), ex.ToString()));
+                }
             }
         }
 

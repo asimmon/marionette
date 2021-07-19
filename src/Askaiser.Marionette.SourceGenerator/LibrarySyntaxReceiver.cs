@@ -54,7 +54,7 @@ namespace Askaiser.Marionette.SourceGenerator
 
                 if (!classSyntax.Modifiers.Any(SyntaxKind.PartialKeyword))
                 {
-                    this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.MissingPartialModifier, Location.None, classModel.GetFullName()));
+                    this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.MissingPartialModifier, context.Node.GetLocation(), classModel.GetFullName()));
                     return;
                 }
 
@@ -76,14 +76,13 @@ namespace Askaiser.Marionette.SourceGenerator
                         ClassName = classModel.Name,
                         NamespaceName = classModel.GetNamespace(),
                         ImageDirectoryPath = validImageDirPath,
+                        SyntaxNode = context.Node,
                     });
 
                     return;
                 }
-                else
-                {
-                    this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.InvalidDirectoryPath, Location.None, rawImageDirPath));
-                }
+
+                this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.InvalidDirectoryPath, context.Node.GetLocation(), rawImageDirPath));
             }
         }
 

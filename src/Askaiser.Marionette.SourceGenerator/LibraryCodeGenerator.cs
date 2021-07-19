@@ -74,7 +74,7 @@ namespace Askaiser.Marionette.SourceGenerator
                 var imageFileSize = this._fileSystem.GetFileSize(imageFilePath);
                 if (imageFileSize > this._target.MaxImageSize)
                 {
-                    this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.FileTooLarge, Location.None, imageFilePath, this._target.MaxImageSize.ToString(CultureInfo.InvariantCulture)));
+                    this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.FileTooLarge, this._target.SyntaxNode.GetLocation(), imageFilePath, this._target.MaxImageSize.ToString(CultureInfo.InvariantCulture)));
                     return;
                 }
 
@@ -88,7 +88,7 @@ namespace Askaiser.Marionette.SourceGenerator
             }
             catch (Exception ex)
             {
-                this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.UnexpectedException, Location.None, ex.ToString()));
+                this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.UnexpectedException, this._target.SyntaxNode.GetLocation(), ex.ToString()));
                 return;
             }
 
@@ -96,7 +96,7 @@ namespace Askaiser.Marionette.SourceGenerator
 
             if (imageGroup.Any(x => x.GroupIndex == image.GroupIndex))
             {
-                this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.DuplicateImageName, Location.None, image.UniqueName, imageFilePath));
+                this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.DuplicateImageName, this._target.SyntaxNode.GetLocation(), image.UniqueName, imageFilePath));
             }
             else
             {

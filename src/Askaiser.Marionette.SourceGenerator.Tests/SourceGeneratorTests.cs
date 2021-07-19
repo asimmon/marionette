@@ -733,7 +733,7 @@ namespace MyCode
 [Askaiser.Marionette.ImageLibraryAttribute(""."")]
 public partial class MyLibrary { }";
 
-            this.FileSystem.SetFileBytes("./logo.png", new byte[TargetedClassInfo.DefaultMaxImageSize + 1]);
+            this.FileSystem.SetFileBytes("./logo.png", new byte[Constants.DefaultMaxImageSize + 1]);
 
             var result = this.Compile(userSource);
 
