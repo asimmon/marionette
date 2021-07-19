@@ -79,6 +79,12 @@ namespace Askaiser.Marionette
             return await this._monitorService.GetMonitors().ConfigureAwait(false);
         }
 
+        public async Task<MonitorDescription> GetCurrentMonitor()
+        {
+            var monitors = await this.GetMonitors().ConfigureAwait(false);
+            return monitors.FirstOrDefault(x => x.Index == this._monitorIndex);
+        }
+
         public async Task<Bitmap> GetScreenshot()
         {
             var monitor = await this.GetCurrentMonitor().ConfigureAwait(false);
@@ -305,12 +311,6 @@ namespace Askaiser.Marionette
         public MarionetteDriver SetMonitor(MonitorDescription monitor)
         {
             return this.SetMonitor(monitor.Index);
-        }
-
-        public async Task<MonitorDescription> GetCurrentMonitor()
-        {
-            var monitors = await this.GetMonitors().ConfigureAwait(false);
-            return monitors.FirstOrDefault(x => x.Index == this._monitorIndex);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "It looks more coherent to only use instance methods here.")]
