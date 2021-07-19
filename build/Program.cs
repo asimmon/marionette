@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using Cake.Common;
 using Cake.Common.Diagnostics;
@@ -86,17 +87,24 @@ public sealed class MetadataTask : FrostingTask<BuildContext>
         else
         {
             var gitVersion = context.GitVersion();
+            var informationalVersion = gitVersion.AssemblySemVer + "-" + gitVersion.Sha;
+
             context.Information("Generated assembly version: " + gitVersion.AssemblySemVer);
+            context.Information("Generated file version: " + gitVersion.AssemblySemFileVer);
+            context.Information("Generated informational version: " + informationalVersion);
 
             if (context.HasArgument("alpha"))
             {
                 context.AddMSBuildProperty("VersionPrefix", gitVersion.AssemblySemVer);
-                context.AddMSBuildProperty("VersionSuffix", "alpha" + gitVersion.BuildMetaData);
+                context.AddMSBuildProperty("VersionSuffix", "alpha" + gitVersion.CommitsSinceVersionSource.GetValueOrDefault(0).ToString(CultureInfo.InvariantCulture));
             }
             else
             {
                 context.AddMSBuildProperty("Version", gitVersion.AssemblySemVer);
             }
+
+            context.AddMSBuildProperty("FileVersion", gitVersion.AssemblySemFileVer);
+            context.AddMSBuildProperty("InformationalVersion", informationalVersion);
         }
     }
 
