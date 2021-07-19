@@ -1,0 +1,4 @@
+[*.{cs,vb}]
+
+# RS2008: Enable analyzer release tracking for the analyzer project containing rule '{0}'
+dotnet_diagnostic.RS2008.severity = none
