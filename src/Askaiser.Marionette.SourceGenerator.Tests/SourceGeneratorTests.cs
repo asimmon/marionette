@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using Microsoft.CodeAnalysis;
 using Xunit;
 
 namespace Askaiser.Marionette.SourceGenerator.Tests
@@ -44,6 +45,7 @@ namespace MyCode
 
             var warning = Assert.Single(result.Diagnostics);
             Assert.NotNull(warning);
+            Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
             Assert.Equal(DiagnosticsDescriptors.MissingPartialModifier.Id, warning.Id);
             Assert.Empty(result.SourceFiles);
         }
@@ -62,6 +64,7 @@ namespace MyCode
 
             var warning = Assert.Single(result.Diagnostics);
             Assert.NotNull(warning);
+            Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
             Assert.Equal(DiagnosticsDescriptors.InvalidDirectoryPath.Id, warning.Id);
 
             Assert.Empty(result.SourceFiles);
@@ -81,6 +84,7 @@ namespace MyCode
 
             var warning = Assert.Single(result.Diagnostics);
             Assert.NotNull(warning);
+            Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
             Assert.Equal(DiagnosticsDescriptors.InvalidDirectoryPath.Id, warning.Id);
 
             Assert.Empty(result.SourceFiles);
@@ -131,20 +135,32 @@ namespace MyCode
         }
 
         [Fact]
-        public void WhenEmptyImageInCurrentDirectory_GeneratesEmptyLibrary()
+        public void WhenReferencedEmptyImage_GeneratesEmptyLibrary_AndDoesNotCompile()
         {
             const string userSource = @"
 namespace MyCode
 {
     [Askaiser.Marionette.ImageLibraryAttribute(""."")]
     public partial class MyLibrary { }
+
+    public class MyClass
+    {
+        public void DoSomething()
+        {
+            var library = new MyLibrary();
+            var logo = library.Logo;
+        }
+    }
 }";
 
             this.FileSystem.SetFileBytes("./logo.png", Array.Empty<byte>());
 
             var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics);
+            var error = Assert.Single(result.Diagnostics);
+            Assert.NotNull(error);
+            Assert.Equal("CS1061", error.Id);
+            Assert.Equal(DiagnosticSeverity.Error, error.Severity);
 
             var sourceFile = Assert.Single(result.SourceFiles);
             Assert.NotNull(sourceFile);
@@ -230,6 +246,15 @@ namespace MyCode
 {
     [Askaiser.Marionette.ImageLibraryAttribute(""."")]
     public partial class MyLibrary { }
+
+    public class MyClass
+    {
+        public void DoSomething()
+        {
+            var library = new MyLibrary();
+            var logo = library.Logo;
+        }
+    }
 }";
 
             this.FileSystem.SetFileBytes("./logo.png", new byte[] { 1, 2, 3 });
@@ -691,6 +716,7 @@ namespace MyCode
 
             var warning = Assert.Single(result.Diagnostics);
             Assert.NotNull(warning);
+            Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
             Assert.Equal(DiagnosticsDescriptors.DuplicateImageName.Id, warning.Id);
 
             var sourceFile = Assert.Single(result.SourceFiles);
@@ -739,6 +765,7 @@ public partial class MyLibrary { }";
 
             var warning = Assert.Single(result.Diagnostics);
             Assert.NotNull(warning);
+            Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
             Assert.Equal(DiagnosticsDescriptors.FileTooLarge.Id, warning.Id);
 
             var sourceFile = Assert.Single(result.SourceFiles);
