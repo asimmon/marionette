@@ -48,5 +48,93 @@ namespace Askaiser.Marionette.Tests
             Assert.Equal(expectedCenterX, centerX);
             Assert.Equal(expectedCenterY, centerY);
         }
+
+        [Fact]
+        public void Corners()
+        {
+            var r1 = new Rectangle(75, 63, 478, 362);
+            Assert.Equal(new Point(75, 63), r1.TopLeft);
+            Assert.Equal(new Point(478, 63), r1.TopRight);
+            Assert.Equal(new Point(75, 362), r1.BottomLeft);
+            Assert.Equal(new Point(478, 362), r1.BottomRight);
+        }
+
+        [Fact]
+        public void ConstructorWithPoints()
+        {
+            var r1 = new Rectangle(75, 63, 478, 362);
+            var r2 = new Rectangle(r1.TopLeft, r1.BottomRight);
+            Assert.Equal(r1, r2);
+        }
+
+        [Fact]
+        public void FromLeft()
+        {
+            var rect = new Rectangle(100, 200, 300, 400);
+            Assert.Equal(new Rectangle(100, 200, 150, 400), rect.FromLeft(50));
+        }
+
+        [Fact]
+        public void FromRight()
+        {
+            var rect = new Rectangle(100, 200, 300, 400);
+            Assert.Equal(new Rectangle(250, 200, 300, 400), rect.FromRight(50));
+        }
+
+        [Fact]
+        public void FromTop()
+        {
+            var rect = new Rectangle(100, 200, 300, 400);
+            Assert.Equal(new Rectangle(100, 200, 300, 250), rect.FromTop(50));
+        }
+
+        [Fact]
+        public void FromBottom()
+        {
+            var rect = new Rectangle(100, 200, 300, 400);
+            Assert.Equal(new Rectangle(100, 350, 300, 400), rect.FromBottom(50));
+        }
+
+        [Fact]
+        public void FromTopLeft()
+        {
+            var rect = new Rectangle(1, 1, 100, 100);
+            Assert.Equal(new Rectangle(1, 1, 50, 30), rect.FromTopLeft(49, 29));
+        }
+
+        [Fact]
+        public void FromTopRight()
+        {
+            var rect = new Rectangle(1, 1, 100, 100);
+            Assert.Equal(new Rectangle(50, 1, 100, 30), rect.FromTopRight(50, 29));
+        }
+
+        [Fact]
+        public void FromBottomLeft()
+        {
+            var rect = new Rectangle(1, 1, 100, 100);
+            Assert.Equal(new Rectangle(1, 70, 50, 100), rect.FromBottomLeft(49, 30));
+        }
+
+        [Fact]
+        public void FromBottomRight()
+        {
+            var rect = new Rectangle(1, 1, 100, 100);
+            Assert.Equal(new Rectangle(50, 70, 100, 100), rect.FromBottomRight(50, 30));
+        }
+
+        [Fact]
+        public void FromCenter()
+        {
+            var rect = new Rectangle(0, 0, 100, 100);
+            Assert.Equal(new Rectangle(20, 30, 80, 70), rect.FromCenter(60, 40));
+        }
+
+        [Fact]
+        public void Multiply()
+        {
+            var rect = new Rectangle(5, 5, 20, 20);
+            Assert.Equal(new Rectangle(10, 10, 40, 40), rect.Multiply(2));
+        }
     }
 }

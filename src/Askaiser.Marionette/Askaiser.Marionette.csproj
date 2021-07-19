@@ -4,6 +4,8 @@
     <AssemblyTitle>Askaiser.Marionette</AssemblyTitle>
     <PackageId>Askaiser.Marionette</PackageId>
     <IsPackable>True</IsPackable>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>

@@ -45,13 +45,45 @@ namespace Askaiser.Marionette
             this.Bottom = bottom;
         }
 
+        public Rectangle(Point topLeft, Point bottomRight)
+            : this(topLeft.X, topLeft.Y, bottomRight.X, bottomRight.Y)
+        {
+        }
+
         public int Left { get; private init; }
         public int Top { get; private init; }
         public int Right { get; private init; }
         public int Bottom { get; private init; }
 
-        public int Width => this.Right - this.Left;
-        public int Height => this.Bottom - this.Top;
+        public int Width
+        {
+            get => this.Right - this.Left;
+        }
+
+        public int Height
+        {
+            get => this.Bottom - this.Top;
+        }
+
+        public Point TopLeft
+        {
+            get => new Point(this.Left, this.Top);
+        }
+
+        public Point TopRight
+        {
+            get => new Point(this.Right, this.Top);
+        }
+
+        public Point BottomLeft
+        {
+            get => new Point(this.Left, this.Bottom);
+        }
+
+        public Point BottomRight
+        {
+            get => new Point(this.Right, this.Bottom);
+        }
 
         public Point Center
         {
