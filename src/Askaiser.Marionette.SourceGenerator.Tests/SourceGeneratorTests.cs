@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Xunit;
 
 namespace Askaiser.Marionette.SourceGenerator.Tests
@@ -765,6 +766,64 @@ public partial class MyLibrary
 }
 ";
             Assert.Equal(expectedSource, sourceFile.Code);
+        }
+
+        [Fact]
+        public void WhenMultipleLibraries_GeneratesMultipleLibraries()
+        {
+            const string userSource = @"
+namespace MyCode
+{
+    [Askaiser.Marionette.ImageLibraryAttribute(""foo"")]
+    public partial class FooLibrary { }
+
+    [Askaiser.Marionette.ImageLibraryAttribute(""bar"")]
+    public partial class BarLibrary { }
+}";
+
+            this.FileSystem.SetFileBytes("foo/logo.png", new byte[] { 1, 2, 3 });
+            this.FileSystem.SetFileBytes("bar/title.png", new byte[] { 1, 2, 3 });
+
+            var result = this.Compile(userSource);
+
+            Assert.Empty(result.Diagnostics);
+
+            Assert.Equal(2, result.SourceFiles.Count);
+
+            var fooSourceFile = Assert.Single(result.SourceFiles, x => x.Filename == "MyCode.FooLibrary.images.cs");
+            var barSourceFile = Assert.Single(result.SourceFiles, x => x.Filename == "MyCode.BarLibrary.images.cs");
+
+            Assert.NotNull(fooSourceFile);
+            Assert.NotNull(barSourceFile);
+
+            const string expectedSource =
+                @"// Code generated at 2021-01-01T00:00:00.0000000
+// From directory: {0}
+using Askaiser.Marionette;
+
+namespace MyCode
+{{
+    public partial class {1}Library
+    {{
+        private readonly ElementCollection _elements;
+
+        public {1}Library()
+        {{
+            this._elements = new ElementCollection();
+            this.CreateElements();
+        }}
+
+        public IElement {2} => this._elements[""Root.{2}.0""];
+
+        private void CreateElements()
+        {{
+            this._elements.Add(new ImageElement(""Root.{2}.0"", ""AQID"", 0.95m, false));
+        }}
+    }}
+}}
+";
+            Assert.Equal(string.Format(CultureInfo.InvariantCulture, expectedSource, "foo", "Foo", "Logo"), fooSourceFile.Code);
+            Assert.Equal(string.Format(CultureInfo.InvariantCulture, expectedSource, "bar", "Bar", "Title"), barSourceFile.Code);
         }
     }
 }

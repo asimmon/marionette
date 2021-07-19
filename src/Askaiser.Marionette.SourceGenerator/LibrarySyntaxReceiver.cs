@@ -40,12 +40,6 @@ namespace Askaiser.Marionette.SourceGenerator
                 return;
             }
 
-            if (!classSyntax.Modifiers.Any(SyntaxKind.PartialKeyword))
-            {
-                this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.MissingPartialModifier, Location.None, classModel.GetFullName()));
-                return;
-            }
-
             foreach (var attribute in classModel.GetAttributes())
             {
                 if (attribute.AttributeClass is null)
@@ -56,6 +50,12 @@ namespace Askaiser.Marionette.SourceGenerator
                 if (!Constants.ExpectedAttributeFullName.Equals(attribute.AttributeClass.GetFullName(), StringComparison.Ordinal))
                 {
                     continue;
+                }
+
+                if (!classSyntax.Modifiers.Any(SyntaxKind.PartialKeyword))
+                {
+                    this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.MissingPartialModifier, Location.None, classModel.GetFullName()));
+                    return;
                 }
 
                 if (attribute.ConstructorArguments.Length == 0)
