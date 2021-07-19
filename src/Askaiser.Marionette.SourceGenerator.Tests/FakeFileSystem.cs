@@ -146,7 +146,7 @@ namespace Askaiser.Marionette.SourceGenerator.Tests
             public byte[] Bytes
             {
                 get => this._bytes;
-                set => this._bytes = value ?? throw new ArgumentNullException(nameof(this.Bytes));
+                set => this._bytes = value ?? throw new ArgumentNullException(nameof(value));
             }
 
             private bool Equals(FakeFileInfo other)

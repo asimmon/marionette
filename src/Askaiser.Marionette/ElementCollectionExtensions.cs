@@ -1,5 +1,7 @@
 ﻿using System;
+#if !NETSTANDARD2_0
 using System.Buffers;
+#endif
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

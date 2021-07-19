@@ -36,7 +36,7 @@ namespace Askaiser.Marionette.Keyboard
         /// Returns an enumerator that iterates through the list of <see cref="INPUT"/> messages.
         /// </summary>
         /// <returns>
-        /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the list of <see cref="INPUT"/> messages.
+        /// A <see cref="System.Collections.Generic.IEnumerator{T}"/> that can be used to iterate through the list of <see cref="INPUT"/> messages.
         /// </returns>
         /// <filterpriority>1</filterpriority>
         public IEnumerator<INPUT> GetEnumerator()
@@ -48,7 +48,7 @@ namespace Askaiser.Marionette.Keyboard
         /// Returns an enumerator that iterates through the list of <see cref="INPUT"/> messages.
         /// </summary>
         /// <returns>
-        /// An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the list of <see cref="INPUT"/> messages.
+        /// An <see cref="System.Collections.IEnumerator"/> object that can be used to iterate through the list of <see cref="INPUT"/> messages.
         /// </returns>
         /// <filterpriority>2</filterpriority>
         IEnumerator IEnumerable.GetEnumerator()

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Askaiser.Marionette.Keyboard.Native
+﻿namespace Askaiser.Marionette.Keyboard.Native
 {
 #pragma warning disable 649
     /// <summary>

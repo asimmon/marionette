@@ -48,7 +48,7 @@ namespace Askaiser.Marionette
         {
             var monitors = new List<MonitorDescription>();
 
-            var onMonitorCallback = new MonitorEnumProcedure((IntPtr handle, IntPtr dcHandle, ref RectangleL rect, IntPtr callbackObject) =>
+            var onMonitorCallback = new MonitorEnumProcedure((IntPtr _, IntPtr _, ref RectangleL rect, IntPtr _) =>
             {
                 const int temporaryMonitorIndex = 0;
                 monitors.Add(new MonitorDescription(temporaryMonitorIndex, rect.Left, rect.Top, rect.Right, rect.Bottom));

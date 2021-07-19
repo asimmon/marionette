@@ -1,5 +1,4 @@
-﻿using System;
-using Askaiser.Marionette.Keyboard.Native;
+﻿using Askaiser.Marionette.Keyboard.Native;
 
 namespace Askaiser.Marionette.Keyboard
 {
