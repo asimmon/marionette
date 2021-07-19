@@ -2,11 +2,19 @@
 
 namespace Askaiser.Marionette
 {
-    public sealed class TestContextOptions
+    public sealed class DriverOptions
     {
-        private readonly string _tesseractDataPath = "./tessdata";
-        private readonly string _tesseractLanguage = "eng";
+        private readonly string _tesseractDataPath;
+        private readonly string _tesseractLanguage;
         private readonly string _failureScreenshotPath;
+
+        public DriverOptions()
+        {
+            this._tesseractDataPath = "./tessdata";
+            this._tesseractLanguage = "eng";
+            this._failureScreenshotPath = null;
+            this.MouseSpeed = MouseSpeed.Fast;
+        }
 
         /// <summary>
         /// The directory path of Tesseract OCR data (https://github.com/tesseract-ocr/tessdata).
@@ -36,5 +44,10 @@ namespace Askaiser.Marionette
             get => this._failureScreenshotPath;
             init => this._failureScreenshotPath = value?.Trim() is { Length: > 0 } trimmedValue ? trimmedValue : throw new ArgumentException(nameof(this.FailureScreenshotPath));
         }
+
+        /// <summary>
+        /// Gets or sets the initial mouse speed of the driver
+        /// </summary>
+        public MouseSpeed MouseSpeed { get; init; }
     }
 }

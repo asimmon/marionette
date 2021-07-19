@@ -12,7 +12,7 @@ using Askaiser.Marionette.Commands;
 
 namespace Askaiser.Marionette
 {
-    public sealed class TestContext : IDisposable
+    public sealed class MarionetteDriver : IDisposable
     {
         private readonly IMonitorService _monitorService;
         private readonly IDisposable[] _disposables;
@@ -35,7 +35,7 @@ namespace Askaiser.Marionette
         private int _monitorIndex;
         private MouseSpeed _mouseSpeed;
 
-        private TestContext(TestContextOptions options, IMonitorService monitorService, IElementRecognizer elementRecognizer, IMouseController mouseController, IKeyboardController keyboardController, IDisposable[] disposables)
+        private MarionetteDriver(DriverOptions options, IMonitorService monitorService, IElementRecognizer elementRecognizer, IMouseController mouseController, IKeyboardController keyboardController, IDisposable[] disposables)
         {
             this._monitorService = monitorService;
             this._disposables = disposables;
@@ -57,12 +57,12 @@ namespace Askaiser.Marionette
             this._keyUpHandler = new KeyUpCommandHandler(keyboardController);
 
             this._monitorIndex = 0;
-            this._mouseSpeed = MouseSpeed.Fast;
+            this._mouseSpeed = options.MouseSpeed;
         }
 
-        public static TestContext Create(TestContextOptions options = default)
+        public static MarionetteDriver Create(DriverOptions options = default)
         {
-            options ??= new TestContextOptions();
+            options ??= new DriverOptions();
 
             var monitorService = new MonitorService(TimeSpan.FromMilliseconds(200));
             var imageRecognizer = new ImageElementRecognizer();
@@ -71,7 +71,7 @@ namespace Askaiser.Marionette
             var mouseController = new MouseController();
             var keyboardController = new KeyboardController();
 
-            return new TestContext(options, monitorService, elementRecognizer, mouseController, keyboardController, new IDisposable[] { textRecognizer });
+            return new MarionetteDriver(options, monitorService, elementRecognizer, mouseController, keyboardController, new IDisposable[] { textRecognizer });
         }
 
         public async Task<MonitorDescription[]> GetMonitors()
@@ -285,13 +285,13 @@ namespace Askaiser.Marionette
             }
         }
 
-        public TestContext SetMouseSpeed(MouseSpeed speed)
+        public MarionetteDriver SetMouseSpeed(MouseSpeed speed)
         {
             this._mouseSpeed = speed;
             return this;
         }
 
-        public TestContext SetMonitor(int monitorIndex)
+        public MarionetteDriver SetMonitor(int monitorIndex)
         {
             if (monitorIndex < 0)
             {
@@ -302,7 +302,7 @@ namespace Askaiser.Marionette
             return this;
         }
 
-        public TestContext SetMonitor(MonitorDescription monitor)
+        public MarionetteDriver SetMonitor(MonitorDescription monitor)
         {
             return this.SetMonitor(monitor.Index);
         }

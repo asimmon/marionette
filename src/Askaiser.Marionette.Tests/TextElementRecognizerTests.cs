@@ -10,7 +10,7 @@ namespace Askaiser.Marionette.Tests
 
         public TextElementRecognizerTests()
         {
-            this._recognizer = new TextElementRecognizer(new TestContextOptions());
+            this._recognizer = new TextElementRecognizer(new DriverOptions());
         }
 
         [Theory]

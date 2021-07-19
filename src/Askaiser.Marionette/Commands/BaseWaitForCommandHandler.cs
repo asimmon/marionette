@@ -13,11 +13,11 @@ namespace Askaiser.Marionette.Commands
     {
         private static readonly TimeSpan ThrottlingInterval = TimeSpan.FromMilliseconds(50);
 
-        private readonly TestContextOptions _options;
+        private readonly DriverOptions _options;
         private readonly IMonitorService _monitorService;
         private readonly IElementRecognizer _elementRecognizer;
 
-        protected BaseWaitForCommandHandler(TestContextOptions options, IMonitorService monitorService, IElementRecognizer elementRecognizer)
+        protected BaseWaitForCommandHandler(DriverOptions options, IMonitorService monitorService, IElementRecognizer elementRecognizer)
         {
             this._options = options;
             this._monitorService = monitorService;

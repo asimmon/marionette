@@ -17,10 +17,10 @@ namespace Askaiser.Marionette
 
         private readonly Guid _defaultEngineId;
         private readonly ConcurrentDictionary<Guid, TesseractEngine> _engines;
-        private readonly TestContextOptions _options;
+        private readonly DriverOptions _options;
         private int _activeEngineCount;
 
-        public TextElementRecognizer(TestContextOptions options)
+        public TextElementRecognizer(DriverOptions options)
         {
             this._defaultEngineId = Guid.NewGuid();
             this._engines = new ConcurrentDictionary<Guid, TesseractEngine>();

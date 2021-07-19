@@ -2,9 +2,9 @@
 
 namespace Askaiser.Marionette
 {
-    internal sealed class MultipleElementLocationsException : UITestingException
+    internal sealed class MultipleElementFoundException : MarionetteException
     {
-        public MultipleElementLocationsException(SearchResult result)
+        public MultipleElementFoundException(SearchResult result)
             : base(string.Format(CultureInfo.InvariantCulture, "Element '{0}' was found at multiple locations: {1}.", result.Element, result.Locations.ToCenterString()))
         {
             this.Result = result;

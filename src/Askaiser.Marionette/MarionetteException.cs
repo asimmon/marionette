@@ -2,9 +2,9 @@
 
 namespace Askaiser.Marionette
 {
-    public abstract class UITestingException : Exception
+    public abstract class MarionetteException : Exception
     {
-        protected UITestingException(string message)
+        protected MarionetteException(string message)
             : base(message)
         {
         }

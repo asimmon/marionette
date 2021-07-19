@@ -79,7 +79,7 @@ namespace Askaiser.Marionette
                 throw new ElementNotFoundException(this.Element, waitFor);
             }
 
-            throw new MultipleElementLocationsException(this);
+            throw new MultipleElementFoundException(this);
         }
     }
 }
