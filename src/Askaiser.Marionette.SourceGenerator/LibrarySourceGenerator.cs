@@ -37,17 +37,29 @@ namespace Askaiser.Marionette.SourceGenerator
                 return;
             }
 
-            foreach (var targetedClass in receiver.TargetedClasses)
+            foreach (var diagnostic in receiver.Diagnostics)
             {
-                this.AddSource(context, new LibraryCodeGenerator(this._fileSystem, this._dateTimeProvider, targetedClass).Generate());
+                context.ReportDiagnostic(diagnostic);
+            }
+
+            try
+            {
+                foreach (var targetedClass in receiver.TargetedClasses)
+                {
+                    this.AddSource(context, new LibraryCodeGenerator(this._fileSystem, this._dateTimeProvider, targetedClass).Generate());
+                }
+            }
+            catch (Exception ex)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(DiagnosticsDescriptors.UnexpectedException, Location.None, ex.ToString()));
             }
         }
 
         protected virtual void AddSource(GeneratorExecutionContext context, CodeGeneratorResult result)
         {
-            if (result.Warnings.Count > 0)
+            foreach (var diagnostic in result.Diagnostics)
             {
-                throw new Exception(string.Join(", ", result.Warnings));
+                context.ReportDiagnostic(diagnostic);
             }
 
             context.AddSource(result.Filename, SourceText.From(result.Code, Encoding.UTF8));

@@ -9,18 +9,23 @@ namespace Askaiser.Marionette.SourceGenerator
 {
     public class LibrarySyntaxReceiver : ISyntaxContextReceiver
     {
-        private const string ExpectedAttributeFullName = "Askaiser.Marionette.ImageLibraryAttribute";
-
         private readonly List<TargetedClassInfo> _targetedClasses;
+        private readonly List<Diagnostic> _diagnostics;
 
         public LibrarySyntaxReceiver()
         {
             this._targetedClasses = new List<TargetedClassInfo>();
+            this._diagnostics = new List<Diagnostic>();
         }
 
         public IReadOnlyCollection<TargetedClassInfo> TargetedClasses
         {
             get => this._targetedClasses;
+        }
+
+        public IReadOnlyCollection<Diagnostic> Diagnostics
+        {
+            get => this._diagnostics;
         }
 
         public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
@@ -30,13 +35,14 @@ namespace Askaiser.Marionette.SourceGenerator
                 return;
             }
 
-            if (ModelExtensions.GetDeclaredSymbol(context.SemanticModel, classSyntax) is not { } classModel)
+            if (ModelExtensions.GetDeclaredSymbol(context.SemanticModel, classSyntax) is not INamedTypeSymbol classModel)
             {
                 return;
             }
 
             if (!classSyntax.Modifiers.Any(SyntaxKind.PartialKeyword))
             {
+                this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.MissingPartialModifier, Location.None, classModel.GetFullName()));
                 return;
             }
 
@@ -47,7 +53,7 @@ namespace Askaiser.Marionette.SourceGenerator
                     continue;
                 }
 
-                if (!ExpectedAttributeFullName.Equals(attribute.AttributeClass.GetFullName(), StringComparison.Ordinal))
+                if (!Constants.ExpectedAttributeFullName.Equals(attribute.AttributeClass.GetFullName(), StringComparison.Ordinal))
                 {
                     continue;
                 }
@@ -57,7 +63,8 @@ namespace Askaiser.Marionette.SourceGenerator
                     continue;
                 }
 
-                if (attribute.ConstructorArguments[0].Value is string rawImageDirPath && TryValidatePath(rawImageDirPath, out var validImageDirPath))
+                var rawImageDirPath = attribute.ConstructorArguments[0].Value as string;
+                if (rawImageDirPath != null && TryValidatePath(rawImageDirPath, out var validImageDirPath))
                 {
                     if (!Path.IsPathRooted(validImageDirPath) && classSyntax.SyntaxTree.FilePath is { Length: > 0 } codeFilePath && Path.GetDirectoryName(codeFilePath) is { Length: > 0 } codeDirPath)
                     {
@@ -72,6 +79,10 @@ namespace Askaiser.Marionette.SourceGenerator
                     });
 
                     return;
+                }
+                else
+                {
+                    this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.InvalidDirectoryPath, Location.None, rawImageDirPath));
                 }
             }
         }

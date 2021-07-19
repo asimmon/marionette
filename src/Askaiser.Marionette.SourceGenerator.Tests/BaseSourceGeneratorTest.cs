@@ -31,7 +31,7 @@ namespace Askaiser.Marionette.SourceGenerator.Tests
             var updatedCompilation = RunGenerators(driver, initialCompilation, out var diagnostics1);
             var diagnostics2 = updatedCompilation.GetDiagnostics();
 
-            return new SourceGeneratorResult(diagnostics1, diagnostics2, this.SourceGenerator.GeneratedSources);
+            return new SourceGeneratorResult(diagnostics1.Concat(diagnostics2), this.SourceGenerator.GeneratedSources);
         }
 
         private static Compilation CreateCompilation(string source) => CSharpCompilation.Create(

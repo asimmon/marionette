@@ -10,8 +10,7 @@ namespace Askaiser.Marionette.SourceGenerator.Tests
         {
             var result = this.Compile(string.Empty);
 
-            Assert.Empty(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
+            Assert.Empty(result.Diagnostics);
             Assert.Empty(result.SourceFiles);
         }
 
@@ -26,8 +25,7 @@ namespace MyCode
 
             var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
+            Assert.Empty(result.Diagnostics);
             Assert.Empty(result.SourceFiles);
         }
 
@@ -43,8 +41,9 @@ namespace MyCode
 
             var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
+            var warning = Assert.Single(result.Diagnostics);
+            Assert.NotNull(warning);
+            Assert.Equal(DiagnosticsDescriptors.MissingPartialModifier.Id, warning.Id);
             Assert.Empty(result.SourceFiles);
         }
 
@@ -60,8 +59,10 @@ namespace MyCode
 
             var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
+            var warning = Assert.Single(result.Diagnostics);
+            Assert.NotNull(warning);
+            Assert.Equal(DiagnosticsDescriptors.InvalidDirectoryPath.Id, warning.Id);
+
             Assert.Empty(result.SourceFiles);
         }
 
@@ -77,8 +78,10 @@ namespace MyCode
 
             var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
+            var warning = Assert.Single(result.Diagnostics);
+            Assert.NotNull(warning);
+            Assert.Equal(DiagnosticsDescriptors.InvalidDirectoryPath.Id, warning.Id);
+
             Assert.Empty(result.SourceFiles);
         }
 
@@ -94,8 +97,7 @@ namespace MyCode
 
             var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
+            Assert.Empty(result.Diagnostics);
 
             var sourceFile = Assert.Single(result.SourceFiles);
             Assert.NotNull(sourceFile);
@@ -141,8 +143,7 @@ namespace MyCode
 
             var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
+            Assert.Empty(result.Diagnostics);
 
             var sourceFile = Assert.Single(result.SourceFiles);
             Assert.NotNull(sourceFile);
@@ -188,8 +189,7 @@ namespace MyCode
 
             var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
+            Assert.Empty(result.Diagnostics);
 
             var sourceFile = Assert.Single(result.SourceFiles);
             Assert.NotNull(sourceFile);
@@ -235,8 +235,7 @@ namespace MyCode
 
             var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
+            Assert.Empty(result.Diagnostics);
 
             var sourceFile = Assert.Single(result.SourceFiles);
             Assert.NotNull(sourceFile);
@@ -282,8 +281,7 @@ public partial class MyLibrary { }";
 
             var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
+            Assert.Empty(result.Diagnostics);
 
             var sourceFile = Assert.Single(result.SourceFiles);
             Assert.NotNull(sourceFile);
@@ -330,8 +328,7 @@ namespace MyCode
 
             var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
+            Assert.Empty(result.Diagnostics);
 
             var sourceFile = Assert.Single(result.SourceFiles);
             Assert.NotNull(sourceFile);
@@ -384,8 +381,7 @@ namespace MyCode
 
             var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
+            Assert.Empty(result.Diagnostics);
 
             var sourceFile = Assert.Single(result.SourceFiles);
             Assert.NotNull(sourceFile);
@@ -465,8 +461,7 @@ namespace MyCode
 
             var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
+            Assert.Empty(result.Diagnostics);
 
             var sourceFile = Assert.Single(result.SourceFiles);
             Assert.NotNull(sourceFile);
@@ -523,8 +518,7 @@ namespace MyCode
 
             var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
+            Assert.Empty(result.Diagnostics);
 
             var sourceFile = Assert.Single(result.SourceFiles);
             Assert.NotNull(sourceFile);
@@ -588,8 +582,7 @@ namespace MyCode
 
             var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
+            Assert.Empty(result.Diagnostics);
 
             var sourceFile = Assert.Single(result.SourceFiles);
             Assert.NotNull(sourceFile);
@@ -686,18 +679,92 @@ namespace MyCode
             const string userSource = @"
 namespace MyCode
 {
-    [Askaiser.Marionette.ImageLibraryAttribute(""."")]
+    [Askaiser.Marionette.ImageLibraryAttribute(""C:\\"")]
     public partial class MyLibrary { }
 }";
 
-            this.FileSystem.SetFileBytes("./foo_0.99_gs_0.png", new byte[] { 1, 2, 3 });
-            this.FileSystem.SetFileBytes("./foo_0.80_0.png", new byte[] { 1, 2, 3 });
+            this.FileSystem.SetFileBytes("C:\\foo_0.99_gs_0.png", new byte[] { 1, 2, 3 });
+            this.FileSystem.SetFileBytes("C:\\foo_0.80_0.png", new byte[] { 1, 2, 3 });
 
             var result = this.Compile(userSource);
 
-            Assert.Single(result.Diagnostics1);
-            Assert.Empty(result.Diagnostics2);
-            Assert.Empty(result.SourceFiles);
+            var warning = Assert.Single(result.Diagnostics);
+            Assert.NotNull(warning);
+            Assert.Equal(DiagnosticsDescriptors.DuplicateImageName.Id, warning.Id);
+
+            var sourceFile = Assert.Single(result.SourceFiles);
+            Assert.NotNull(sourceFile);
+            Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
+
+            const string expectedSource =
+                @"// Code generated at 2021-01-01T00:00:00.0000000
+// From directory: C:\
+using Askaiser.Marionette;
+
+namespace MyCode
+{
+    public partial class MyLibrary
+    {
+        private readonly ElementCollection _elements;
+
+        public MyLibrary()
+        {
+            this._elements = new ElementCollection();
+            this.CreateElements();
+        }
+
+        public IElement Foo => this._elements[""Root.Foo.0""];
+
+        private void CreateElements()
+        {
+            this._elements.Add(new ImageElement(""Root.Foo.0"", ""AQID"", 0.99m, true));
+        }
+    }
+}
+";
+            Assert.Equal(expectedSource, sourceFile.Code);
+        }
+
+        [Fact]
+        public void WhenFileTooLarge_AddsDiagnostic()
+        {
+            const string userSource = @"
+[Askaiser.Marionette.ImageLibraryAttribute(""."")]
+public partial class MyLibrary { }";
+
+            this.FileSystem.SetFileBytes("./logo.png", new byte[TargetedClassInfo.DefaultMaxImageSize + 1]);
+
+            var result = this.Compile(userSource);
+
+            var warning = Assert.Single(result.Diagnostics);
+            Assert.NotNull(warning);
+            Assert.Equal(DiagnosticsDescriptors.FileTooLarge.Id, warning.Id);
+
+            var sourceFile = Assert.Single(result.SourceFiles);
+            Assert.NotNull(sourceFile);
+            Assert.Equal("MyLibrary.images.cs", sourceFile.Filename);
+
+            const string expectedSource =
+                @"// Code generated at 2021-01-01T00:00:00.0000000
+// From directory: .
+using Askaiser.Marionette;
+
+public partial class MyLibrary
+{
+    private readonly ElementCollection _elements;
+
+    public MyLibrary()
+    {
+        this._elements = new ElementCollection();
+        this.CreateElements();
+    }
+
+    private void CreateElements()
+    {
+    }
+}
+";
+            Assert.Equal(expectedSource, sourceFile.Code);
         }
     }
 }

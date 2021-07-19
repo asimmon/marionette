@@ -2,9 +2,11 @@
 {
     public sealed class TargetedClassInfo
     {
+        internal const long DefaultMaxImageSize = 2 * 1024 * 1024;
+
         public TargetedClassInfo()
         {
-            this.MaxImageSize = 2 * 1024 * 1024;
+            this.MaxImageSize = DefaultMaxImageSize;
         }
 
         public long MaxImageSize { get; set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Microsoft.CodeAnalysis;
 
 namespace Askaiser.Marionette.SourceGenerator
 {
@@ -19,7 +20,7 @@ namespace Askaiser.Marionette.SourceGenerator
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly TargetedClassInfo _target;
         private readonly GeneratedLibrary _rootLibrary;
-        private readonly List<string> _warnings;
+        private readonly List<Diagnostic> _diagnostics;
 
         internal LibraryCodeGenerator(IFileSystem fileSystem, IDateTimeProvider dateTimeProvider, TargetedClassInfo target)
         {
@@ -27,14 +28,14 @@ namespace Askaiser.Marionette.SourceGenerator
             this._dateTimeProvider = dateTimeProvider;
             this._target = target;
             this._rootLibrary = new GeneratedLibrary("root");
-            this._warnings = new List<string>();
+            this._diagnostics = new List<Diagnostic>();
         }
 
         public CodeGeneratorResult Generate()
         {
             this.ProcessImagesInDirectory(this._target.ImageDirectoryPath, this._rootLibrary);
             var filename = $"{this._target.NamespaceName}.{this._target.ClassName}.images.cs".TrimStart('.');
-            return new CodeGeneratorResult(filename, this.GenerateCode(), this._warnings);
+            return new CodeGeneratorResult(filename, this.GenerateCode(), this._diagnostics);
         }
 
         private void ProcessImagesInDirectory(string directoryPath, GeneratedLibrary library)
@@ -66,28 +67,28 @@ namespace Askaiser.Marionette.SourceGenerator
 
         private void ProcessImage(string imageFilePath, GeneratedLibrary library)
         {
-            var imageFileSize = this._fileSystem.GetFileSize(imageFilePath);
-            if (imageFileSize > this._target.MaxImageSize)
-            {
-                this._warnings.Add($"The file '{imageFilePath}' size is greater than the supported maximum {this._target.MaxImageSize} bytes.");
-                return;
-            }
-
-            if (imageFileSize == 0)
-            {
-                return;
-            }
-
             GeneratedImage image;
 
             try
             {
+                var imageFileSize = this._fileSystem.GetFileSize(imageFilePath);
+                if (imageFileSize > this._target.MaxImageSize)
+                {
+                    this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.FileTooLarge, Location.None, imageFilePath, this._target.MaxImageSize.ToString(CultureInfo.InvariantCulture)));
+                    return;
+                }
+
+                if (imageFileSize == 0)
+                {
+                    return;
+                }
+
                 var bytes = this._fileSystem.GetFileBytes(imageFilePath);
                 image = new GeneratedImage(Path.GetFileName(imageFilePath), bytes, library);
             }
             catch (Exception ex)
             {
-                this._warnings.Add($"An error occurred while processing image '{imageFilePath}': {ex}");
+                this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.UnexpectedException, Location.None, ex.ToString()));
                 return;
             }
 
@@ -95,7 +96,7 @@ namespace Askaiser.Marionette.SourceGenerator
 
             if (imageGroup.Any(x => x.GroupIndex == image.GroupIndex))
             {
-                this._warnings.Add($"An image named '{image.UniqueName}' already exists, therefore the image {imageFilePath} will be skipped.");
+                this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.DuplicateImageName, Location.None, image.UniqueName, imageFilePath));
             }
             else
             {
