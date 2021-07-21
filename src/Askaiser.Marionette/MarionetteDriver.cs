@@ -60,9 +60,17 @@ namespace Askaiser.Marionette
             this._mouseSpeed = options.MouseSpeed;
         }
 
-        public static MarionetteDriver Create(DriverOptions options = default)
+        public static MarionetteDriver Create()
         {
-            options ??= new DriverOptions();
+            return Create(new DriverOptions());
+        }
+
+        public static MarionetteDriver Create(DriverOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
 
             var monitorService = new MonitorService(TimeSpan.FromMilliseconds(200));
             var imageRecognizer = new ImageElementRecognizer();
@@ -260,22 +268,37 @@ namespace Askaiser.Marionette
             }
         }
 
-        public async Task KeyPress(params VirtualKeyCode[] keyCodes)
+        public async Task KeyPress(VirtualKeyCode[] keyCodes, TimeSpan sleepAfter = default)
         {
             EnsureNotNullOrEmpty(keyCodes);
             await this._keyPressHandler.Execute(new KeyboardKeysCommand(keyCodes)).ConfigureAwait(false);
+
+            if (sleepAfter > TimeSpan.Zero)
+            {
+                await this.Sleep(sleepAfter).ConfigureAwait(false);
+            }
         }
 
-        public async Task KeyDown(params VirtualKeyCode[] keyCodes)
+        public async Task KeyDown(VirtualKeyCode[] keyCodes, TimeSpan sleepAfter = default)
         {
             EnsureNotNullOrEmpty(keyCodes);
             await this._keyDownHandler.Execute(new KeyboardKeysCommand(keyCodes)).ConfigureAwait(false);
+
+            if (sleepAfter > TimeSpan.Zero)
+            {
+                await this.Sleep(sleepAfter).ConfigureAwait(false);
+            }
         }
 
-        public async Task KeyUp(params VirtualKeyCode[] keyCodes)
+        public async Task KeyUp(VirtualKeyCode[] keyCodes, TimeSpan sleepAfter = default)
         {
             EnsureNotNullOrEmpty(keyCodes);
             await this._keyUpHandler.Execute(new KeyboardKeysCommand(keyCodes)).ConfigureAwait(false);
+
+            if (sleepAfter > TimeSpan.Zero)
+            {
+                await this.Sleep(sleepAfter).ConfigureAwait(false);
+            }
         }
 
         private static void EnsureNotNullOrEmpty(params VirtualKeyCode[] keyCodes)
@@ -297,7 +320,7 @@ namespace Askaiser.Marionette
             return this;
         }
 
-        public MarionetteDriver SetMonitor(int monitorIndex)
+        public MarionetteDriver SetCurrentMonitor(int monitorIndex)
         {
             if (monitorIndex < 0)
             {
@@ -308,9 +331,9 @@ namespace Askaiser.Marionette
             return this;
         }
 
-        public MarionetteDriver SetMonitor(MonitorDescription monitor)
+        public MarionetteDriver SetCurrentMonitor(MonitorDescription monitor)
         {
-            return this.SetMonitor(monitor.Index);
+            return this.SetCurrentMonitor(monitor.Index);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "It looks more coherent to only use instance methods here.")]
