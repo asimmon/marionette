@@ -5,6 +5,7 @@ Askaiser.Marionette is a **test automation framework based on image and text rec
 [![NuGet version (Askaiser.Marionette)](https://img.shields.io/nuget/v/Askaiser.Marionette.svg?logo=nuget)](https://www.nuget.org/packages/Askaiser.Marionette/)
 [![build](https://img.shields.io/github/workflow/status/asimmon/askaiser-marionette/CI%20Build?logo=github)](https://github.com/asimmon/askaiser-marionette/actions/workflows/ci.yml)
 
+
 ## Askaiser.Marionette in action
 
 * `00:00` : Capture screenshots of the app you're testing,
@@ -15,6 +16,7 @@ Askaiser.Marionette is a **test automation framework based on image and text rec
 
 https://user-images.githubusercontent.com/14242083/126416123-aebd0fce-825f-4ece-90e9-762503dc4cab.mp4
 
+
 ## Why use Askaiser.Marionette
 
 * Unlike other test automation frameworks, Askaiser.Marionette **does not rely on hardcoded identifiers, CSS or XPath selectors**. It uses image and text recognition to ensure that you interact with elements that are **actually visible** on the screen.
@@ -24,6 +26,7 @@ https://user-images.githubusercontent.com/14242083/126416123-aebd0fce-825f-4ece-
 * This means you can also test desktop applications!
 * You can use it for automation only, like a bot.
 * It works well with BDD and [SpecFlow](https://specflow.org/).
+
 
 ## Getting started
 
@@ -40,7 +43,40 @@ using (var driver = MarionetteDriver.Create(/* optional DriverOptions */))
 }
 ```
 
-The [sample project](https://github.com/asimmon/askaiser-marionette/tree/readme-demo/samples/Askaiser.Marionette.ConsoleApp) will show you the basics of using this library. 
+The [sample project](https://github.com/asimmon/askaiser-marionette/tree/readme-demo/samples/Askaiser.Marionette.ConsoleApp) will show you the basics of using this library.
+
+
+## Creating image and text elements manually
+
+#### Image search with OpenCV
+
+```csharp
+// Instead of relying on the source generator that works with image files, you can create an ImageElement manually
+var bytes = await File.ReadAllBytesAsync("path/to/your/image.png");
+var image = new ImageElement(name: "sidebar-close-button", content: bytes, threshold: 0.95m, grayscale: false);
+```
+
+* `ImageElement.Threshold` is a floating number between 0 and 1. It defines the accuracy of the image search process. `0.95` is the default value.
+* `ImageElement.Grayscale` defines whether or not the engine will apply grayscaling preprocessing. Image search is faster with grayscaling.
+
+#### Text search with OpenCV and Tesseract OCR
+
+```csharp
+Although many methods accept a simple string as an element, you can manually create a TextElement
+var text = new TextElement("Save changes", options: TextOptions.BlackAndWhite | TextOptions.Negative);
+```
+
+**Text options** are flags that define the preprocessing behavior of your monitor's screenshots before executing the OCR.
+* `TextOptions.None` : do not use preprocessing,
+* `TextOptions.Grayscale` : Use grayscaling,
+* `TextOptions.BlackAndWhite` : Use grayscaling and binarization (this is the default value),
+* `TextOptions.Negative` : Use negative preprocessing, very helpful with white text on dark background.
+
+
+## Source generator behavior
+
+*TODO: I will explain how to define settings for each individual image (threshold and grayscaling), as well as grouping images into an array property. All of this can be done by using special keywords in each image file name.*
+
 
 ## Show me the APIs
 
