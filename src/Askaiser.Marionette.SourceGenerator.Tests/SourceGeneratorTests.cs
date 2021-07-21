@@ -37,7 +37,7 @@ namespace MyCode
             const string userSource = @"
 namespace MyCode
 {
-    [Askaiser.Marionette.ImageLibraryAttribute(""ignored"")]
+    [Askaiser.Marionette.ImageLibrary(""ignored"")]
     public class MyLibrary { }
 }";
 
@@ -56,7 +56,7 @@ namespace MyCode
             const string userSource = @"
 namespace MyCode
 {
-    [Askaiser.Marionette.ImageLibraryAttribute(null)]
+    [Askaiser.Marionette.ImageLibrary(null)]
     public partial class MyLibrary { }
 }";
 
@@ -76,7 +76,7 @@ namespace MyCode
             const string userSource = @"
 namespace MyCode
 {
-    [Askaiser.Marionette.ImageLibraryAttribute("""")]
+    [Askaiser.Marionette.ImageLibrary("""")]
     public partial class MyLibrary { }
 }";
 
@@ -96,7 +96,7 @@ namespace MyCode
             const string userSource = @"
 namespace MyCode
 {
-    [Askaiser.Marionette.ImageLibraryAttribute(""."")]
+    [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 }";
 
@@ -140,7 +140,7 @@ namespace MyCode
             const string userSource = @"
 namespace MyCode
 {
-    [Askaiser.Marionette.ImageLibraryAttribute(""."")]
+    [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 
     public class MyClass
@@ -198,7 +198,7 @@ namespace MyCode
             const string userSource = @"
 namespace MyCode
 {
-    [Askaiser.Marionette.ImageLibraryAttribute(""."")]
+    [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 }";
 
@@ -244,7 +244,7 @@ namespace MyCode
             const string userSource = @"
 namespace MyCode
 {
-    [Askaiser.Marionette.ImageLibraryAttribute(""."")]
+    [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 
     public class MyClass
@@ -300,7 +300,7 @@ namespace MyCode
         public void WhenSingleImageWithoutNamespace_GeneratesLibrary()
         {
             const string userSource = @"
-[Askaiser.Marionette.ImageLibraryAttribute(""."")]
+[Askaiser.Marionette.ImageLibrary(""."")]
 public partial class MyLibrary { }";
 
             this.FileSystem.SetFileBytes("./logo.png", new byte[] { 1, 2, 3 });
@@ -345,7 +345,7 @@ public partial class MyLibrary
             const string userSource = @"
 namespace MyCode
 {
-    [Askaiser.Marionette.ImageLibraryAttribute(""."")]
+    [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 }";
 
@@ -398,7 +398,7 @@ namespace MyCode
             const string userSource = @"
 namespace MyCode
 {
-    [Askaiser.Marionette.ImageLibraryAttribute(""."")]
+    [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 }";
 
@@ -478,7 +478,7 @@ namespace MyCode
             const string userSource = @"
 namespace MyCode
 {
-    [Askaiser.Marionette.ImageLibraryAttribute(""."")]
+    [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 }";
 
@@ -533,7 +533,7 @@ namespace MyCode
             const string userSource = @"
 namespace MyCode
 {
-    [Askaiser.Marionette.ImageLibraryAttribute(""."")]
+    [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 }";
 
@@ -599,7 +599,7 @@ namespace MyCode
             const string userSource = @"
 namespace MyCode
 {
-    [Askaiser.Marionette.ImageLibraryAttribute(""."")]
+    [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 }";
 
@@ -705,7 +705,7 @@ namespace MyCode
             const string userSource = @"
 namespace MyCode
 {
-    [Askaiser.Marionette.ImageLibraryAttribute(""C:\\"")]
+    [Askaiser.Marionette.ImageLibrary(""C:\\"")]
     public partial class MyLibrary { }
 }";
 
@@ -756,7 +756,7 @@ namespace MyCode
         public void WhenFileTooLarge_AddsDiagnostic()
         {
             const string userSource = @"
-[Askaiser.Marionette.ImageLibraryAttribute(""."")]
+[Askaiser.Marionette.ImageLibrary(""."")]
 public partial class MyLibrary { }";
 
             this.FileSystem.SetFileBytes("./logo.png", new byte[Constants.DefaultMaxImageSize + 1]);
@@ -801,10 +801,10 @@ public partial class MyLibrary
             const string userSource = @"
 namespace MyCode
 {
-    [Askaiser.Marionette.ImageLibraryAttribute(""foo"")]
+    [Askaiser.Marionette.ImageLibrary(""foo"")]
     public partial class FooLibrary { }
 
-    [Askaiser.Marionette.ImageLibraryAttribute(""bar"")]
+    [Askaiser.Marionette.ImageLibrary(""bar"")]
     public partial class BarLibrary { }
 }";
 
@@ -851,6 +851,31 @@ namespace MyCode
 ";
             Assert.Equal(string.Format(CultureInfo.InvariantCulture, expectedSource, "foo", "Foo", "Logo"), fooSourceFile.Code);
             Assert.Equal(string.Format(CultureInfo.InvariantCulture, expectedSource, "bar", "Bar", "Title"), barSourceFile.Code);
+        }
+
+        [Fact]
+        public void WhenNestedClass_AddsDiagnostic()
+        {
+            const string userSource = @"
+namespace MyCode
+{
+    public class ParentClass
+    {
+        [Askaiser.Marionette.ImageLibrary(""foo"")]
+        public partial class FooLibrary { }
+    }
+}";
+
+            this.FileSystem.SetFileBytes("foo/logo.png", new byte[] { 1, 2, 3 });
+
+            var result = this.Compile(userSource);
+
+            var warning = Assert.Single(result.Diagnostics);
+
+            Assert.NotNull(warning);
+            Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
+            Assert.Equal(DiagnosticsDescriptors.NestedClassNotAllowed.Id, warning.Id);
+            Assert.Empty(result.SourceFiles);
         }
     }
 }

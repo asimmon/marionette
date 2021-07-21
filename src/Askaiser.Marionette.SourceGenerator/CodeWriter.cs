@@ -53,7 +53,7 @@ namespace Askaiser.Marionette.SourceGenerator
             return new CodeBlock(this);
         }
 
-        public IDisposable BeginClass(string modifier, string name, string inherits = null)
+        public IDisposable BeginClass(string modifier, string name)
         {
             if ((modifier = modifier?.Trim()) is not { Length: > 0 })
             {
@@ -66,11 +66,6 @@ namespace Askaiser.Marionette.SourceGenerator
             }
 
             this.Append(modifier).Append(" class ").Append(name);
-
-            if (!string.IsNullOrEmpty(inherits))
-            {
-                this.Append(" : ").Append(inherits);
-            }
 
             this.AppendLine();
 

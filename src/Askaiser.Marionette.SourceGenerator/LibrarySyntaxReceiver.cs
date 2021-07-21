@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -40,50 +41,69 @@ namespace Askaiser.Marionette.SourceGenerator
                 return;
             }
 
-            foreach (var attribute in classModel.GetAttributes())
+            var attribute = FindImageLibraryAttribute(classModel);
+            if (attribute == null)
             {
-                if (attribute.AttributeClass is null)
+                return;
+            }
+
+            if (!classSyntax.Modifiers.Any(SyntaxKind.PartialKeyword))
+            {
+                this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.MissingPartialModifier, context.Node.GetLocation(), classModel.GetFullName()));
+                return;
+            }
+
+            if (classSyntax.Parent is ClassDeclarationSyntax)
+            {
+                this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.NestedClassNotAllowed, context.Node.GetLocation()));
+                return;
+            }
+
+            var rawImageDirPath = attribute.ConstructorArguments[0].Value as string;
+            if (rawImageDirPath != null && TryValidatePath(rawImageDirPath, out var validImageDirPath))
+            {
+                if (!Path.IsPathRooted(validImageDirPath) && classSyntax.SyntaxTree.FilePath is { Length: > 0 } codeFilePath && Path.GetDirectoryName(codeFilePath) is { Length: > 0 } codeDirPath)
                 {
-                    continue;
+                    validImageDirPath = Path.Combine(codeDirPath, validImageDirPath);
                 }
 
-                if (!Constants.ExpectedAttributeFullName.Equals(attribute.AttributeClass.GetFullName(), StringComparison.Ordinal))
+                this._targetedClasses.Add(new TargetedClassInfo
                 {
-                    continue;
-                }
-
-                if (!classSyntax.Modifiers.Any(SyntaxKind.PartialKeyword))
-                {
-                    this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.MissingPartialModifier, context.Node.GetLocation(), classModel.GetFullName()));
-                    return;
-                }
-
-                if (attribute.ConstructorArguments.Length == 0)
-                {
-                    continue;
-                }
-
-                var rawImageDirPath = attribute.ConstructorArguments[0].Value as string;
-                if (rawImageDirPath != null && TryValidatePath(rawImageDirPath, out var validImageDirPath))
-                {
-                    if (!Path.IsPathRooted(validImageDirPath) && classSyntax.SyntaxTree.FilePath is { Length: > 0 } codeFilePath && Path.GetDirectoryName(codeFilePath) is { Length: > 0 } codeDirPath)
-                    {
-                        validImageDirPath = Path.Combine(codeDirPath, validImageDirPath);
-                    }
-
-                    this._targetedClasses.Add(new TargetedClassInfo
-                    {
-                        ClassName = classModel.Name,
-                        NamespaceName = classModel.GetNamespace(),
-                        ImageDirectoryPath = validImageDirPath,
-                        SyntaxNode = context.Node,
-                    });
-
-                    return;
-                }
-
+                    ClassName = classModel.Name,
+                    NamespaceName = classModel.GetNamespace(),
+                    ImageDirectoryPath = validImageDirPath,
+                    SyntaxNode = context.Node,
+                });
+            }
+            else
+            {
                 this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.InvalidDirectoryPath, context.Node.GetLocation(), rawImageDirPath));
             }
+        }
+
+        private static AttributeData FindImageLibraryAttribute(ISymbol symbol)
+        {
+            return symbol.GetAttributes().FirstOrDefault(IsImageLibraryAttribute);
+        }
+
+        private static bool IsImageLibraryAttribute(AttributeData attribute)
+        {
+            if (attribute.ConstructorArguments.Length == 0)
+            {
+                return false;
+            }
+
+            if (attribute.AttributeClass is null)
+            {
+                return false;
+            }
+
+            if (!Constants.ExpectedAttributeName.Equals(attribute.AttributeClass.Name, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            return Constants.ExpectedAttributeNamespaceName.Equals(attribute.AttributeClass.GetNamespace(), StringComparison.Ordinal);
         }
 
         private static bool TryValidatePath(string rawPath, out string validPath)

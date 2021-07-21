@@ -43,5 +43,13 @@ namespace Askaiser.Marionette.SourceGenerator
             category: nameof(LibrarySourceGenerator),
             DiagnosticSeverity.Warning,
             isEnabledByDefault: true);
+
+        public static readonly DiagnosticDescriptor NestedClassNotAllowed = new DiagnosticDescriptor(
+            id: "AMSG006",
+            title: "Nested class not allowed",
+            messageFormat: Constants.ExpectedAttributeFullName + " cannot be used on a nested class.",
+            category: nameof(LibrarySourceGenerator),
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true);
     }
 }
