@@ -34,12 +34,22 @@ https://user-images.githubusercontent.com/14242083/126416123-aebd0fce-825f-4ece-
 dotnet add package Askaiser.Marionette
 ```
 
-It supports **.NET Standard 2.0**, **.NET Standard 2.1** an **.NET 5**.
+It supports **.NET Standard 2.0**, **.NET Standard 2.1** an **.NET 5**, but only on Windows for now.
 
 ```csharp
 using (var driver = MarionetteDriver.Create(/* optional DriverOptions */))
 {
-    // insert magic here
+    // in this exemple, we enter a username and password in a login page
+    await driver.WaitFor(library.Pages.Login.Title, waitFor: TimeSpan.FromSeconds(5));
+
+    await driver.SingleClick(library.Pages.Login.Email);
+    await driver.TypeText("much@automated.foo", sleepAfter: TimeSpan.FromSeconds(0.5));
+    await driver.SingleClick(library.Pages.Login.Password);
+    await driver.TypeText("V3ry5ecre7!", sleepAfter: TimeSpan.FromSeconds(0.5));
+
+    await driver.SingleClick(library.Pages.Login.Submit);
+    
+    // insert moar magic here
 }
 ```
 
@@ -48,7 +58,7 @@ The [sample project](https://github.com/asimmon/askaiser-marionette/tree/readme-
 
 ## Creating image and text elements manually
 
-#### Image search with OpenCV
+#### Image search
 
 ```csharp
 // Instead of relying on the source generator that works with image files, you can create an ImageElement manually
@@ -59,7 +69,7 @@ var image = new ImageElement(name: "sidebar-close-button", content: bytes, thres
 * `ImageElement.Threshold` is a floating number between 0 and 1. It defines the accuracy of the image search process. `0.95` is the default value.
 * `ImageElement.Grayscale` defines whether or not the engine will apply grayscaling preprocessing. Image search is faster with grayscaling.
 
-#### Text search with OpenCV and Tesseract OCR
+#### Text search
 
 ```csharp
 Although many methods accept a simple string as an element, you can manually create a TextElement
