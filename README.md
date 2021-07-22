@@ -24,8 +24,8 @@ https://user-images.githubusercontent.com/14242083/126416123-aebd0fce-825f-4ece-
 * With the built-in C# source generator, you can start **writing the test code right away**.
 * You can interact with the whole operating system, instead of a single application.
 * This means you can also test desktop applications!
-* You can use it for automation only, like a bot.
 * It works well with BDD and [SpecFlow](https://specflow.org/).
+* You can use it to create a bot.
 
 
 ## Getting started
