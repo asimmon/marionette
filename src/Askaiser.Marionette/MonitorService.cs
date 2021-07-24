@@ -42,7 +42,7 @@ namespace Askaiser.Marionette
                     return this._monitors;
                 }
 
-                this._monitors = await GraphicsScreenshot.GetMonitors().ConfigureAwait(false);
+                this._monitors = await DisplayScreen.GetMonitors().ConfigureAwait(false);
             }
 
             return this._monitors;
@@ -75,7 +75,7 @@ namespace Askaiser.Marionette
                     return cachedScreenshot;
                 }
 
-                var screenshot = await GraphicsScreenshot.Take(monitor).ConfigureAwait(false);
+                var screenshot = await ScreenshotService.Take(monitor).ConfigureAwait(false);
 
                 var screenshotStream = new MemoryStream();
 
