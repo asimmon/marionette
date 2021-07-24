@@ -47,11 +47,11 @@ namespace Askaiser.Marionette
         private static IEnumerable<MonitorDescription> GetMonitorsInternal()
         {
             var monitors = new List<MonitorDescription>();
+            var monitorIndex = 0;
 
             var onMonitorCallback = new MonitorEnumProcedure((IntPtr _, IntPtr _, ref RectangleL rect, IntPtr _) =>
             {
-                const int temporaryMonitorIndex = 0;
-                monitors.Add(new MonitorDescription(temporaryMonitorIndex, rect.Left, rect.Top, rect.Right, rect.Bottom));
+                monitors.Add(new MonitorDescription(monitorIndex++, rect.Left, rect.Top, rect.Right, rect.Bottom));
                 return 1;
             });
 
@@ -62,7 +62,7 @@ namespace Askaiser.Marionette
                 throw new InvalidOperationException("No monitors were found.");
             }
 
-            return monitors.OrderBy(x => x.Left).ThenBy(x => x.Top).Select((monitor, index) => monitor with { Index = index });
+            return monitors;
         }
 
         public static Task<Bitmap> Take(Rectangle monitor)

@@ -142,7 +142,7 @@ namespace Askaiser.Marionette
 
         private static Rectangle Downscale(Rectangle r)
         {
-            return r.Multiply(1f / UpscalingRatio);
+            return r / (UpscalingRatio, UpscalingRatio);
         }
 
         private sealed class TesseractResultHandler

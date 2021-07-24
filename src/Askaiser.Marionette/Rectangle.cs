@@ -9,26 +9,6 @@ namespace Askaiser.Marionette
     {
         public Rectangle(int left, int top, int right, int bottom)
         {
-            if (left < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(left), $"Left property cannot be negative: {left}.");
-            }
-
-            if (top < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(top), $"Top property cannot be negative: {top}.");
-            }
-
-            if (right < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(right), $"Right property cannot be negative: {right}.");
-            }
-
-            if (bottom < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(bottom), $"Bottom property cannot be negative: {bottom}.");
-            }
-
             if (left > right)
             {
                 throw new ArgumentOutOfRangeException(nameof(left), $"Left property {left} is greater than the Right property {right}.");
@@ -115,6 +95,36 @@ namespace Askaiser.Marionette
             }
         }
 
+        public static Rectangle operator +(Rectangle rect, ValueTuple<int, int> xy) => rect with
+        {
+            Left = rect.Left + xy.Item1,
+            Top = rect.Top + xy.Item2,
+            Right = rect.Right + xy.Item1,
+            Bottom = rect.Bottom + xy.Item2,
+        };
+
+        public static Rectangle operator -(Rectangle rect, ValueTuple<int, int> xy) => rect with
+        {
+            Left = rect.Left - xy.Item1,
+            Top = rect.Top - xy.Item2,
+            Right = rect.Right - xy.Item1,
+            Bottom = rect.Bottom - xy.Item2,
+        };
+
+        public static Rectangle operator +(Rectangle rect, Point xy) => rect + (xy.X, xy.Y);
+
+        public static Rectangle operator -(Rectangle rect, Point xy) => rect - (xy.X, xy.Y);
+
+        public static Rectangle operator *(Rectangle rect, ValueTuple<double, double> xy) => rect with
+        {
+            Left = (int)Math.Round(rect.Left * xy.Item1),
+            Top = (int)Math.Round(rect.Top * xy.Item2),
+            Right = (int)Math.Round(rect.Right * xy.Item1),
+            Bottom = (int)Math.Round(rect.Bottom * xy.Item2),
+        };
+
+        public static Rectangle operator /(Rectangle rect, ValueTuple<double, double> xy) => rect * (1d / xy.Item1, 1d / xy.Item2);
+
         public void Deconstruct(out int left, out int top, out int right, out int bottom)
         {
             left = this.Left;
@@ -122,14 +132,6 @@ namespace Askaiser.Marionette
             right = this.Right;
             bottom = this.Bottom;
         }
-
-        internal Rectangle AddOffset(int leftOffset, int topOffset) => this with
-        {
-            Left = this.Left + leftOffset,
-            Top = this.Top + topOffset,
-            Right = this.Right + leftOffset,
-            Bottom = this.Bottom + topOffset,
-        };
 
         public Rectangle FromLeft(int width)
         {
@@ -362,14 +364,6 @@ namespace Askaiser.Marionette
 
             return new Rectangle(left, top, right, bottom);
         }
-
-        public Rectangle Multiply(double factor) => this with
-        {
-            Left = (int)Math.Round(this.Left * factor),
-            Top = (int)Math.Round(this.Top * factor),
-            Right = (int)Math.Round(this.Right * factor),
-            Bottom = (int)Math.Round(this.Bottom * factor),
-        };
 
         public override string ToString()
         {

@@ -42,7 +42,7 @@ namespace Askaiser.Marionette
 
         internal SearchResult AdjustToMonitor(MonitorDescription monitor)
         {
-            var newLocations = this.Locations.Select(x => x.AddOffset(monitor.Left, monitor.Top));
+            var newLocations = this.Locations.Select(x => x + (monitor.Left, monitor.Top));
             return new SearchResult(this.Element, newLocations);
         }
 
@@ -53,7 +53,7 @@ namespace Askaiser.Marionette
                 return this;
             }
 
-            var newLocations = this.Locations.Select(x => x.AddOffset(rect.Left, rect.Top));
+            var newLocations = this.Locations.Select(x => x + (rect.Left, rect.Top));
             return new SearchResult(this.Element, newLocations);
         }
 

@@ -6,12 +6,10 @@ namespace Askaiser.Marionette.Tests
     public class RectangleTests
     {
         [Theory]
-        [InlineData(-1, 0, 0, 0)]
-        [InlineData(0, -1, 0, 0)]
-        [InlineData(0, 0, -1, 0)]
-        [InlineData(0, 0, 0, -1)]
         [InlineData(1, 0, 0, 0)]
         [InlineData(0, 1, 0, 0)]
+        [InlineData(0, 0, -1, 0)]
+        [InlineData(0, 0, 0, -1)]
         public void WhenArgumentOutOfRangeException_Throws(int left, int top, int right, int bottom)
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => new Rectangle(left, top, right, bottom));
@@ -134,7 +132,14 @@ namespace Askaiser.Marionette.Tests
         public void Multiply()
         {
             var rect = new Rectangle(5, 5, 20, 20);
-            Assert.Equal(new Rectangle(10, 10, 40, 40), rect.Multiply(2));
+            Assert.Equal(new Rectangle(10, 15, 40, 60), rect * (2, 3));
+        }
+
+        [Fact]
+        public void Divide()
+        {
+            var rect = new Rectangle(10, 15, 40, 60);
+            Assert.Equal(new Rectangle(5, 5, 20, 20), rect / (2, 3));
         }
 
         [Fact]
@@ -145,6 +150,18 @@ namespace Askaiser.Marionette.Tests
             Assert.Equal(new Point(100, 110), rect.CenterRight);
             Assert.Equal(new Point(55, 20), rect.CenterTop);
             Assert.Equal(new Point(55, 200), rect.CenterBottom);
+        }
+
+        [Fact]
+        public void Operators()
+        {
+            var rect = new Rectangle(1, 2, 3, 4);
+
+            Assert.Equal(new Rectangle(2, 4, 4, 6), rect + (1, 2));
+            Assert.Equal(new Rectangle(2, 4, 4, 6), rect + new Point(1, 2));
+
+            Assert.Equal(new Rectangle(0, 0, 2, 2), rect - (1, 2));
+            Assert.Equal(new Rectangle(0, 0, 2, 2), rect - new Point(1, 2));
         }
     }
 }
