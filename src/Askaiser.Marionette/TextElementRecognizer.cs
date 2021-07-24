@@ -70,7 +70,14 @@ namespace Askaiser.Marionette
 
         private TesseractEngine CreateEngine()
         {
-            return new TesseractEngine(this._options.TesseractDataPath, this._options.TesseractLanguage, EngineMode.LstmOnly);
+            var engine = new TesseractEngine(this._options.TesseractDataPath, this._options.TesseractLanguage, EngineMode.Default);
+
+            if (engine.DefaultPageSegMode == PageSegMode.Auto)
+            {
+                engine.DefaultPageSegMode = PageSegMode.SparseText;
+            }
+
+            return engine;
         }
 
         private static IEnumerable<Func<Mat, Mat>> GetConverters(TextOptions options)
@@ -103,7 +110,8 @@ namespace Askaiser.Marionette
 
         private static Mat Grayscale(Mat mat)
         {
-            return mat.CvtColor(ColorConversionCodes.BGRA2GRAY);
+            var isAlreadyGrayscaled = mat.Channels() == 1;
+            return isAlreadyGrayscaled ? mat : mat.CvtColor(ColorConversionCodes.BGRA2GRAY);
         }
 
         private static Mat Binarize(Mat mat)
