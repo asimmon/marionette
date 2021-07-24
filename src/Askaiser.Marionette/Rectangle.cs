@@ -85,6 +85,26 @@ namespace Askaiser.Marionette
             get => new Point(this.Right, this.Bottom);
         }
 
+        public Point CenterLeft
+        {
+            get => new Point(this.Left, this.Center.Y);
+        }
+
+        public Point CenterRight
+        {
+            get => new Point(this.Right, this.Center.Y);
+        }
+
+        public Point CenterTop
+        {
+            get => new Point(this.Center.X, this.Top);
+        }
+
+        public Point CenterBottom
+        {
+            get => new Point(this.Center.X, this.Bottom);
+        }
+
         public Point Center
         {
             get

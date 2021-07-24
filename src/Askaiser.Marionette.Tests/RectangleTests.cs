@@ -52,11 +52,11 @@ namespace Askaiser.Marionette.Tests
         [Fact]
         public void Corners()
         {
-            var r1 = new Rectangle(75, 63, 478, 362);
-            Assert.Equal(new Point(75, 63), r1.TopLeft);
-            Assert.Equal(new Point(478, 63), r1.TopRight);
-            Assert.Equal(new Point(75, 362), r1.BottomLeft);
-            Assert.Equal(new Point(478, 362), r1.BottomRight);
+            var rect = new Rectangle(75, 63, 478, 362);
+            Assert.Equal(new Point(75, 63), rect.TopLeft);
+            Assert.Equal(new Point(478, 63), rect.TopRight);
+            Assert.Equal(new Point(75, 362), rect.BottomLeft);
+            Assert.Equal(new Point(478, 362), rect.BottomRight);
         }
 
         [Fact]
@@ -135,6 +135,16 @@ namespace Askaiser.Marionette.Tests
         {
             var rect = new Rectangle(5, 5, 20, 20);
             Assert.Equal(new Rectangle(10, 10, 40, 40), rect.Multiply(2));
+        }
+
+        [Fact]
+        public void BoundingCenters()
+        {
+            var rect = new Rectangle(10, 20, 100, 200);
+            Assert.Equal(new Point(10, 110), rect.CenterLeft);
+            Assert.Equal(new Point(100, 110), rect.CenterRight);
+            Assert.Equal(new Point(55, 20), rect.CenterTop);
+            Assert.Equal(new Point(55, 200), rect.CenterBottom);
         }
     }
 }
