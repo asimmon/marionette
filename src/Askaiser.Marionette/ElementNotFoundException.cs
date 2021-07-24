@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace Askaiser.Marionette
 {
-    internal sealed class ElementNotFoundException : MarionetteException
+    public sealed class ElementNotFoundException : MarionetteException
     {
         private const string MessageFormatWithDuration = "Element '{0}' was not found within the allotted time: {1}.";
         private const string MessageFormatWithoutDuration = "Element '{0}' was not found.";
