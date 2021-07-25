@@ -6,17 +6,6 @@ Askaiser.Marionette is a **test automation framework based on image and text rec
 [![build](https://img.shields.io/github/workflow/status/asimmon/askaiser-marionette/CI%20Build?logo=github)](https://github.com/asimmon/askaiser-marionette/actions/workflows/ci.yml)
 
 
-## Askaiser.Marionette in action
-
-* `00:00` : Capture screenshots of the app you're testing,
-* `00:08` : Rename and organize your screenshots in a meaningful way,
-* `00:22` : Drop your screenshots in your project,
-* `00:30` : Use `ImageLibrary` to **automatically** generate properties from your screenshots,
-* `01:06` : Use `MarionetteDriver` to interact with the generated properties (or even text recognized by the OCR)!
-
-https://user-images.githubusercontent.com/14242083/126416123-aebd0fce-825f-4ece-90e9-762503dc4cab.mp4
-
-
 ## Why use Askaiser.Marionette
 
 * Unlike other test automation frameworks, Askaiser.Marionette **does not rely on hardcoded identifiers, CSS or XPath selectors**. It uses image and text recognition to ensure that you interact with elements that are **actually visible** on the screen.
@@ -26,6 +15,17 @@ https://user-images.githubusercontent.com/14242083/126416123-aebd0fce-825f-4ece-
 * This means you can also test desktop applications!
 * It works well with BDD and [SpecFlow](https://specflow.org/).
 * You can use it to create a bot.
+
+
+## Askaiser.Marionette in action
+
+* `00:00` : Capture screenshots of the app you're testing,
+* `00:08` : Rename and organize your screenshots in a meaningful way,
+* `00:22` : Drop your screenshots in your project,
+* `00:30` : Use `ImageLibrary` to **automatically** generate properties from your screenshots,
+* `01:06` : Use `MarionetteDriver` to interact with the generated properties (or even text recognized by the OCR)!
+
+https://user-images.githubusercontent.com/14242083/126416123-aebd0fce-825f-4ece-90e9-762503dc4cab.mp4
 
 
 ## Getting started
