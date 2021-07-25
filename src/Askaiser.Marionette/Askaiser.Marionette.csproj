@@ -21,7 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="tessdata\**" CopyToOutputDirectory="PreserveNewest">
+    <None Include="tessdata\eng.traineddata">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <PackagePath>content\tessdata;contentFiles\any\any\tessdata</PackagePath>
       <PackageCopyToOutput>True</PackageCopyToOutput>
       <Pack>True</Pack>
     </None>

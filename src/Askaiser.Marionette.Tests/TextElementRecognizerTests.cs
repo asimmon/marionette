@@ -16,7 +16,7 @@ namespace Askaiser.Marionette.Tests
         [Theory]
         [InlineData(0, 0, 120, 30, "Google News", TextOptions.BlackAndWhite | TextOptions.Negative, 80, 18)]
         [InlineData(380, 170, 880, 336, "Headlines", TextOptions.None, 62, 17)]
-        [InlineData(380, 170, 880, 336, "mperatures in southern califor", TextOptions.None, 172, 150)]
+        [InlineData(380, 170, 880, 336, "mperatures in southern califor", TextOptions.None, 173, 150)]
         [InlineData(20, 810, 160, 860, "English (United States)", TextOptions.None, 67, 36)]
         [InlineData(0, 0, 1920, 1080, "historic miami-dade courthouse closed due to ", TextOptions.None, 600, 665)]
         public async Task Recognize_WhenSingleMatch_Works(int x1, int y1, int x2, int y2, string searched, TextOptions options, int expectedX, int expectedY)
