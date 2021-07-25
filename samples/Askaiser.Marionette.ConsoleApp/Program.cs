@@ -28,8 +28,7 @@ namespace Askaiser.Marionette.ConsoleApp
             {
                 // We expect the IDE logo to be in a 200x200 square at the top left of the current monitor.
                 var monitor = await driver.GetCurrentMonitor();
-                var monitorRect = new Rectangle(0, 0, monitor.Width, monitor.Height);
-                var ideLogoRect = monitorRect.FromTopLeft(200, 200);
+                var ideLogoRect = monitor.FromTopLeft(200, 200);
 
                 // RiderLogo and VsLogo properties will be generated from the *.png files
                 await driver.MoveToAny(new[] { library.RiderLogo, library.VsLogo }, waitFor: TimeSpan.FromSeconds(2), searchRect: ideLogoRect);

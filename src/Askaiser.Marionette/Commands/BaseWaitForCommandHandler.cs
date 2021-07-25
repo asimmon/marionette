@@ -32,6 +32,7 @@ namespace Askaiser.Marionette.Commands
             }
 
             var monitor = await this._monitorService.GetMonitor(command.MonitorIndex).ConfigureAwait(false);
+            var searchRect = AdjustSearchRectangleRelativeToMonitorSize(monitor, command.SearchRectangle);
 
             RecognizerSearchResult disposableResult = null;
             try
@@ -39,12 +40,12 @@ namespace Askaiser.Marionette.Commands
                 var isFirstLoop = true;
                 for (var sw = Stopwatch.StartNew(); sw.Elapsed < command.WaitFor || isFirstLoop;)
                 {
-                    using var screenshot = await this.GetScreenshot(monitor, command.SearchRectangle).ConfigureAwait(false);
+                    using var screenshot = await this.GetScreenshot(monitor, searchRect).ConfigureAwait(false);
 
                     disposableResult = await this._elementRecognizer.Recognize(screenshot, element).ConfigureAwait(false);
                     if (disposableResult.Success)
                     {
-                        var adjustedResult = disposableResult.AdjustToMonitor(monitor).AdjustToSearchRectangle(command.SearchRectangle);
+                        var adjustedResult = disposableResult.AdjustToMonitor(monitor).AdjustToSearchRectangle(searchRect);
 
                         if (command.Behavior == NoSingleResultBehavior.Throw)
                         {
@@ -74,6 +75,19 @@ namespace Askaiser.Marionette.Commands
             }
 
             return SearchResult.NotFound(element);
+        }
+
+        private static Rectangle AdjustSearchRectangleRelativeToMonitorSize(MonitorDescription monitor, Rectangle searchRect)
+        {
+            if (searchRect == null)
+            {
+                return null;
+            }
+
+            var offsetLeft = searchRect.Left - monitor.Left;
+            var offsetTop = searchRect.Top - monitor.Top;
+
+            return new Rectangle(offsetLeft, offsetTop, offsetLeft + searchRect.Width, offsetTop + searchRect.Height);
         }
 
         private async Task<Bitmap> GetScreenshot(MonitorDescription monitor, Rectangle searchRect)
