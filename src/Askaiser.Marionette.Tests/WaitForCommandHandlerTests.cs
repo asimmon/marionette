@@ -21,7 +21,7 @@ namespace Askaiser.Marionette.Tests
 
         public async Task InitializeAsync()
         {
-            this._screenshot = await BitmapUtils.FromFile("./images/google-news.png");
+            this._screenshot = await BitmapUtils.FromAssembly("Askaiser.Marionette.Tests.images.google-news.png");
             this._monitorService = new FakeMonitorService(this._screenshot);
             this._elementRecognizer = A.Fake<IElementRecognizer>();
             this._searchedElement = new FakeElement("Foo.Bar.0");

@@ -21,7 +21,7 @@ namespace Askaiser.Marionette.Tests
         [InlineData(0, 0, 1920, 1080, "historic miami-dade courthouse closed due to ", TextOptions.None, 600, 665)]
         public async Task Recognize_WhenSingleMatch_Works(int x1, int y1, int x2, int y2, string searched, TextOptions options, int expectedX, int expectedY)
         {
-            using var screenshot = await BitmapUtils.FromFile("./images/google-news.png");
+            using var screenshot = await BitmapUtils.FromAssembly("Askaiser.Marionette.Tests.images.google-news.png");
             using var cropped = screenshot.Crop(new Rectangle(x1, y1, x2, y2));
             var element = new TextElement(searched, options);
 
@@ -33,7 +33,7 @@ namespace Askaiser.Marionette.Tests
         [Fact]
         public async Task Recognize_WhenMultipleMatches_Works()
         {
-            using var screenshot = await BitmapUtils.FromFile("./images/google-news.png");
+            using var screenshot = await BitmapUtils.FromAssembly("Askaiser.Marionette.Tests.images.google-news.png");
             using var cropped = screenshot.Crop(new Rectangle(410, 300, 800, 550));
             var element = new TextElement("California") { IgnoreCase = false };
 
