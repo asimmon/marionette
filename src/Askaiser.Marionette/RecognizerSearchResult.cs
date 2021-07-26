@@ -13,6 +13,11 @@ namespace Askaiser.Marionette
             this.TransformedScreenshot = transformedScreenshot;
         }
 
+        internal RecognizerSearchResult(Bitmap transformedScreenshot, SearchResult searchResult)
+            : this(transformedScreenshot, searchResult.Element, searchResult.Locations)
+        {
+        }
+
         public Bitmap TransformedScreenshot { get; }
 
         public static SearchResult NotFound(Bitmap screenshot, IElement element)

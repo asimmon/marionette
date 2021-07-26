@@ -27,7 +27,7 @@ namespace Askaiser.Marionette.Tests
         [InlineData(20, 620, 162, 660, "0.95", true, 91, 640)]
         public async Task Recognize_WhenSingleMatch_Works(int x1, int y1, int x2, int y2, string threshold, bool grayscale, int expectedX, int expectedY)
         {
-            using var screenshot = await BitmapFromFile("./images/google-news.png");
+            using var screenshot = await BitmapUtils.FromFile("./images/google-news.png");
             using var searched = screenshot.Crop(new Rectangle(x1, y1, x2, y2));
             var element = new ImageElement("searched", searched.GetBytes(ImageFormat.Png), Convert.ToDecimal(threshold, CultureInfo.InvariantCulture), grayscale);
 
@@ -39,7 +39,7 @@ namespace Askaiser.Marionette.Tests
         [Fact]
         public async Task Recognize_WhenTwoMatchesInScreenshot_Works()
         {
-            using var screenshot = await BitmapFromFile("./images/google-news.png");
+            using var screenshot = await BitmapUtils.FromFile("./images/google-news.png");
             using var searched = screenshot.Crop(new Rectangle(1376, 390, 1420, 436));
             var element = new ImageElement("searched", searched.GetBytes(ImageFormat.Png), ImageElement.DefaultThreshold, false);
 

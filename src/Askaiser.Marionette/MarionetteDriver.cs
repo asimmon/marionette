@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Askaiser.Marionette.Commands;
 
 [assembly: InternalsVisibleTo("Askaiser.Marionette.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace Askaiser.Marionette
 {

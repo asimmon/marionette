@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Askaiser.Marionette.Commands
@@ -24,7 +25,12 @@ namespace Askaiser.Marionette.Commands
             this._elementRecognizer = elementRecognizer;
         }
 
-        protected async Task<SearchResult> WaitFor(IElement element, WaitForCommand command)
+        protected Task<SearchResult> WaitFor(IElement element, WaitForCommand command)
+        {
+            return this.WaitFor(element, command, CancellationToken.None);
+        }
+
+        protected async Task<SearchResult> WaitFor(IElement element, WaitForCommand command, CancellationToken token)
         {
             if (command.WaitFor < TimeSpan.Zero)
             {
@@ -42,7 +48,18 @@ namespace Askaiser.Marionette.Commands
                 {
                     using var screenshot = await this.GetScreenshot(monitor, searchRect).ConfigureAwait(false);
 
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
                     disposableResult = await this._elementRecognizer.Recognize(screenshot, element).ConfigureAwait(false);
+
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
                     if (disposableResult.Success)
                     {
                         var adjustedResult = disposableResult.AdjustToMonitor(monitor).AdjustToSearchRectangle(searchRect);
@@ -55,14 +72,23 @@ namespace Askaiser.Marionette.Commands
                         return adjustedResult;
                     }
 
-                    await Task.Delay(ThrottlingInterval).ConfigureAwait(false);
+                    await Task.Delay(ThrottlingInterval, token).ConfigureAwait(false);
                     isFirstLoop = false;
                 }
 
-                if (command.Behavior == NoSingleResultBehavior.Throw && this._options.FailureScreenshotPath != null)
+                if (!token.IsCancellationRequested && command.Behavior == NoSingleResultBehavior.Throw && disposableResult != null)
                 {
                     await this.SaveScreenshot(element, disposableResult.TransformedScreenshot).ConfigureAwait(false);
                 }
+            }
+            catch (MultipleElementFoundException)
+            {
+                if (!token.IsCancellationRequested && command.Behavior == NoSingleResultBehavior.Throw && disposableResult != null)
+                {
+                    await this.SaveScreenshot(element, disposableResult.TransformedScreenshot).ConfigureAwait(false);
+                }
+
+                throw;
             }
             finally
             {
@@ -109,18 +135,27 @@ namespace Askaiser.Marionette.Commands
 
         private async Task SaveScreenshot(IElement element, Image screenshot)
         {
+            if (this._options.FailureScreenshotPath == null)
+            {
+                return;
+            }
+
             var elementDescriptor = NotAlphanumericRegex.Replace(WhitespaceRegex.Replace(element.ToString()?.Trim() ?? string.Empty, "-"), string.Empty);
-            var fileName = string.Format(CultureInfo.InvariantCulture, "{0:yyyy-MM-dd-HH-mm-ss-ffff}_{1}.png", DateTime.UtcNow, elementDescriptor);
+            var fileName = string.Format(CultureInfo.InvariantCulture, "{0:yyyy-MM-dd-HH-mm-ss-ffff}_{1}.png", DateTime.UtcNow, elementDescriptor.ToLowerInvariant());
 
             var screenshotBytes = screenshot.GetBytes(ImageFormat.Png);
+            await this.SaveScreenshot(screenshotBytes, Path.Combine(this._options.FailureScreenshotPath, fileName.ToLowerInvariant())).ConfigureAwait(false);
+        }
 
+        protected virtual async Task SaveScreenshot(byte[] screenshotBytes, string path)
+        {
 #if NETSTANDARD2_0
-            using (var fileStream = File.Open(Path.Combine(this._options.FailureScreenshotPath, fileName.ToLowerInvariant()), FileMode.Create))
+            using (var fileStream = File.Open(path, FileMode.Create))
             {
                 await fileStream.WriteAsync(screenshotBytes, 0, screenshotBytes.Length).ConfigureAwait(false);
             }
 #else
-            await using (var fileStream = File.Open(Path.Combine(this._options.FailureScreenshotPath, fileName.ToLowerInvariant()), FileMode.Create))
+            await using (var fileStream = File.Open(path, FileMode.Create))
             {
                 await fileStream.WriteAsync(screenshotBytes).ConfigureAwait(false);
             }
