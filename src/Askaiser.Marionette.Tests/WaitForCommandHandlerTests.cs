@@ -16,6 +16,8 @@ namespace Askaiser.Marionette.Tests
         private IElementRecognizer _elementRecognizer;
         private IElement _searchedElement;
         private IElement[] _searchedElements;
+        private List<FailureScreenshot> _failures;
+        private IFileWriter _fileWriter;
 
         public async Task InitializeAsync()
         {
@@ -24,13 +26,30 @@ namespace Askaiser.Marionette.Tests
             this._elementRecognizer = A.Fake<IElementRecognizer>();
             this._searchedElement = new FakeElement("Foo.Bar.0");
             this._searchedElements = new[] { this._searchedElement };
+            this._failures = new List<FailureScreenshot>();
+            this._fileWriter = A.Fake<IFileWriter>();
+            A.CallTo(() => this._fileWriter.SaveScreenshot(A<string>._, A<byte[]>._))
+                .Invokes(x =>
+                {
+                    var path = x.GetArgument<string>(0);
+                    var fileBytes = x.GetArgument<byte[]>(1);
+
+                    Assert.NotNull(path);
+                    Assert.NotNull(fileBytes);
+
+                    using var ms = new MemoryStream(fileBytes);
+                    using var img = Image.FromStream(ms);
+
+                    this._failures.Add(new FailureScreenshot(img.Width, img.Height, path));
+                })
+                .Returns(Task.CompletedTask);
         }
 
         [Fact]
         public async Task Execute_WhenNegativeTimeout_Throws()
         {
             var opts = new DriverOptions();
-            var handler = new TestableWaitForCommandHandler(opts, this._monitorService, this._elementRecognizer);
+            var handler = new WaitForCommandHandler(opts, this._fileWriter, this._monitorService, this._elementRecognizer);
 
             await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
             {
@@ -42,7 +61,7 @@ namespace Askaiser.Marionette.Tests
         public async Task Execute_WhenSingleLocation_Works()
         {
             var opts = new DriverOptions();
-            var handler = new TestableWaitForCommandHandler(opts, this._monitorService, this._elementRecognizer);
+            var handler = new WaitForCommandHandler(opts, this._fileWriter, this._monitorService, this._elementRecognizer);
 
             var expectedResult = new SearchResult(this._searchedElement, new[] { new Rectangle(10, 40, 20, 50) });
             this.RegisterRecognizeResult(this._searchedElement, expectedResult);
@@ -59,7 +78,7 @@ namespace Askaiser.Marionette.Tests
         {
             var opts = useFailureScreenshotPath ? new DriverOptions { FailureScreenshotPath = @"C:\foo\bar" } : new DriverOptions();
 
-            var handler = new TestableWaitForCommandHandler(opts, this._monitorService, this._elementRecognizer);
+            var handler = new WaitForCommandHandler(opts, this._fileWriter, this._monitorService, this._elementRecognizer);
 
             var expectedResult = new SearchResult(this._searchedElement, Array.Empty<Rectangle>());
             this.RegisterRecognizeResult(this._searchedElement, expectedResult);
@@ -73,7 +92,7 @@ namespace Askaiser.Marionette.Tests
 
             if (useFailureScreenshotPath)
             {
-                var failure = Assert.Single(handler.SavedFailurePaths);
+                var failure = Assert.Single(this._failures);
 
                 Assert.StartsWith(opts.FailureScreenshotPath, failure.Path);
                 Assert.EndsWith("_foobar0.png", failure.Path);
@@ -90,7 +109,7 @@ namespace Askaiser.Marionette.Tests
         {
             var opts = useFailureScreenshotPath ? new DriverOptions { FailureScreenshotPath = @"C:\foo\bar" } : new DriverOptions();
 
-            var handler = new TestableWaitForCommandHandler(opts, this._monitorService, this._elementRecognizer);
+            var handler = new WaitForCommandHandler(opts, this._fileWriter, this._monitorService, this._elementRecognizer);
 
             var loc1 = new Rectangle(10, 40, 20, 50);
             var loc2 = new Rectangle(100, 400, 200, 500);
@@ -106,7 +125,7 @@ namespace Askaiser.Marionette.Tests
 
             if (useFailureScreenshotPath)
             {
-                var failure = Assert.Single(handler.SavedFailurePaths);
+                var failure = Assert.Single(this._failures);
 
                 Assert.StartsWith(opts.FailureScreenshotPath, failure.Path);
                 Assert.EndsWith("_foobar0.png", failure.Path);
@@ -124,7 +143,7 @@ namespace Askaiser.Marionette.Tests
                 FailureScreenshotPath = @"C:\foo\bar",
             };
 
-            var handler = new TestableWaitForCommandHandler(opts, this._monitorService, this._elementRecognizer);
+            var handler = new WaitForCommandHandler(opts, this._fileWriter, this._monitorService, this._elementRecognizer);
 
             var expectedResult = new RecognizerSearchResult(new Bitmap(this._screenshot), this._searchedElement, Array.Empty<Rectangle>());
             this.RegisterRecognizeResult(this._searchedElement, expectedResult);
@@ -138,7 +157,7 @@ namespace Askaiser.Marionette.Tests
 
             Assert.Equal(this._searchedElement, ex.Element);
 
-            var failure = Assert.Single(handler.SavedFailurePaths);
+            var failure = Assert.Single(this._failures);
 
             Assert.StartsWith(opts.FailureScreenshotPath, failure.Path);
             Assert.EndsWith("_foobar0.png", failure.Path);
@@ -155,7 +174,7 @@ namespace Askaiser.Marionette.Tests
                 FailureScreenshotPath = @"C:\foo\bar",
             };
 
-            var handler = new TestableWaitForCommandHandler(opts, this._monitorService, this._elementRecognizer);
+            var handler = new WaitForCommandHandler(opts, this._fileWriter, this._monitorService, this._elementRecognizer);
 
             var loc1 = new Rectangle(10, 40, 20, 50);
             var loc2 = new Rectangle(100, 400, 200, 500);
@@ -171,7 +190,7 @@ namespace Askaiser.Marionette.Tests
 
             AssertSearchResult(expectedResult, ex.Result, searchRect);
 
-            var failure = Assert.Single(handler.SavedFailurePaths);
+            var failure = Assert.Single(this._failures);
 
             Assert.StartsWith(opts.FailureScreenshotPath, failure.Path);
             Assert.EndsWith("_foobar0.png", failure.Path);
@@ -206,31 +225,6 @@ namespace Askaiser.Marionette.Tests
             for (var i = 0; i < expected.Locations.Count; i++)
             {
                 Assert.Equal(expected.Locations[i], actual.Locations[i]);
-            }
-        }
-
-        private class TestableWaitForCommandHandler : WaitForCommandHandler
-        {
-            private readonly List<FailureScreenshot> _failures;
-
-            public TestableWaitForCommandHandler(DriverOptions options, IMonitorService monitorService, IElementRecognizer elementRecognizer)
-                : base(options, monitorService, elementRecognizer)
-            {
-                this._failures = new List<FailureScreenshot>();
-            }
-
-            public IReadOnlyList<FailureScreenshot> SavedFailurePaths
-            {
-                get => this._failures;
-            }
-
-            protected override Task SaveScreenshot(byte[] screenshotBytes, string path)
-            {
-                using var ms = new MemoryStream(screenshotBytes);
-                using var img = Image.FromStream(ms);
-
-                this._failures.Add(new FailureScreenshot(img.Width, img.Height, path));
-                return Task.CompletedTask;
             }
         }
 

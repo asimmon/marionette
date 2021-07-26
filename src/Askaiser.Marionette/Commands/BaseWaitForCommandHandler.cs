@@ -15,12 +15,14 @@ namespace Askaiser.Marionette.Commands
         private static readonly TimeSpan ThrottlingInterval = TimeSpan.FromMilliseconds(50);
 
         private readonly DriverOptions _options;
+        private readonly IFileWriter _fileWriter;
         private readonly IMonitorService _monitorService;
         private readonly IElementRecognizer _elementRecognizer;
 
-        protected BaseWaitForCommandHandler(DriverOptions options, IMonitorService monitorService, IElementRecognizer elementRecognizer)
+        protected BaseWaitForCommandHandler(DriverOptions options, IFileWriter fileWriter, IMonitorService monitorService, IElementRecognizer elementRecognizer)
         {
             this._options = options;
+            this._fileWriter = fileWriter;
             this._monitorService = monitorService;
             this._elementRecognizer = elementRecognizer;
         }
@@ -144,22 +146,7 @@ namespace Askaiser.Marionette.Commands
             var fileName = string.Format(CultureInfo.InvariantCulture, "{0:yyyy-MM-dd-HH-mm-ss-ffff}_{1}.png", DateTime.UtcNow, elementDescriptor.ToLowerInvariant());
 
             var screenshotBytes = screenshot.GetBytes(ImageFormat.Png);
-            await this.SaveScreenshot(screenshotBytes, Path.Combine(this._options.FailureScreenshotPath, fileName.ToLowerInvariant())).ConfigureAwait(false);
-        }
-
-        protected virtual async Task SaveScreenshot(byte[] screenshotBytes, string path)
-        {
-#if NETSTANDARD2_0
-            using (var fileStream = File.Open(path, FileMode.Create))
-            {
-                await fileStream.WriteAsync(screenshotBytes, 0, screenshotBytes.Length).ConfigureAwait(false);
-            }
-#else
-            await using (var fileStream = File.Open(path, FileMode.Create))
-            {
-                await fileStream.WriteAsync(screenshotBytes).ConfigureAwait(false);
-            }
-#endif
+            await this._fileWriter.SaveScreenshot(Path.Combine(this._options.FailureScreenshotPath, fileName.ToLowerInvariant()), screenshotBytes).ConfigureAwait(false);
         }
     }
 }

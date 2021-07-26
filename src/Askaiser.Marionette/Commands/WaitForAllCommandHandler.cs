@@ -5,8 +5,8 @@ namespace Askaiser.Marionette.Commands
 {
     internal class WaitForAllCommandHandler : BaseWaitForCommandHandler
     {
-        public WaitForAllCommandHandler(DriverOptions options, IMonitorService monitorService, IElementRecognizer elementRecognizer)
-            : base(options, monitorService, elementRecognizer)
+        public WaitForAllCommandHandler(DriverOptions options, IFileWriter fileWriter, IMonitorService monitorService, IElementRecognizer elementRecognizer)
+            : base(options, fileWriter, monitorService, elementRecognizer)
         {
         }
 
