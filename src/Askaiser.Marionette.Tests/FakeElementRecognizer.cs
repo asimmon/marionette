@@ -21,9 +21,10 @@ namespace Askaiser.Marionette.Tests
 
         public int RecognizeCallCount { get; private set; }
 
-        public void AddExpectedResult(IElement element, SearchResult result)
+        public SearchResult AddExpectedResult(IElement element, SearchResult result)
         {
             this.AddExpectedResult(element, () => result);
+            return result;
         }
 
         public void AddExpectedResult(IElement element, Func<SearchResult> resultFunc)
