@@ -24,5 +24,11 @@ namespace Askaiser.Marionette.Tests
                 return (Bitmap)Image.FromStream(ms);
             }
         }
+
+        public static Bitmap FromBytes(byte[] bytes)
+        {
+            using var ms = new MemoryStream(bytes);
+            return (Bitmap)Image.FromStream(ms);
+        }
     }
 }

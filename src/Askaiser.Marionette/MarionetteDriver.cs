@@ -36,7 +36,7 @@ namespace Askaiser.Marionette
         private int _monitorIndex;
         private MouseSpeed _mouseSpeed;
 
-        private MarionetteDriver(
+        internal MarionetteDriver(
             DriverOptions options,
             IFileWriter fileWriter,
             IMonitorService monitorService,
