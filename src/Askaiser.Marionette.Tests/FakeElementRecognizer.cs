@@ -15,7 +15,11 @@ namespace Askaiser.Marionette.Tests
         {
             this._lockObj = new object();
             this._expectedResultsByElements = new Dictionary<IElement, Queue<Func<SearchResult>>>();
+
+            this.RecognizeCallCount = 0;
         }
+
+        public int RecognizeCallCount { get; private set; }
 
         public void AddExpectedResult(IElement element, SearchResult result)
         {
@@ -33,6 +37,8 @@ namespace Askaiser.Marionette.Tests
 
         public Task<RecognizerSearchResult> Recognize(Bitmap screenshot, IElement element)
         {
+            this.RecognizeCallCount++;
+
             Assert.NotNull(screenshot);
             Assert.NotNull(element);
 

@@ -142,11 +142,16 @@ namespace Askaiser.Marionette.Commands
                 return;
             }
 
-            var elementDescriptor = NotAlphanumericRegex.Replace(WhitespaceRegex.Replace(element.ToString()?.Trim() ?? string.Empty, "-"), string.Empty);
-            var fileName = string.Format(CultureInfo.InvariantCulture, "{0:yyyy-MM-dd-HH-mm-ss-ffff}_{1}.png", DateTime.UtcNow, elementDescriptor.ToLowerInvariant());
+            var fileName = MakeFailureScreenshotFileName(element);
 
             var screenshotBytes = screenshot.GetBytes(ImageFormat.Png);
             await this._fileWriter.SaveScreenshot(Path.Combine(this._options.FailureScreenshotPath, fileName.ToLowerInvariant()), screenshotBytes).ConfigureAwait(false);
+        }
+
+        private static string MakeFailureScreenshotFileName(IElement element)
+        {
+            var elementDescriptor = NotAlphanumericRegex.Replace(WhitespaceRegex.Replace(element.ToString()?.Trim() ?? string.Empty, "-"), string.Empty);
+            return string.Format(CultureInfo.InvariantCulture, "{0:yyyy-MM-dd-HH-mm-ss-ffff}_{1}.png", DateTime.UtcNow, elementDescriptor.ToLowerInvariant());
         }
     }
 }

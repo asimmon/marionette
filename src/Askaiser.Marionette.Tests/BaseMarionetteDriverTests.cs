@@ -55,5 +55,23 @@ namespace Askaiser.Marionette.Tests
             this.Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        protected static void AssertSearchResult(SearchResult expected, SearchResult actual, Rectangle searchRect = null)
+        {
+            Assert.NotNull(actual);
+            Assert.NotNull(expected);
+
+            expected = expected.AdjustToSearchRectangle(searchRect);
+
+            Assert.Equal(expected.Success, actual.Success);
+            Assert.Equal(expected.Element, actual.Element);
+
+            Assert.Equal(expected.Locations.Count, actual.Locations.Count);
+
+            for (var i = 0; i < expected.Locations.Count; i++)
+            {
+                Assert.Equal(expected.Locations[i], actual.Locations[i]);
+            }
+        }
     }
 }
