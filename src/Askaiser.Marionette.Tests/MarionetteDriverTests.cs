@@ -4,14 +4,17 @@ using Xunit;
 
 namespace Askaiser.Marionette.Tests
 {
-    public class WaitForMarionetteDriverTests : BaseMarionetteDriverTests
+    public class MarionetteDriverTests : BaseMarionetteDriverTests
     {
+        #region WaitFor with element
+
         [Fact]
         public async Task WaitFor_WhenNegativeTimeout_Throws()
         {
             using var driver = this.CreateDriver();
-            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => driver.WaitFor(new FakeElement("needle"), TimeSpan.FromSeconds(-1)));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => driver.WaitFor(new FakeElement("needle"), waitFor: TimeSpan.FromSeconds(-1)));
             Assert.Equal(0, this.ElementRecognizer.RecognizeCallCount);
+            Assert.Empty(this.FileWriter.SavedFailures);
         }
 
         [Fact]
@@ -26,6 +29,7 @@ namespace Askaiser.Marionette.Tests
             var actualResult = await driver.WaitFor(needle);
             AssertSearchResult(expectedResult, actualResult);
             Assert.Equal(1, this.ElementRecognizer.RecognizeCallCount);
+            Assert.Empty(this.FileWriter.SavedFailures);
         }
 
         [Theory]
@@ -145,5 +149,82 @@ namespace Askaiser.Marionette.Tests
             Assert.Equal(searchRect.Width, failure.Width);
             Assert.Equal(searchRect.Height, failure.Height);
         }
+
+        #endregion
+
+        #region IsVisible with element
+
+        [Fact]
+        public async Task IsVisible_WhenNegativeTimeout_Throws()
+        {
+            using var driver = this.CreateDriver();
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => driver.IsVisible(new FakeElement("needle"), waitFor: TimeSpan.FromSeconds(-1)));
+            Assert.Equal(0, this.ElementRecognizer.RecognizeCallCount);
+            Assert.Empty(this.FileWriter.SavedFailures);
+        }
+
+        [Fact]
+        public async Task IsVisible_WhenSingleLocation_Works()
+        {
+            using var driver = this.CreateDriver();
+
+            var needle = new FakeElement("needle");
+            var expectedResult = new SearchResult(needle, new[] { new Rectangle(10, 40, 20, 50) });
+            this.ElementRecognizer.AddExpectedResult(needle, expectedResult);
+
+            var isVisible = await driver.IsVisible(needle);
+            Assert.True(isVisible);
+            Assert.Equal(1, this.ElementRecognizer.RecognizeCallCount);
+            Assert.Empty(this.FileWriter.SavedFailures);
+        }
+
+        [Theory]
+        [InlineData(false, 0)]
+        [InlineData(true, 0)]
+        [InlineData(false, 1000)]
+        [InlineData(true,  1000)]
+        public async Task IsVisible_WhenNoLocation_Throws(bool useFailureScreenshotPath, int waitForMs)
+        {
+            var opts = useFailureScreenshotPath ? new DriverOptions { FailureScreenshotPath = @"C:\foo\bar" } : new DriverOptions();
+            using var driver = this.CreateDriver(opts);
+
+            var needle = new FakeElement("needle");
+            var expectedResult = new SearchResult(needle, Array.Empty<Rectangle>());
+            this.ElementRecognizer.AddExpectedResult(needle, expectedResult);
+
+            var isVisible = await driver.IsVisible(needle, waitFor: TimeSpan.FromMilliseconds(waitForMs));
+            Assert.False(isVisible);
+
+            if (waitForMs == 0)
+            {
+                Assert.Equal(1, this.ElementRecognizer.RecognizeCallCount);
+            }
+            else
+            {
+                Assert.True(this.ElementRecognizer.RecognizeCallCount > 1);
+            }
+
+            Assert.Empty(this.FileWriter.SavedFailures);
+        }
+
+        [Theory]
+        [InlineData(false, 1000)]
+        [InlineData(true, 1000)]
+        public async Task IsVisible_WhenTooManyLocations_Throws(bool useFailureScreenshotPath, int waitForMs)
+        {
+            var opts = useFailureScreenshotPath ? new DriverOptions { FailureScreenshotPath = @"C:\foo\bar" } : new DriverOptions();
+            using var driver = this.CreateDriver(opts);
+
+            var needle = new FakeElement("needle");
+            var expectedResult = new SearchResult(needle, new[] { new Rectangle(10, 40, 20, 50), new Rectangle(100, 400, 200, 500) });
+            this.ElementRecognizer.AddExpectedResult(needle, expectedResult);
+
+            var isVisible = await driver.IsVisible(needle, waitFor: TimeSpan.FromMilliseconds(waitForMs));
+            Assert.True(isVisible);
+            Assert.Equal(1, this.ElementRecognizer.RecognizeCallCount);
+            Assert.Empty(this.FileWriter.SavedFailures);
+        }
+
+        #endregion
     }
 }
