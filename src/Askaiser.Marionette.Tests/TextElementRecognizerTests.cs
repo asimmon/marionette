@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -25,7 +26,7 @@ namespace Askaiser.Marionette.Tests
             using var cropped = screenshot.Crop(new Rectangle(x1, y1, x2, y2));
             var element = new TextElement(searched, options);
 
-            var result = await this._recognizer.Recognize(cropped, element);
+            var result = await this._recognizer.Recognize(cropped, element, CancellationToken.None);
 
             AssertResult(result, new Point(expectedX, expectedY));
         }
@@ -37,7 +38,7 @@ namespace Askaiser.Marionette.Tests
             using var cropped = screenshot.Crop(new Rectangle(410, 300, 800, 550));
             var element = new TextElement("California") { IgnoreCase = false };
 
-            var result = await this._recognizer.Recognize(cropped, element);
+            var result = await this._recognizer.Recognize(cropped, element, CancellationToken.None);
 
             AssertResult(result, new Point(255, 18), new Point(306, 132));
         }

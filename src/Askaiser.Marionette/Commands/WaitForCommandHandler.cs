@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Askaiser.Marionette.Commands
@@ -12,7 +13,8 @@ namespace Askaiser.Marionette.Commands
 
         public async Task<SearchResult> Execute(WaitForCommand command)
         {
-            return await this.WaitFor(command.Elements.First(), command).ConfigureAwait(false);
+            var disposableResult = await this.WaitFor(command.Elements.First(), command, CancellationToken.None).ConfigureAwait(false);
+            return await this.TrimRecognizerResultAndThrowIfRequired(command, disposableResult).ConfigureAwait(false);
         }
     }
 }

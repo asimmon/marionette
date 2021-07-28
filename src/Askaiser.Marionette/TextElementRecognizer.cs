@@ -28,7 +28,7 @@ namespace Askaiser.Marionette
             this._activeEngineCount = 0;
         }
 
-        public async Task<RecognizerSearchResult> Recognize(Bitmap screenshot, IElement element)
+        public async Task<RecognizerSearchResult> Recognize(Bitmap screenshot, IElement element, CancellationToken token)
         {
             RecognizerSearchResult RecognizeInternal()
             {
@@ -40,6 +40,11 @@ namespace Askaiser.Marionette
                     .ConvertAndDispose(BitmapConverter.ToBitmap)
                     .ConvertAndDispose(PixConverter.ToPix);
 
+                if (token.IsCancellationRequested)
+                {
+                    return RecognizerSearchResult.NotFound(PixConverter.ToBitmap(screenshotMat), element);
+                }
+
                 Guid engineId = default;
 
                 try
@@ -49,11 +54,18 @@ namespace Askaiser.Marionette
                     var engine = this._engines.GetOrAdd(engineId, _ => this.CreateEngine());
 
                     using var page = engine.Process(screenshotMat);
-                    using var iterator = page.GetIterator();
-                    var locations = TesseractResultHandler.Handle(iterator, textElement);
 
-                    var transformedScreenshot = PixConverter.ToBitmap(screenshotMat);
-                    return new RecognizerSearchResult(transformedScreenshot, element, locations.Select(Downscale));
+                    if (token.IsCancellationRequested)
+                    {
+                        return RecognizerSearchResult.NotFound(PixConverter.ToBitmap(screenshotMat), element);
+                    }
+
+                    using var iterator = page.GetIterator();
+                    var locations = TesseractResultHandler.Handle(iterator, textElement, token);
+
+                    return token.IsCancellationRequested
+                        ? RecognizerSearchResult.NotFound(PixConverter.ToBitmap(screenshotMat), element)
+                        : new RecognizerSearchResult(PixConverter.ToBitmap(screenshotMat), element, locations.Select(Downscale));
                 }
                 finally
                 {
@@ -148,15 +160,17 @@ namespace Askaiser.Marionette
         private sealed class TesseractResultHandler
         {
             private readonly ResultIterator _iterator;
+            private readonly CancellationToken _token;
             private readonly string _searchedText;
             private readonly List<Rectangle> _confirmedResults;
             private readonly Func<char, char, bool> _charEquals;
             private Rectangle _currentResult;
             private int _characterIndex;
 
-            private TesseractResultHandler(ResultIterator iterator, TextElement element)
+            private TesseractResultHandler(ResultIterator iterator, TextElement element, CancellationToken token)
             {
                 this._iterator = iterator;
+                this._token = token;
                 this._searchedText = string.Join(" ", element.Content.Split().TrimAndRemoveEmptyEntries());
                 this._charEquals = element.IgnoreCase ? AreEqualOrdinalIgnoreCase : AreEqualOrdinal;
                 this._confirmedResults = new List<Rectangle>();
@@ -164,17 +178,27 @@ namespace Askaiser.Marionette
                 this._characterIndex = 0;
             }
 
-            public static IEnumerable<Rectangle> Handle(ResultIterator iterator, TextElement element)
+            public static IEnumerable<Rectangle> Handle(ResultIterator iterator, TextElement element, CancellationToken token)
             {
-                return new TesseractResultHandler(iterator, element).Handle();
+                return new TesseractResultHandler(iterator, element, token).Handle();
             }
 
             private IEnumerable<Rectangle> Handle()
             {
                 do
                 {
+                    if (this._token.IsCancellationRequested)
+                    {
+                        return Enumerable.Empty<Rectangle>();
+                    }
+
                     do
                     {
+                        if (this._token.IsCancellationRequested)
+                        {
+                            return Enumerable.Empty<Rectangle>();
+                        }
+
                         this.HandleIteration();
                     }
                     while (this._iterator.Next(PageIteratorLevel.Word, PageIteratorLevel.Symbol));

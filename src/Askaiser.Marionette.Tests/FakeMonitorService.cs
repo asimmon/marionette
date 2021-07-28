@@ -1,21 +1,20 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Threading.Tasks;
 
 namespace Askaiser.Marionette.Tests
 {
-    public sealed class FakeMonitorService : IMonitorService, IDisposable
+    public sealed class FakeMonitorService : IMonitorService
     {
         private static readonly MonitorDescription[] Monitors =
         {
             new MonitorDescription(0, 0, 0, 1920, 1080),
         };
 
-        private readonly Bitmap _screenshot;
+        private readonly byte[] _screenshotBytes;
 
-        public FakeMonitorService(Bitmap screenshot)
+        public FakeMonitorService(Image screenshot)
         {
-            this._screenshot = screenshot;
+            this._screenshotBytes = BitmapUtils.ToBytes(screenshot);
         }
 
         public Task<MonitorDescription[]> GetMonitors()
@@ -30,12 +29,7 @@ namespace Askaiser.Marionette.Tests
 
         public Task<Bitmap> GetScreenshot(MonitorDescription monitor)
         {
-            return Task.FromResult(new Bitmap(this._screenshot));
-        }
-
-        public void Dispose()
-        {
-            this._screenshot.Dispose();
+            return Task.FromResult(BitmapUtils.FromBytes(this._screenshotBytes));
         }
     }
 }

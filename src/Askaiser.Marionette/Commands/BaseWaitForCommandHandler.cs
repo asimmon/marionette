@@ -27,82 +27,58 @@ namespace Askaiser.Marionette.Commands
             this._elementRecognizer = elementRecognizer;
         }
 
-        protected Task<SearchResult> WaitFor(IElement element, WaitForCommand command)
-        {
-            return this.WaitFor(element, command, CancellationToken.None);
-        }
-
-        protected async Task<SearchResult> WaitFor(IElement element, WaitForCommand command, CancellationToken token)
+        protected async Task<RecognizerSearchResult> WaitFor(IElement element, WaitForCommand command, CancellationToken token)
         {
             if (command.WaitFor < TimeSpan.Zero)
             {
-                throw new ArgumentOutOfRangeException(nameof(command.WaitFor), "WaitFor duration must be greater or equal to zero");
+                throw new ArgumentOutOfRangeException(nameof(command.WaitFor), $"{nameof(command.WaitFor)} duration must be greater or equal to zero");
             }
 
             var monitor = await this._monitorService.GetMonitor(command.MonitorIndex).ConfigureAwait(false);
             var searchRect = AdjustSearchRectangleRelativeToMonitorSize(monitor, command.SearchRectangle);
+            var watch = Stopwatch.StartNew();
 
-            RecognizerSearchResult disposableResult = null;
-            try
+            RecognizerSearchResult recognizerResult = null;
+            do
             {
-                var isFirstLoop = true;
-                for (var sw = Stopwatch.StartNew(); sw.Elapsed < command.WaitFor || isFirstLoop;)
+                if (token.IsCancellationRequested)
                 {
-                    using var screenshot = await this.GetScreenshot(monitor, searchRect).ConfigureAwait(false);
+                    break;
+                }
 
-                    if (token.IsCancellationRequested)
-                    {
-                        break;
-                    }
+                using var screenshot = await this.GetScreenshot(monitor, searchRect).ConfigureAwait(false);
 
-                    disposableResult = await this._elementRecognizer.Recognize(screenshot, element).ConfigureAwait(false);
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
 
-                    if (token.IsCancellationRequested)
-                    {
-                        break;
-                    }
+                recognizerResult?.Dispose();
+                recognizerResult = await this._elementRecognizer.Recognize(screenshot, element, token).ConfigureAwait(false);
 
-                    if (disposableResult.Success)
-                    {
-                        var adjustedResult = disposableResult.AdjustToMonitor(monitor).AdjustToSearchRectangle(searchRect);
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
 
-                        if (command.Behavior == NoSingleResultBehavior.Throw)
-                        {
-                            adjustedResult.EnsureSingleLocation(command.WaitFor);
-                        }
+                if (recognizerResult.Success)
+                {
+                    var adjustedResult = recognizerResult.AdjustToMonitor(monitor).AdjustToSearchRectangle(searchRect);
+                    return new RecognizerSearchResult(recognizerResult.TransformedScreenshot, adjustedResult);
+                }
 
-                        return adjustedResult;
-                    }
-
+                try
+                {
                     await Task.Delay(ThrottlingInterval, token).ConfigureAwait(false);
-                    isFirstLoop = false;
                 }
-
-                if (!token.IsCancellationRequested && command.Behavior == NoSingleResultBehavior.Throw && disposableResult != null)
+                catch (TaskCanceledException)
                 {
-                    await this.SaveScreenshot(element, disposableResult.TransformedScreenshot).ConfigureAwait(false);
+                    break;
                 }
             }
-            catch (MultipleElementFoundException)
-            {
-                if (!token.IsCancellationRequested && command.Behavior == NoSingleResultBehavior.Throw && disposableResult != null)
-                {
-                    await this.SaveScreenshot(element, disposableResult.TransformedScreenshot).ConfigureAwait(false);
-                }
+            while (watch.Elapsed < command.WaitFor);
 
-                throw;
-            }
-            finally
-            {
-                disposableResult?.Dispose();
-            }
-
-            if (command.Behavior == NoSingleResultBehavior.Throw)
-            {
-                throw new ElementNotFoundException(element, command.WaitFor);
-            }
-
-            return SearchResult.NotFound(element);
+            return RecognizerSearchResult.NotFound(recognizerResult?.TransformedScreenshot, element);
         }
 
         private static Rectangle AdjustSearchRectangleRelativeToMonitorSize(MonitorDescription monitor, Rectangle searchRect)
@@ -129,6 +105,33 @@ namespace Askaiser.Marionette.Commands
             using (screenshot)
             {
                 return screenshot.Crop(searchRect);
+            }
+        }
+
+        protected async Task<SearchResult> TrimRecognizerResultAndThrowIfRequired(WaitForCommand command, RecognizerSearchResult disposableResult)
+        {
+            try
+            {
+                if (command.Behavior == NoSingleResultBehavior.Throw)
+                {
+                    disposableResult.EnsureSingleLocation(command.WaitFor);
+                }
+
+                return new SearchResult(disposableResult);
+            }
+            catch (MarionetteException)
+            {
+                if (disposableResult != null)
+                {
+                    if (command.Behavior == NoSingleResultBehavior.Throw && disposableResult.TransformedScreenshot != null)
+                    {
+                        await this.SaveScreenshot(disposableResult.Element, disposableResult.TransformedScreenshot).ConfigureAwait(false);
+                    }
+
+                    disposableResult.Dispose();
+                }
+
+                throw;
             }
         }
 

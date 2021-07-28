@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing.Imaging;
 using System.Globalization;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -31,7 +32,7 @@ namespace Askaiser.Marionette.Tests
             using var searched = screenshot.Crop(new Rectangle(x1, y1, x2, y2));
             var element = new ImageElement("searched", searched.GetBytes(ImageFormat.Png), Convert.ToDecimal(threshold, CultureInfo.InvariantCulture), grayscale);
 
-            using var result = await this._recognizer.Recognize(screenshot, element).ConfigureAwait(false);
+            using var result = await this._recognizer.Recognize(screenshot, element, CancellationToken.None).ConfigureAwait(false);
 
             AssertResult(result, new Point(expectedX, expectedY));
         }
@@ -43,7 +44,7 @@ namespace Askaiser.Marionette.Tests
             using var searched = screenshot.Crop(new Rectangle(1376, 390, 1420, 436));
             var element = new ImageElement("searched", searched.GetBytes(ImageFormat.Png), ImageElement.DefaultThreshold, false);
 
-            using var result = await this._recognizer.Recognize(screenshot, element).ConfigureAwait(false);
+            using var result = await this._recognizer.Recognize(screenshot, element, CancellationToken.None).ConfigureAwait(false);
 
             AssertResult(result, new Point(1398, 413), new Point(1464, 413));
         }

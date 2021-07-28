@@ -20,7 +20,7 @@ namespace Askaiser.Marionette
 
         public Bitmap TransformedScreenshot { get; }
 
-        public static SearchResult NotFound(Bitmap screenshot, IElement element)
+        public static RecognizerSearchResult NotFound(Bitmap screenshot, IElement element)
         {
             return new RecognizerSearchResult(screenshot, element, Enumerable.Empty<Rectangle>());
         }

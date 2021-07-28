@@ -19,23 +19,29 @@ namespace Askaiser.Marionette.Commands
 
             var tasks = command.Elements.Select(async element =>
             {
-                var result = await this.WaitFor(element, command, cts.Token).ConfigureAwait(false);
-                if (result.Locations.Count == 1)
+                try
                 {
-                    //TODO wip
+                    return await this.WaitFor(element, command, cts.Token).ConfigureAwait(false);
                 }
-                return result;
+                finally
+                {
+                    if (!cts.IsCancellationRequested)
+                    {
+                        // This task is the first one to finish so we can cancel the others
+                        cts.Cancel();
+                    }
+                }
             });
 
             var firstTaskToFinish = await Task.WhenAny(tasks).ConfigureAwait(false);
 
-            // Rethrow exception if all the tasks are faulted
+            // Rethrow any exception
             if (firstTaskToFinish.IsFaulted)
             {
                 await firstTaskToFinish.ConfigureAwait(false);
             }
 
-            return firstTaskToFinish.Result;
+            return await this.TrimRecognizerResultAndThrowIfRequired(command, firstTaskToFinish.Result).ConfigureAwait(false);
         }
     }
 }
