@@ -7,12 +7,14 @@ namespace Askaiser.Marionette
         private readonly string _tesseractDataPath;
         private readonly string _tesseractLanguage;
         private readonly string _failureScreenshotPath;
+        private readonly TimeSpan _screenshotCacheDuration;
 
         public DriverOptions()
         {
             this._tesseractDataPath = "./tessdata";
             this._tesseractLanguage = "eng";
             this._failureScreenshotPath = null;
+            this._screenshotCacheDuration = TimeSpan.FromMilliseconds(100);
             this.MouseSpeed = MouseSpeed.Fast;
         }
 
@@ -43,6 +45,15 @@ namespace Askaiser.Marionette
         {
             get => this._failureScreenshotPath;
             init => this._failureScreenshotPath = value?.Trim() is { Length: > 0 } trimmedValue ? trimmedValue : throw new ArgumentException(nameof(this.FailureScreenshotPath));
+        }
+
+        /// <summary>
+        /// Default value: 100 milliseconds.
+        /// </summary>
+        public TimeSpan ScreenshotCacheDuration
+        {
+            get => this._screenshotCacheDuration;
+            init => this._screenshotCacheDuration = value >= TimeSpan.Zero ? value : throw new ArgumentOutOfRangeException(nameof(this.ScreenshotCacheDuration), "Screenshot cache duration cannot be negative.");
         }
 
         /// <summary>

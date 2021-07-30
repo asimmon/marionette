@@ -19,13 +19,15 @@ namespace Askaiser.Marionette
         private MonitorDescription[] _monitors;
         private byte[] _cachedBitmapBytes;
         private DateTime? _cacheDate;
+        private int _cacheMonitorIndex;
 
         public MonitorService(TimeSpan cacheDuration)
         {
-            this._cacheDuration = cacheDuration > TimeSpan.Zero ? cacheDuration : throw new ArgumentOutOfRangeException(nameof(cacheDuration), "Cache duration must be greater than zero.");
+            this._cacheDuration = cacheDuration;
             this._monitors = null;
             this._cachedBitmapBytes = null;
             this._cacheDate = null;
+            this._cacheMonitorIndex = 0;
         }
 
         public async Task<MonitorDescription[]> GetMonitors()
@@ -63,14 +65,14 @@ namespace Askaiser.Marionette
 
         public async Task<Bitmap> GetScreenshot(MonitorDescription monitor)
         {
-            if (this.TryGetNonExpiredCachedBitmapClone(out var cachedScreenshot))
+            if (this.TryGetNonExpiredCachedBitmapClone(monitor.Index, out var cachedScreenshot))
             {
                 return cachedScreenshot;
             }
 
             using (await SemaphoreWaiter.EnterAsync(this._screenshotMutex).ConfigureAwait(false))
             {
-                if (this.TryGetNonExpiredCachedBitmapClone(out cachedScreenshot))
+                if (this.TryGetNonExpiredCachedBitmapClone(monitor.Index, out cachedScreenshot))
                 {
                     return cachedScreenshot;
                 }
@@ -88,16 +90,30 @@ namespace Askaiser.Marionette
                     screenshot.Save(screenshotStream, ImageFormat.Png);
                     this._cachedBitmapBytes = screenshotStream.ToArray();
                     this._cacheDate = DateTime.UtcNow;
+                    this._cacheMonitorIndex = monitor.Index;
                     return screenshot;
                 }
             }
         }
 
-        private bool TryGetNonExpiredCachedBitmapClone(out Bitmap bitmap)
+        private bool TryGetNonExpiredCachedBitmapClone(int monitorIndex, out Bitmap bitmap)
         {
             bitmap = default;
 
-            if (!this._cacheDate.HasValue)
+            var isCacheDisabled = this._cacheDuration == TimeSpan.Zero;
+            if (isCacheDisabled)
+            {
+                return false;
+            }
+
+            var isCacheEmpty = !this._cacheDate.HasValue;
+            if (isCacheEmpty)
+            {
+                return false;
+            }
+
+            var isAnotherMonitor = this._cacheMonitorIndex != monitorIndex;
+            if (isAnotherMonitor)
             {
                 return false;
             }

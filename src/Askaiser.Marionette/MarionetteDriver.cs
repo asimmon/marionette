@@ -80,7 +80,7 @@ namespace Askaiser.Marionette
                 throw new ArgumentNullException(nameof(options));
             }
 
-            var monitorService = new MonitorService(TimeSpan.FromMilliseconds(200));
+            var monitorService = new MonitorService(options.ScreenshotCacheDuration);
             var imageRecognizer = new ImageElementRecognizer();
             var textRecognizer = new TextElementRecognizer(options);
             var elementRecognizer = new AggregateElementRecognizer(imageRecognizer, textRecognizer);
