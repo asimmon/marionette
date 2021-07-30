@@ -99,14 +99,14 @@ namespace Askaiser.Marionette.Tests
             this.ElementRecognizer.AddExpectedResult(needle1, async () =>
             {
                 Interlocked.Increment(ref recognizeCallCount);
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromSeconds(0.5));
                 return expectedResult;
             });
 
             this.ElementRecognizer.AddExpectedResult(needle2, async () =>
             {
                 Interlocked.Increment(ref recognizeCallCount);
-                await Task.Delay(TimeSpan.FromSeconds(0.5));
+                await Task.Delay(TimeSpan.FromSeconds(0.1));
                 return SearchResult.NotFound(needle2);
             });
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -17,7 +16,7 @@ namespace Askaiser.Marionette.Tests
         }
 
         [Fact]
-        public async Task IsVisible_WhenSingleLocation_Works()
+        public async Task IsVisible_WhenSingleLocation_ReturnsTrue()
         {
             using var driver = this.CreateDriver();
 
@@ -35,7 +34,7 @@ namespace Askaiser.Marionette.Tests
         [InlineData(null, 1000)]
         [InlineData(FakeFailuresScreenshotPath, 0)]
         [InlineData(FakeFailuresScreenshotPath, 1000)]
-        public async Task IsVisible_WhenNoLocation_Throws(string failureScreenshotPath, int waitForMs)
+        public async Task IsVisible_WhenNoLocation_ReturnsFalse(string failureScreenshotPath, int waitForMs)
         {
             var opts = failureScreenshotPath == null ? new DriverOptions() : new DriverOptions { FailureScreenshotPath = failureScreenshotPath };
             using var driver = this.CreateDriver(opts);
@@ -52,7 +51,7 @@ namespace Askaiser.Marionette.Tests
             }
             else
             {
-                Assert.True(this.ElementRecognizer.RecognizeCallCount > 1);
+                Assert.True(this.ElementRecognizer.RecognizeCallCount >= 1);
             }
 
             Assert.Empty(this.FileWriter.SavedFailures);
@@ -61,7 +60,7 @@ namespace Askaiser.Marionette.Tests
         [Theory]
         [InlineData(null, 1000)]
         [InlineData(FakeFailuresScreenshotPath, 1000)]
-        public async Task IsVisible_WhenTooManyLocations_Throws(string failureScreenshotPath, int waitForMs)
+        public async Task IsVisible_WhenTooManyLocations_ReturnsTrue(string failureScreenshotPath, int waitForMs)
         {
             var opts = failureScreenshotPath == null ? new DriverOptions() : new DriverOptions { FailureScreenshotPath = failureScreenshotPath };
             using var driver = this.CreateDriver(opts);

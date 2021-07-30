@@ -8,7 +8,7 @@ namespace Askaiser.Marionette.Tests
     public class MarionetteDriverTests_AreAllVisible : BaseMarionetteDriverTests
     {
         [Fact]
-        public async Task AreAllVisible_WhenNoResult_Throws()
+        public async Task AreAllVisible_WhenNoResult_ReturnsFalse()
         {
             var opts = new DriverOptions { FailureScreenshotPath = FakeFailuresScreenshotPath };
             using var driver = this.CreateDriver(opts);
@@ -26,7 +26,7 @@ namespace Askaiser.Marionette.Tests
         }
 
         [Fact]
-        public async Task AreAllVisible_WhenTimeout_Throws()
+        public async Task AreAllVisible_WhenTimeout_ReturnsFalse()
         {
             var opts = new DriverOptions { FailureScreenshotPath = FakeFailuresScreenshotPath };
             using var driver = this.CreateDriver(opts);
@@ -55,7 +55,7 @@ namespace Askaiser.Marionette.Tests
         }
 
         [Fact]
-        public async Task AreAllVisible_WhenSuccessfulResults_Works()
+        public async Task AreAllVisible_WhenSuccessfulResults_ReturnsTrue()
         {
             var opts = new DriverOptions { FailureScreenshotPath = FakeFailuresScreenshotPath };
             using var driver = this.CreateDriver(opts);
