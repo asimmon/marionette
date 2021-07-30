@@ -6,6 +6,8 @@ namespace Askaiser.Marionette.Tests
 {
     public class BaseMarionetteDriverTests : IAsyncLifetime
     {
+        protected const string FakeFailuresScreenshotPath = "C:\\foo\\bar\\";
+
         public virtual async Task InitializeAsync()
         {
             using var screenshot = await BitmapUtils.FromAssembly("Askaiser.Marionette.Tests.images.google-news.png");
