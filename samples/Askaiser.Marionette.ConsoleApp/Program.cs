@@ -24,7 +24,10 @@ namespace Askaiser.Marionette.ConsoleApp
         {
             var library = new MyLibrary();
 
-            using (var driver = MarionetteDriver.Create())
+            using (var driver = MarionetteDriver.Create(new DriverOptions()
+            {
+                FailureScreenshotPath = @"C:\Users\simmo\Desktop\failures",
+            }))
             {
                 // We expect the IDE logo to be in a 200x200 square at the top left of the current monitor.
                 var monitor = await driver.GetCurrentMonitor();
