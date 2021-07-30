@@ -38,7 +38,7 @@ namespace Askaiser.Marionette.Tests
             await Task.Delay(TimeSpan.FromSeconds(1));
 
             Assert.Equal(needle1, ex.Element);
-            Assert.True(recognizeCallCount > 2);
+            Assert.True(recognizeCallCount >= 1);
             Assert.Equal(recognizeCallCount, this.ElementRecognizer.RecognizeCallCount);
 
             if (string.IsNullOrEmpty(failureScreenshotPath))
@@ -97,7 +97,7 @@ namespace Askaiser.Marionette.Tests
             await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitForAll(new[] { needle1, needle2, needle3 }, waitFor: TimeSpan.FromSeconds(2)));
             await Task.Delay(TimeSpan.FromSeconds(1));
 
-            Assert.True(recognizeCallCount > 2);
+            Assert.True(recognizeCallCount >= 1);
             Assert.Equal(recognizeCallCount, this.ElementRecognizer.RecognizeCallCount);
 
             if (failureScreenshotPath == null)
