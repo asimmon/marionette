@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Askaiser.Marionette
@@ -15,11 +16,11 @@ namespace Askaiser.Marionette
             this._textElementRecognizer = textElementRecognizer;
         }
 
-        public async Task<RecognizerSearchResult> Recognize(Bitmap screenshot, IElement element) => element switch
+        public async Task<RecognizerSearchResult> Recognize(Bitmap screenshot, IElement element, CancellationToken token) => element switch
         {
             null => throw new ArgumentNullException(nameof(element)),
-            ImageElement => await this._imageElementRecognizer.Recognize(screenshot, element).ConfigureAwait(false),
-            TextElement => await this._textElementRecognizer.Recognize(screenshot, element).ConfigureAwait(false),
+            ImageElement => await this._imageElementRecognizer.Recognize(screenshot, element, token).ConfigureAwait(false),
+            TextElement => await this._textElementRecognizer.Recognize(screenshot, element, token).ConfigureAwait(false),
             _ => throw new NotSupportedException(element.GetType().FullName)
         };
     }

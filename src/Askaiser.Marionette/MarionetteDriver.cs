@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Askaiser.Marionette.Commands;
 
 [assembly: InternalsVisibleTo("Askaiser.Marionette.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace Askaiser.Marionette
 {
@@ -35,14 +36,21 @@ namespace Askaiser.Marionette
         private int _monitorIndex;
         private MouseSpeed _mouseSpeed;
 
-        private MarionetteDriver(DriverOptions options, IMonitorService monitorService, IElementRecognizer elementRecognizer, IMouseController mouseController, IKeyboardController keyboardController, IDisposable[] disposables)
+        internal MarionetteDriver(
+            DriverOptions options,
+            IFileWriter fileWriter,
+            IMonitorService monitorService,
+            IElementRecognizer elementRecognizer,
+            IMouseController mouseController,
+            IKeyboardController keyboardController,
+            params IDisposable[] disposables)
         {
             this._monitorService = monitorService;
             this._disposables = disposables;
 
-            this._waitForHandler = new WaitForCommandHandler(options, monitorService, elementRecognizer);
-            this._waitForAnyHandler = new WaitForAnyCommandHandler(options, monitorService, elementRecognizer);
-            this._waitForAllHandler = new WaitForAllCommandHandler(options, monitorService, elementRecognizer);
+            this._waitForHandler = new WaitForCommandHandler(options, fileWriter, monitorService, elementRecognizer);
+            this._waitForAnyHandler = new WaitForAnyCommandHandler(options, fileWriter, monitorService, elementRecognizer);
+            this._waitForAllHandler = new WaitForAllCommandHandler(options, fileWriter, monitorService, elementRecognizer);
             this._moveToLocationHandler = new MoveToLocationCommandHandler(mouseController);
             this._singleClickLocationHandler = new SingleClickLocationCommandHandler(mouseController);
             this._doubleClickLocationHandler = new DoubleClickLocationCommandHandler(mouseController);
@@ -78,8 +86,9 @@ namespace Askaiser.Marionette
             var elementRecognizer = new AggregateElementRecognizer(imageRecognizer, textRecognizer);
             var mouseController = new MouseController();
             var keyboardController = new KeyboardController();
+            var fileWriter = new RealFileWriter();
 
-            return new MarionetteDriver(options, monitorService, elementRecognizer, mouseController, keyboardController, new IDisposable[] { textRecognizer });
+            return new MarionetteDriver(options, fileWriter, monitorService, elementRecognizer, mouseController, keyboardController, textRecognizer);
         }
 
         public async Task<MonitorDescription[]> GetMonitors()

@@ -30,6 +30,11 @@ namespace Askaiser.Marionette
             this.Success = this.Locations.Count > 0;
         }
 
+        internal SearchResult(SearchResult other)
+            : this(other.Element, other.Locations)
+        {
+        }
+
         public IEnumerator<Rectangle> GetEnumerator()
         {
             return this.Locations.GetEnumerator();
@@ -69,17 +74,15 @@ namespace Askaiser.Marionette
 
         public void EnsureSingleLocation(TimeSpan waitFor)
         {
-            if (this.Locations.Count == 1)
-            {
-                return;
-            }
-
             if (this.Locations.Count == 0)
             {
                 throw new ElementNotFoundException(this.Element, waitFor);
             }
 
-            throw new MultipleElementFoundException(this);
+            if (this.Locations.Count > 1)
+            {
+                throw new MultipleElementFoundException(this);
+            }
         }
     }
 }

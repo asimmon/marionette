@@ -169,41 +169,20 @@ namespace Askaiser.Marionette
 
         public static async Task<bool> IsVisible(this MarionetteDriver driver, IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            try
-            {
-                var result = await driver.WaitFor(element, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
-                return result.Success;
-            }
-            catch (MarionetteException)
-            {
-                return false;
-            }
+            var result = await driver.WaitFor(element, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
+            return result.Success;
         }
 
         public static async Task<bool> IsAnyVisible(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            try
-            {
-                var result = await driver.WaitForAny(elements, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
-                return result.Success;
-            }
-            catch (MarionetteException)
-            {
-                return false;
-            }
+            var result = await driver.WaitForAny(elements, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
+            return result.Success;
         }
 
         public static async Task<bool> AreAllVisible(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan waitFor = default, Rectangle searchRect = default)
         {
-            try
-            {
-                var result = await driver.WaitForAll(elements, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
-                return result.All(x => x.Success);
-            }
-            catch (MarionetteException)
-            {
-                return false;
-            }
+            var result = await driver.WaitForAll(elements, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
+            return result.All(x => x.Success);
         }
 
         #endregion
