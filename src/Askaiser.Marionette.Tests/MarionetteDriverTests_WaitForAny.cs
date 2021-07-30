@@ -62,7 +62,7 @@ namespace Askaiser.Marionette.Tests
             await Task.Delay(TimeSpan.FromSeconds(1));
 
             Assert.Equal(needle1, ex.Element);
-            Assert.True(recognizeCallCount > 2);
+            Assert.True(recognizeCallCount >= 1);
             Assert.Equal(recognizeCallCount, this.ElementRecognizer.RecognizeCallCount);
 
             if (string.IsNullOrEmpty(failureScreenshotPath))
