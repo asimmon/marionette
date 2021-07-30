@@ -52,7 +52,7 @@ namespace Askaiser.Marionette.Tests
             }
             else
             {
-                Assert.True(this.ElementRecognizer.RecognizeCallCount > 1);
+                Assert.True(this.ElementRecognizer.RecognizeCallCount >= 1);
             }
 
             if (opts.FailureScreenshotPath != null)
