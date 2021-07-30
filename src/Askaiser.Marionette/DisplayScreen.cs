@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Askaiser.Marionette
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Local", Justification = "I prefer to have all interop enum values listed here instead of keeping what we actually use.")]
     internal static class DisplayScreen
     {
         public static Task<MonitorDescription[]> GetMonitors()
@@ -16,7 +18,6 @@ namespace Askaiser.Marionette
         private static IEnumerable<MonitorDescription> GetMonitorsInternal()
         {
             var monitors = new List<MonitorDescription>();
-            var monitorIndex = 0;
 
             var onMonitorCallback = new MonitorEnumProcedure((IntPtr monitorHandle, IntPtr _, ref RectangleL _, IntPtr _) =>
             {
@@ -28,12 +29,22 @@ namespace Askaiser.Marionette
                     var width = (int)deviceMode.PixelsWidth;
                     var height = (int)deviceMode.PixelsHeight;
 
-                    monitors.Add(new MonitorDescription(
-                        Index: monitorIndex++,
+                    const int temporaryIndex = 0;
+                    var monitor = new MonitorDescription(
+                        Index: temporaryIndex,
                         Left: monitorInfo.Bounds.Left,
                         Top: monitorInfo.Bounds.Top,
                         Right: monitorInfo.Bounds.Left + width,
-                        Bottom: monitorInfo.Bounds.Top + height));
+                        Bottom: monitorInfo.Bounds.Top + height);
+
+                    if (monitor.IsPrimary)
+                    {
+                        monitors.Insert(0, monitor);
+                    }
+                    else
+                    {
+                        monitors.Add(monitor);
+                    }
                 }
 
                 return 1;
@@ -44,6 +55,14 @@ namespace Askaiser.Marionette
             if (monitors.Count == 0)
             {
                 throw new InvalidOperationException("No monitors were found.");
+            }
+
+            for (var index = 0; index < monitors.Count; index++)
+            {
+                monitors[index] = monitors[index] with
+                {
+                    Index = index
+                };
             }
 
             return monitors;
