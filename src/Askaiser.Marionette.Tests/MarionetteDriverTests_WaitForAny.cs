@@ -114,7 +114,7 @@ namespace Askaiser.Marionette.Tests
             await Task.Delay(TimeSpan.FromSeconds(1));
 
             AssertSearchResult(expectedResult, actualResult);
-            Assert.True(recognizeCallCount > 2);
+            Assert.True(recognizeCallCount >= 2);
             Assert.Equal(recognizeCallCount, this.ElementRecognizer.RecognizeCallCount);
             Assert.Empty(this.FileWriter.SavedFailures);
         }
