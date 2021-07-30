@@ -17,23 +17,10 @@ namespace Askaiser.Marionette.Commands
         {
             using var cts = new CancellationTokenSource();
 
-            var tasks = command.Elements.Select(async element =>
-            {
-                try
-                {
-                    return await this.WaitFor(element, command, cts.Token).ConfigureAwait(false);
-                }
-                finally
-                {
-                    if (!cts.IsCancellationRequested)
-                    {
-                        // This task is the first one to finish so we can cancel the others
-                        cts.Cancel();
-                    }
-                }
-            });
+            var tasks = command.Elements.Select(async element => await this.WaitFor(element, command, cts.Token).ConfigureAwait(false));
 
             var firstTaskToFinish = await Task.WhenAny(tasks).ConfigureAwait(false);
+            cts.Cancel();
 
             // Rethrow any exception
             if (firstTaskToFinish.IsFaulted)
