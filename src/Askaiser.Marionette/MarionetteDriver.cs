@@ -36,6 +36,7 @@ namespace Askaiser.Marionette
         private int _monitorIndex;
         private MouseSpeed _mouseSpeed;
         private TimeSpan _defaultWaitForDuration;
+        private TimeSpan _defaultKeyboardSleepAfterDuration;
 
         internal MarionetteDriver(
             DriverOptions options,
@@ -68,6 +69,7 @@ namespace Askaiser.Marionette
             this._monitorIndex = 0;
             this._mouseSpeed = options.MouseSpeed;
             this._defaultWaitForDuration = options.DefaultWaitForDuration;
+            this._defaultKeyboardSleepAfterDuration = options.DefaultKeyboardSleepAfterDuration;
         }
 
         public static MarionetteDriver Create()
@@ -264,7 +266,7 @@ namespace Askaiser.Marionette
             throw new ElementNotFoundException(element, totalDuration);
         }
 
-        public async Task TypeText(string text, TimeSpan sleepAfter = default)
+        public async Task TypeText(string text, TimeSpan? sleepAfter = default)
         {
             if (text == null)
             {
@@ -275,43 +277,47 @@ namespace Askaiser.Marionette
             {
                 await this._typeTextHandler.Execute(new KeyboardTextCommand(text)).ConfigureAwait(false);
 
-                if (sleepAfter > TimeSpan.Zero)
+                var effectiveSleepAfter = sleepAfter.GetValueOrDefault(this._defaultKeyboardSleepAfterDuration);
+                if (effectiveSleepAfter > TimeSpan.Zero)
                 {
-                    await this.Sleep(sleepAfter).ConfigureAwait(false);
+                    await this.Sleep(effectiveSleepAfter).ConfigureAwait(false);
                 }
             }
         }
 
-        public async Task KeyPress(VirtualKeyCode[] keyCodes, TimeSpan sleepAfter = default)
+        public async Task KeyPress(VirtualKeyCode[] keyCodes, TimeSpan? sleepAfter = default)
         {
             EnsureNotNullOrEmpty(keyCodes);
             await this._keyPressHandler.Execute(new KeyboardKeysCommand(keyCodes)).ConfigureAwait(false);
 
-            if (sleepAfter > TimeSpan.Zero)
+            var effectiveSleepAfter = sleepAfter.GetValueOrDefault(this._defaultKeyboardSleepAfterDuration);
+            if (effectiveSleepAfter > TimeSpan.Zero)
             {
-                await this.Sleep(sleepAfter).ConfigureAwait(false);
+                await this.Sleep(effectiveSleepAfter).ConfigureAwait(false);
             }
         }
 
-        public async Task KeyDown(VirtualKeyCode[] keyCodes, TimeSpan sleepAfter = default)
+        public async Task KeyDown(VirtualKeyCode[] keyCodes, TimeSpan? sleepAfter = default)
         {
             EnsureNotNullOrEmpty(keyCodes);
             await this._keyDownHandler.Execute(new KeyboardKeysCommand(keyCodes)).ConfigureAwait(false);
 
-            if (sleepAfter > TimeSpan.Zero)
+            var effectiveSleepAfter = sleepAfter.GetValueOrDefault(this._defaultKeyboardSleepAfterDuration);
+            if (effectiveSleepAfter > TimeSpan.Zero)
             {
-                await this.Sleep(sleepAfter).ConfigureAwait(false);
+                await this.Sleep(effectiveSleepAfter).ConfigureAwait(false);
             }
         }
 
-        public async Task KeyUp(VirtualKeyCode[] keyCodes, TimeSpan sleepAfter = default)
+        public async Task KeyUp(VirtualKeyCode[] keyCodes, TimeSpan? sleepAfter = default)
         {
             EnsureNotNullOrEmpty(keyCodes);
             await this._keyUpHandler.Execute(new KeyboardKeysCommand(keyCodes)).ConfigureAwait(false);
 
-            if (sleepAfter > TimeSpan.Zero)
+            var effectiveSleepAfter = sleepAfter.GetValueOrDefault(this._defaultKeyboardSleepAfterDuration);
+            if (effectiveSleepAfter > TimeSpan.Zero)
             {
-                await this.Sleep(sleepAfter).ConfigureAwait(false);
+                await this.Sleep(effectiveSleepAfter).ConfigureAwait(false);
             }
         }
 
@@ -358,6 +364,17 @@ namespace Askaiser.Marionette
             }
 
             this._defaultWaitForDuration = defaultWaitFor;
+            return this;
+        }
+
+        public MarionetteDriver SetDefaultKeyboardSleepAfterDuration(TimeSpan defaultKeyboardSleepAfter)
+        {
+            if (defaultKeyboardSleepAfter < TimeSpan.Zero)
+            {
+                throw new ArgumentOutOfRangeException(nameof(defaultKeyboardSleepAfter), "Default 'sleepAfter' duration cannot be negative.");
+            }
+
+            this._defaultKeyboardSleepAfterDuration = defaultKeyboardSleepAfter;
             return this;
         }
 

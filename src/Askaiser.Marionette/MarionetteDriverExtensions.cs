@@ -189,17 +189,17 @@ namespace Askaiser.Marionette
 
         #region Key press with single key code
 
-        public static async Task KeyPress(this MarionetteDriver driver, VirtualKeyCode keyCode, TimeSpan sleepAfter = default)
+        public static async Task KeyPress(this MarionetteDriver driver, VirtualKeyCode keyCode, TimeSpan? sleepAfter = default)
         {
             await driver.KeyPress(new[] { keyCode }, sleepAfter).ConfigureAwait(false);
         }
 
-        public static async Task KeyDown(this MarionetteDriver driver, VirtualKeyCode keyCode, TimeSpan sleepAfter = default)
+        public static async Task KeyDown(this MarionetteDriver driver, VirtualKeyCode keyCode, TimeSpan? sleepAfter = default)
         {
             await driver.KeyDown(new[] { keyCode }, sleepAfter).ConfigureAwait(false);
         }
 
-        public static async Task KeyUp(this MarionetteDriver driver, VirtualKeyCode keyCode, TimeSpan sleepAfter = default)
+        public static async Task KeyUp(this MarionetteDriver driver, VirtualKeyCode keyCode, TimeSpan? sleepAfter = default)
         {
             await driver.KeyUp(new[] { keyCode }, sleepAfter).ConfigureAwait(false);
         }

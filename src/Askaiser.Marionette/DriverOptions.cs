@@ -9,6 +9,7 @@ namespace Askaiser.Marionette
         private readonly string _failureScreenshotPath;
         private readonly TimeSpan _screenshotCacheDuration;
         private readonly TimeSpan _defaultWaitForDuration;
+        private readonly TimeSpan _defaultKeyboardSleepAfterDuration;
 
         public DriverOptions()
         {
@@ -17,6 +18,7 @@ namespace Askaiser.Marionette
             this._failureScreenshotPath = null;
             this._screenshotCacheDuration = TimeSpan.FromMilliseconds(100);
             this._defaultWaitForDuration = TimeSpan.Zero;
+            this._defaultKeyboardSleepAfterDuration = TimeSpan.Zero;
             this.MouseSpeed = MouseSpeed.Fast;
         }
 
@@ -59,12 +61,21 @@ namespace Askaiser.Marionette
         }
 
         /// <summary>
-        /// Gets or sets the waitFor default value for any method that receives a null waitFor Timespan?.
+        /// Gets or sets the waitFor default value for any element wait-based method that receives a null waitFor TimeSpan?. Default is TimeSpan.Zero.
         /// </summary>
         public TimeSpan DefaultWaitForDuration
         {
             get => this._defaultWaitForDuration;
             init => this._defaultWaitForDuration = value >= TimeSpan.Zero ? value : throw new ArgumentOutOfRangeException(nameof(this.DefaultWaitForDuration), "Default 'waitFor' duration cannot be negative.");
+        }
+
+        /// <summary>
+        /// Gets or sets the sleepAfter default value for any keyboard-based method that receives a null sleepAfter TimeSpan?. Default is TimeSpan.Zero.
+        /// </summary>
+        public TimeSpan DefaultKeyboardSleepAfterDuration
+        {
+            get => this._defaultKeyboardSleepAfterDuration;
+            init => this._defaultKeyboardSleepAfterDuration = value >= TimeSpan.Zero ? value : throw new ArgumentOutOfRangeException(nameof(this.DefaultKeyboardSleepAfterDuration), "Default 'sleepAfter' duration cannot be negative.");
         }
 
         /// <summary>
