@@ -53,7 +53,7 @@ using (var driver = MarionetteDriver.Create(/* optional DriverOptions */))
 }
 ```
 
-The [sample project](https://github.com/asimmon/askaiser-marionette/tree/readme-demo/samples/Askaiser.Marionette.ConsoleApp) will show you the basics of using this library.
+The [sample project](https://github.com/asimmon/askaiser-marionette/tree/master/samples/Askaiser.Marionette.ConsoleApp) will show you the basics of using this library.
 
 
 ## Creating image and text elements manually
