@@ -9,6 +9,6 @@ namespace Askaiser.Marionette.Commands
         {
         }
 
-        public override Task Execute(MouseLocationCommand command) => Execute(command, this.MouseController.Drag);
+        public override Task Execute(MouseLocationCommand command) => Execute(command, this.MouseController.DragFrom);
     }
 }

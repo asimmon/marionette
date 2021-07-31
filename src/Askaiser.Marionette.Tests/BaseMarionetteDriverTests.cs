@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using FakeItEasy;
 using Xunit;
 
 namespace Askaiser.Marionette.Tests
@@ -16,8 +15,8 @@ namespace Askaiser.Marionette.Tests
             this.ElementRecognizer = new FakeElementRecognizer();
             this.FileWriter = new FakeScreenshotWriter();
 
-            this.MouseController = A.Fake<IMouseController>();
-            this.KeyboardController = A.Fake<IKeyboardController>();
+            this.MouseController = new FakeMouseController();
+            this.KeyboardController = new FakeKeyboardController();
         }
 
         internal FakeMonitorService MonitorService { get; private set; }
@@ -26,9 +25,9 @@ namespace Askaiser.Marionette.Tests
 
         internal FakeScreenshotWriter FileWriter { get; private set; }
 
-        internal IMouseController MouseController { get; private set; }
+        internal FakeMouseController MouseController { get; private set; }
 
-        internal IKeyboardController KeyboardController { get; private set; }
+        internal FakeKeyboardController KeyboardController { get; private set; }
 
         protected MarionetteDriver CreateDriver(DriverOptions options = null)
         {

@@ -9,7 +9,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="FakeItEasy" Version="7.1.0"/>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1"/>
     <PackageReference Include="OpenCvSharp4" Version="4.5.2.20210404" Condition=" '$(TargetFramework)' == 'net461' "/>
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.5.2.20210404" Condition=" '$(TargetFramework)' == 'net461' "/>

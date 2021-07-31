@@ -84,14 +84,14 @@ namespace Askaiser.Marionette
             MouseInterop.MouseClickEvent(MouseInterop.MouseEventFlags.RightUp);
         }
 
-        public async Task Drag(int x, int y, MouseSpeed speed)
+        public async Task DragFrom(int x, int y, MouseSpeed speed)
         {
             await this.Move(x, y, speed).ConfigureAwait(false);
             await Task.Delay(DelayBeforeFirstClickAction).ConfigureAwait(false);
             MouseInterop.MouseClickEvent(MouseInterop.MouseEventFlags.LeftDown);
         }
 
-        public async Task Drop(int x, int y, MouseSpeed speed)
+        public async Task DropTo(int x, int y, MouseSpeed speed)
         {
             await this.Move(x, y, speed).ConfigureAwait(false);
             await Task.Delay(DelayBeforeFirstClickAction).ConfigureAwait(false);

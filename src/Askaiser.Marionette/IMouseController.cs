@@ -14,9 +14,9 @@ namespace Askaiser.Marionette
 
         Task RightClick(int x, int y, MouseSpeed speed);
 
-        Task Drag(int x, int y, MouseSpeed speed);
+        Task DragFrom(int x, int y, MouseSpeed speed);
 
-        Task Drop(int x, int y, MouseSpeed speed);
+        Task DropTo(int x, int y, MouseSpeed speed);
 
         Task WheelUp();
 
