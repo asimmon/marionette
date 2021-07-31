@@ -388,4 +388,5 @@ build/tools/**
 !build/tools/packages.config
 
 # Build output
-/output
+/.output
+/.coverage

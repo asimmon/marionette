@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
+using Cake.Codecov;
 using Cake.Common;
 using Cake.Common.Diagnostics;
 using Cake.Common.IO;
@@ -12,8 +12,11 @@ using Cake.Common.Tools.DotNetCore.Pack;
 using Cake.Common.Tools.DotNetCore.Restore;
 using Cake.Common.Tools.DotNetCore.Test;
 using Cake.Common.Tools.GitVersion;
+using Cake.Common.Tools.ReportGenerator;
 using Cake.Core;
+using Cake.Coverlet;
 using Cake.Frosting;
+using Path = System.IO.Path;
 
 [assembly: SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleType", Justification = "Multiple tasks classes in a single file improves readability.")]
 
@@ -21,6 +24,8 @@ public static class Program
 {
     public static int Main(string[] args) => new CakeHost()
         .InstallTool(new Uri("nuget:?package=GitVersion.CommandLine&version=5.6.10"))
+        .InstallTool(new Uri("nuget:?package=ReportGenerator&version=4.8.12"))
+        .InstallTool(new Uri("nuget:?package=Codecov&version=1.13.0"))
         .UseContext<BuildContext>()
         .Run(args);
 }
@@ -31,7 +36,8 @@ public static class Constants
     public const string ProjectName = "Askaiser.Marionette";
 
     public static readonly string SourceDirectoryPath = Path.Combine("..", "src");
-    public static readonly string OutputDirectoryPath = Path.Combine("..", "output");
+    public static readonly string OutputDirectoryPath = Path.Combine("..", ".output");
+    public static readonly string CoverageDirectoryPath = Path.Combine("..", ".coverage");
     public static readonly string SolutionPath = Path.Combine("..", ProjectName + ".sln");
     public static readonly string MainProjectPath = Path.Combine(SourceDirectoryPath, ProjectName, ProjectName + ".csproj");
 }
@@ -43,11 +49,19 @@ public class BuildContext : FrostingContext
     {
         this.MsBuildConfiguration = context.Argument("configuration", Constants.Release);
         this.SharedMSBuildSettings = new DotNetCoreMSBuildSettings();
+
+        if (Guid.TryParse(context.Argument("codecov-token", string.Empty), out var codecovToken))
+        {
+            context.Information("Code coverage is enabled.");
+            this.CodecovToken = codecovToken;
+        }
     }
 
     public string MsBuildConfiguration { get; }
 
     public DotNetCoreMSBuildSettings SharedMSBuildSettings { get; }
+
+    public Guid? CodecovToken { get; }
 
     public void AddMSBuildProperty(string name, string value)
     {
@@ -132,6 +146,7 @@ public sealed class CleanTask : FrostingTask<BuildContext>
         context.CleanDirectories(Constants.OutputDirectoryPath);
         context.CleanDirectories(objGlobPath);
         context.CleanDirectories(binGlobPath);
+        context.CleanDirectories(Constants.CoverageDirectoryPath);
     }
 }
 
@@ -166,12 +181,57 @@ public sealed class BuildTask : FrostingTask<BuildContext>
 [IsDependentOn(typeof(BuildTask))]
 public sealed class TestTask : FrostingTask<BuildContext>
 {
-    public override void Run(BuildContext context) => context.DotNetCoreTest(Constants.SolutionPath, new DotNetCoreTestSettings
+    public override void Run(BuildContext context)
     {
-        Configuration = context.MsBuildConfiguration,
-        NoBuild = true,
-        NoLogo = true,
-    });
+        var testSettings = new DotNetCoreTestSettings
+        {
+            Configuration = context.MsBuildConfiguration,
+            NoBuild = true,
+            NoLogo = true,
+        };
+
+        var coverageDirectoryPath = context.Directory(Constants.CoverageDirectoryPath);
+        var testProjectGlobPath = Path.Combine(Constants.SourceDirectoryPath, "*", "*.Tests.csproj");
+        var testProjectFilePaths = context.GetFiles(testProjectGlobPath);
+
+        const string outputFileExtension = ".xml";
+
+        foreach (var testProjectFilePath in testProjectFilePaths)
+        {
+            var outputFileName = testProjectFilePath.GetFilenameWithoutExtension().ToString().Replace('.', '-').ToLowerInvariant() + outputFileExtension;
+
+            var coverletSettings = new CoverletSettings
+            {
+                CollectCoverage = false,
+            };
+
+            if (context.CodecovToken.HasValue)
+            {
+                coverletSettings.CollectCoverage = true;
+                coverletSettings.CoverletOutputFormat = CoverletOutputFormat.cobertura;
+                coverletSettings.CoverletOutputDirectory = coverageDirectoryPath;
+                coverletSettings.CoverletOutputName = outputFileName;
+                coverletSettings.IncludeTestAssembly = false;
+            }
+
+            context.DotNetCoreTest(testProjectFilePath, testSettings, coverletSettings);
+        }
+
+        if (context.CodecovToken.HasValue)
+        {
+            var codecovToken = context.CodecovToken.Value;
+
+            var inputCoverageFilePaths = context.GetFiles(Path.Combine(Constants.CoverageDirectoryPath, "*" + outputFileExtension));
+            var outputCoverageFilePath = Path.Combine(Constants.CoverageDirectoryPath, "Cobertura.xml");
+
+            context.ReportGenerator(inputCoverageFilePaths, coverageDirectoryPath, new ReportGeneratorSettings
+            {
+                ReportTypes = new[] { ReportGeneratorReportType.Cobertura },
+            });
+
+            context.Codecov(outputCoverageFilePath, codecovToken.ToString("D"));
+        }
+    }
 }
 
 [TaskName("Pack")]
@@ -184,7 +244,7 @@ public sealed class PackTask : FrostingTask<BuildContext>
         Configuration = context.MsBuildConfiguration,
         MSBuildSettings = context.SharedMSBuildSettings,
         OutputDirectory = Constants.OutputDirectoryPath,
-        NoBuild = false, // required to pack the additional source generator
+        NoBuild = false, // required to also pack the already built source generator DLL
         NoRestore = true,
         NoLogo = true,
     });

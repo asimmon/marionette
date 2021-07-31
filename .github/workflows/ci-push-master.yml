@@ -1,9 +1,7 @@
-name: CI Build
+name: CI build on master push
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
     branches: [ master ]
 
 jobs:
@@ -34,5 +32,5 @@ jobs:
       with:
         name: nuget-package
         path: |
-          output/*.nupkg
-          output/*.snupkg
+          .output/*.nupkg
+          .output/*.snupkg
