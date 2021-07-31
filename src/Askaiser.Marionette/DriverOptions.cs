@@ -8,6 +8,7 @@ namespace Askaiser.Marionette
         private readonly string _tesseractLanguage;
         private readonly string _failureScreenshotPath;
         private readonly TimeSpan _screenshotCacheDuration;
+        private readonly TimeSpan _defaultWaitForDuration;
 
         public DriverOptions()
         {
@@ -15,6 +16,7 @@ namespace Askaiser.Marionette
             this._tesseractLanguage = "eng";
             this._failureScreenshotPath = null;
             this._screenshotCacheDuration = TimeSpan.FromMilliseconds(100);
+            this._defaultWaitForDuration = TimeSpan.Zero;
             this.MouseSpeed = MouseSpeed.Fast;
         }
 
@@ -54,6 +56,15 @@ namespace Askaiser.Marionette
         {
             get => this._screenshotCacheDuration;
             init => this._screenshotCacheDuration = value >= TimeSpan.Zero ? value : throw new ArgumentOutOfRangeException(nameof(this.ScreenshotCacheDuration), "Screenshot cache duration cannot be negative.");
+        }
+
+        /// <summary>
+        /// Gets or sets the waitFor default value for any method that receives a null waitFor Timespan?.
+        /// </summary>
+        public TimeSpan DefaultWaitForDuration
+        {
+            get => this._defaultWaitForDuration;
+            init => this._defaultWaitForDuration = value >= TimeSpan.Zero ? value : throw new ArgumentOutOfRangeException(nameof(this.DefaultWaitForDuration), "Default 'waitFor' duration cannot be negative.");
         }
 
         /// <summary>

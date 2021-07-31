@@ -35,6 +35,7 @@ namespace Askaiser.Marionette
 
         private int _monitorIndex;
         private MouseSpeed _mouseSpeed;
+        private TimeSpan _defaultWaitForDuration;
 
         internal MarionetteDriver(
             DriverOptions options,
@@ -66,6 +67,7 @@ namespace Askaiser.Marionette
 
             this._monitorIndex = 0;
             this._mouseSpeed = options.MouseSpeed;
+            this._defaultWaitForDuration = options.DefaultWaitForDuration;
         }
 
         public static MarionetteDriver Create()
@@ -108,22 +110,23 @@ namespace Askaiser.Marionette
             return await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
         }
 
-        internal async Task<SearchResult> WaitFor(IElement element, TimeSpan waitFor, Rectangle searchRect, NoSingleResultBehavior noSingleResultBehavior)
+        internal async Task<SearchResult> WaitFor(IElement element, TimeSpan? waitFor, Rectangle searchRect, NoSingleResultBehavior noSingleResultBehavior)
         {
             if (element == null)
             {
                 throw new ArgumentNullException(nameof(element));
             }
 
-            return await this._waitForHandler.Execute(new WaitForCommand(new[] { element }, waitFor, searchRect, this._monitorIndex, noSingleResultBehavior)).ConfigureAwait(false);
+            var effectiveWaitFor = waitFor.GetValueOrDefault(this._defaultWaitForDuration);
+            return await this._waitForHandler.Execute(new WaitForCommand(new[] { element }, effectiveWaitFor, searchRect, this._monitorIndex, noSingleResultBehavior)).ConfigureAwait(false);
         }
 
-        public async Task<SearchResult> WaitFor(IElement element, TimeSpan waitFor = default, Rectangle searchRect = default)
+        public async Task<SearchResult> WaitFor(IElement element, TimeSpan? waitFor = default, Rectangle searchRect = default)
         {
             return await this.WaitFor(element, waitFor, searchRect, NoSingleResultBehavior.Throw).ConfigureAwait(false);
         }
 
-        internal async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect, NoSingleResultBehavior noSingleResultBehavior)
+        internal async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect, NoSingleResultBehavior noSingleResultBehavior)
         {
             if (elements == null)
             {
@@ -137,15 +140,16 @@ namespace Askaiser.Marionette
                 throw new ArgumentException("Elements cannot be empty", nameof(elements));
             }
 
-            return await this._waitForAnyHandler.Execute(new WaitForCommand(enumeratedElements, waitFor, searchRect, this._monitorIndex, noSingleResultBehavior)).ConfigureAwait(false);
+            var effectiveWaitFor = waitFor.GetValueOrDefault(this._defaultWaitForDuration);
+            return await this._waitForAnyHandler.Execute(new WaitForCommand(enumeratedElements, effectiveWaitFor, searchRect, this._monitorIndex, noSingleResultBehavior)).ConfigureAwait(false);
         }
 
-        public async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan waitFor = default, Rectangle searchRect = default)
+        public async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle searchRect = default)
         {
             return await this.WaitForAny(elements, waitFor, searchRect, NoSingleResultBehavior.Throw).ConfigureAwait(false);
         }
 
-        internal async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect, NoSingleResultBehavior noSingleResultBehavior)
+        internal async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect, NoSingleResultBehavior noSingleResultBehavior)
         {
             if (elements == null)
             {
@@ -159,10 +163,11 @@ namespace Askaiser.Marionette
                 throw new ArgumentException("Elements cannot be empty", nameof(elements));
             }
 
-            return await this._waitForAllHandler.Execute(new WaitForCommand(enumeratedElements, waitFor, searchRect, this._monitorIndex, noSingleResultBehavior)).ConfigureAwait(false);
+            var effectiveWaitFor = waitFor.GetValueOrDefault(this._defaultWaitForDuration);
+            return await this._waitForAllHandler.Execute(new WaitForCommand(enumeratedElements, effectiveWaitFor, searchRect, this._monitorIndex, noSingleResultBehavior)).ConfigureAwait(false);
         }
 
-        public async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan waitFor = default, Rectangle searchRect = default)
+        public async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle searchRect = default)
         {
             return await this.WaitForAll(elements, waitFor, searchRect, NoSingleResultBehavior.Throw).ConfigureAwait(false);
         }
@@ -343,6 +348,17 @@ namespace Askaiser.Marionette
         public MarionetteDriver SetCurrentMonitor(MonitorDescription monitor)
         {
             return this.SetCurrentMonitor(monitor.Index);
+        }
+
+        public MarionetteDriver SetDefaultWaitForDuration(TimeSpan defaultWaitFor)
+        {
+            if (defaultWaitFor < TimeSpan.Zero)
+            {
+                throw new ArgumentOutOfRangeException(nameof(defaultWaitFor), "Default 'waitFor' duration cannot be negative.");
+            }
+
+            this._defaultWaitForDuration = defaultWaitFor;
+            return this;
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "It looks more coherent to only use instance methods here.")]
