@@ -24,7 +24,7 @@ jobs:
         dotnet-version: 3.1.x
 
     - name: Cake default
-      run: .\build.ps1 --alpha
+      run: .\build.ps1 --alpha --codecov-token=${{ secrets.codecov_token }}
       shell: powershell
 
     - name: Upload nupkg artifact
