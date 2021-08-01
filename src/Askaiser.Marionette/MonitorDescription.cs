@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace Askaiser.Marionette
+﻿namespace Askaiser.Marionette
 {
     public record MonitorDescription(int Index, int Left, int Top, int Right, int Bottom)
         : Rectangle(Left, Top, Right, Bottom)
@@ -12,7 +10,7 @@ namespace Askaiser.Marionette
 
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, "Monitor #{0} {1} {2}x{3}", this.Index, base.ToString(), this.Width, this.Height);
+            return Messages.MonitorDescription_ToString.FormatInvariant(this.Index, base.ToString(), this.Width, this.Height);
         }
     }
 }

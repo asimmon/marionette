@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="MultipleElementFoundException_Message" xml:space="preserve">
+    <value>Element '{0}' was found at multiple locations: {1}.</value>
+  </data>
+  <data name="ElementNotFoundException_Message_WithDuration" xml:space="preserve">
+    <value>Element '{0}' was not found within the allotted time: {1}.</value>
+  </data>
+  <data name="ElementNotFoundException_Message_WithoutDuration" xml:space="preserve">
+    <value>Element '{0}' was not found.</value>
+  </data>
+  <data name="Point_ToString" xml:space="preserve">
+    <value>({0},{1})</value>
+  </data>
+  <data name="Rectangle_Throw_LeftGreaterThanRight" xml:space="preserve">
+    <value>Left property '{0}' cannot be greater than the Right property '{1}'.</value>
+  </data>
+  <data name="Rectangle_Throw_TopGreaterThanBottom" xml:space="preserve">
+    <value>Top property '{0}' cannot be greater than the Bottom property '{1}'.</value>
+  </data>
+  <data name="Rectangle_ToString" xml:space="preserve">
+    <value>({0},{1},{2},{3})</value>
+  </data>
+  <data name="MonitorDescription_ToString" xml:space="preserve">
+    <value>Monitor #{0} {1} {2}x{3}</value>
+  </data>
+  <data name="BitmapExtensions_Crop_Throw_LeftGreaterThanImageWidth" xml:space="preserve">
+    <value>Left property '{0}' is greater than the image width '{1}'.</value>
+  </data>
+  <data name="BitmapExtensions_Crop_Throw_RightGreaterThanImageWidth" xml:space="preserve">
+    <value>Right property '{0}' is greater than the image width '{1}'.</value>
+  </data>
+  <data name="BitmapExtensions_Crop_Throw_TopGreaterThanImageHeight" xml:space="preserve">
+    <value>Top property '{0}' is greater than the image height '{1}'.</value>
+  </data>
+  <data name="BitmapExtensions_Crop_Throw_BottomGreaterThanImageHeight" xml:space="preserve">
+    <value>Bottom property '{0}' is greater than the image height '{1}'.</value>
+  </data>
+  <data name="BitmapExtensions_Crop_Throw_NewWidthZero" xml:space="preserve">
+    <value>New width cannot be zero.</value>
+  </data>
+  <data name="BitmapExtensions_Crop_Throw_NewHeightZero" xml:space="preserve">
+    <value>New height cannot be zero.</value>
+  </data>
+  <data name="DriverOptions_Throw_NegativeScreenshotCacheDuration" xml:space="preserve">
+    <value>Screenshot cache duration cannot be negative.</value>
+  </data>
+  <data name="DriverOptions_Throw_NegativeDefaultWaitForDuration" xml:space="preserve">
+    <value>Default 'waitFor' duration cannot be negative.</value>
+  </data>
+  <data name="DriverOptions_Throw_NegativeDefaultKeyboardSleepAfterDuration" xml:space="preserve">
+    <value>Default 'sleepAfter' duration cannot be negative.</value>
+  </data>
+  <data name="MarionetteDriver_Throw_ElementsEmpty" xml:space="preserve">
+    <value>Elements cannot be empty.</value>
+  </data>
+  <data name="MarionetteDriver_Throw_ScrollTicksNotGreaterThanZero" xml:space="preserve">
+    <value>Scroll ticks must be greater than zero.</value>
+  </data>
+  <data name="MarionetteDriver_Throw_EmptyKeyCodes" xml:space="preserve">
+    <value>Key codes cannot be empty.</value>
+  </data>
+  <data name="Throw_NegativeWaitFor" xml:space="preserve">
+    <value>Wait for duration cannot be negative.</value>
+  </data>
+  <data name="Element_Throw_ElementNotFound" xml:space="preserve">
+    <value>Element '{0}' was not found.</value>
+  </data>
+  <data name="Element_Throw_InvalidName" xml:space="preserve">
+    <value>Name cannot be null or empty.</value>
+  </data>
+  <data name="ImageElement_Throw_EmptyContent" xml:space="preserve">
+    <value>Content must be a non-empty array of bytes.</value>
+  </data>
+  <data name="ImageElement_Throw_ThresholdOutOfRange" xml:space="preserve">
+    <value>Threshold must be a floating number between 0 and 1.</value>
+  </data>
+  <data name="TextElement_Throw_EmptyContent" xml:space="preserve">
+    <value>Content cannot be null or empty.</value>
+  </data>
+  <data name="SearchResultCollection_Throw_ResultsEmpty" xml:space="preserve">
+    <value>Results cannot be empty.</value>
+  </data>
+  <data name="KeyboardSimulator_Throw_TextTooLong" xml:space="preserve">
+    <value>The text parameter is too long. It must be less than {0} characters.</value>
+  </data>
+  <data name="WindowsInputMessageDispatcher_Throw_EmptyInputs" xml:space="preserve">
+    <value>The input array was empty.</value>
+  </data>
+  <data name="SearchResult_ToString" xml:space="preserve">
+    <value>Search results for '{0}': {1}</value>
+  </data>
+  <data name="FailureScreenshotFileNameFormat" xml:space="preserve">
+    <value>{0:yyyy-MM-dd-HH-mm-ss-ffff}_{1}.png</value>
+  </data>
+  <data name="MonitorService_Throw_MonitorNotFound" xml:space="preserve">
+    <value>Requested monitor index '{0}' not found.</value>
+  </data>
+  <data name="ElementCollectionExtensions_Throw_ElementAlreadyExists" xml:space="preserve">
+    <value>An element with the name '{0}' already exists.</value>
+  </data>
+  <data name="ElementCollectionExtensions_Throw_InvalidElementName" xml:space="preserve">
+    <value>An element cannot have a null or empty name.</value>
+  </data>
+  <data name="ElementCollectionExtensions_Throw_NullJsonElement" xml:space="preserve">
+    <value>The JSON document cannot null elements.</value>
+  </data>
+  <data name="ElementCollectionExtensions_Throw_UnsupportedElementType" xml:space="preserve">
+    <value>Element of type '{0}' is not supported.</value>
+  </data>
+</root>

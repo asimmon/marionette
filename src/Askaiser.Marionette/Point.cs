@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 
 namespace Askaiser.Marionette
 {
@@ -25,7 +24,7 @@ namespace Askaiser.Marionette
 
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, "({0},{1})", this.X, this.Y);
+            return Messages.Point_ToString.FormatInvariant(this.X, this.Y);
         }
     }
 }

@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Globalization;
 
 namespace Askaiser.Marionette
 {
     public sealed class ElementNotFoundException : MarionetteException
     {
-        private const string MessageFormatWithDuration = "Element '{0}' was not found within the allotted time: {1}.";
-        private const string MessageFormatWithoutDuration = "Element '{0}' was not found.";
-
         public ElementNotFoundException(IElement element, TimeSpan duration)
-            : base(string.Format(CultureInfo.InvariantCulture, duration == TimeSpan.Zero ? MessageFormatWithoutDuration : MessageFormatWithDuration, element, duration))
+            : base((duration == TimeSpan.Zero ? Messages.ElementNotFoundException_Message_WithoutDuration : Messages.ElementNotFoundException_Message_WithDuration).FormatInvariant(element, duration))
         {
             this.Element = element;
         }

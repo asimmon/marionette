@@ -36,19 +36,19 @@ namespace Askaiser.Marionette
         public string Name
         {
             get => this._name;
-            init => this._name = value is { Length: > 0 } ? value : throw new ArgumentException("Name cannot be null or empty.", nameof(this.Name));
+            init => this._name = value is { Length: > 0 } ? value : throw new ArgumentException(Messages.Element_Throw_InvalidName, nameof(this.Name));
         }
 
         public byte[] Content
         {
             get => this._content;
-            init => this._content = value is { Length: > 0 } ? value : throw new ArgumentException("Content must be a non-empty array of bytes.", nameof(this.Content));
+            init => this._content = value is { Length: > 0 } ? value : throw new ArgumentException(Messages.ImageElement_Throw_EmptyContent, nameof(this.Content));
         }
 
         public decimal Threshold
         {
             get => this._threshold;
-            init => this._threshold = value is >= 0 and <= 1 ? value : throw new ArgumentOutOfRangeException(nameof(this.Threshold), "Threshold must be a floating number between 0 and 1.");
+            init => this._threshold = value is >= 0 and <= 1 ? value : throw new ArgumentOutOfRangeException(nameof(this.Threshold), Messages.ImageElement_Throw_ThresholdOutOfRange);
         }
 
         public bool Grayscale { get; init; }

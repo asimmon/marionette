@@ -25,7 +25,7 @@ namespace Askaiser.Marionette.Keyboard
 
             if (inputs.Length == 0)
             {
-                throw new ArgumentException("The input array was empty", nameof(inputs));
+                throw new ArgumentException(Messages.WindowsInputMessageDispatcher_Throw_EmptyInputs, nameof(inputs));
             }
 
             var successful = NativeMethods.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));

@@ -24,35 +24,8 @@ namespace Askaiser.Marionette.Keyboard
         /// <param name="inputSimulator">The <see cref="IInputSimulator"/> that owns this instance.</param>
         public KeyboardSimulator(IInputSimulator inputSimulator)
         {
-            if (inputSimulator == null)
-            {
-                throw new ArgumentNullException(nameof(inputSimulator));
-            }
-
-            this._inputSimulator = inputSimulator;
+            this._inputSimulator = inputSimulator ?? throw new ArgumentNullException(nameof(inputSimulator));
             this._messageDispatcher = new WindowsInputMessageDispatcher();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="KeyboardSimulator"/> class using the specified <see cref="IInputMessageDispatcher"/> for dispatching <see cref="INPUT"/> messages.
-        /// </summary>
-        /// <param name="inputSimulator">The <see cref="IInputSimulator"/> that owns this instance.</param>
-        /// <param name="messageDispatcher">The <see cref="IInputMessageDispatcher"/> to use for dispatching <see cref="INPUT"/> messages.</param>
-        /// <exception cref="InvalidOperationException">If null is passed as the <paramref name="messageDispatcher"/>.</exception>
-        internal KeyboardSimulator(IInputSimulator inputSimulator, IInputMessageDispatcher messageDispatcher)
-        {
-            if (inputSimulator == null)
-            {
-                throw new ArgumentNullException(nameof(inputSimulator));
-            }
-
-            if (messageDispatcher == null)
-            {
-                throw new InvalidOperationException($"The {nameof(KeyboardSimulator)} cannot operate with a null {nameof(IInputMessageDispatcher)}. Please provide a valid {nameof(IInputMessageDispatcher)} instance to use for dispatching {nameof(INPUT)} messages.");
-            }
-
-            this._inputSimulator = inputSimulator;
-            this._messageDispatcher = messageDispatcher;
         }
 
         /// <summary>
@@ -221,7 +194,7 @@ namespace Askaiser.Marionette.Keyboard
         {
             if (text.Length > uint.MaxValue / 2)
             {
-                throw new ArgumentException($"The text parameter is too long. It must be less than {uint.MaxValue / 2} characters.", nameof(text));
+                throw new ArgumentException(Messages.KeyboardSimulator_Throw_TextTooLong.FormatInvariant(uint.MaxValue / 2), nameof(text));
             }
 
             var inputList = new InputBuilder().AddCharacters(text).ToArray();

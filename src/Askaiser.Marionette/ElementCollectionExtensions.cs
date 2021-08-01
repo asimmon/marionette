@@ -37,18 +37,18 @@ namespace Askaiser.Marionette
                     {
                         JsonElementKinds.Image => new ImageElement(Deserialize<JsonImageElement>(jsonObject)),
                         JsonElementKinds.Text => new TextElement(Deserialize<JsonTextElement>(jsonObject)),
-                        null => throw new ArgumentException("The JSON document cannot null elements."),
-                        _ => throw new ArgumentException($"The JSON document contains an unsupported element type: '{elementKind}'.")
+                        null => throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_NullJsonElement),
+                        _ => throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_UnsupportedElementType.FormatInvariant(elementKind))
                     };
 
                     if (string.IsNullOrWhiteSpace(element.Name))
                     {
-                        throw new ArgumentException("An element cannot have a null or empty name.");
+                        throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_InvalidElementName);
                     }
 
                     if (elements.Contains(element))
                     {
-                        throw new ArgumentException($"An element with the name '{element.Name}' already exists.");
+                        throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_ElementAlreadyExists.FormatInvariant(element.Name));
                     }
 
                     elements.Add(element);
@@ -86,7 +86,7 @@ namespace Askaiser.Marionette
                 {
                     ImageElement imageElement => new JsonImageElement(imageElement),
                     TextElement textElement => new JsonTextElement(textElement),
-                    _ => throw new NotSupportedException($"Element of type {element.GetType().FullName} is not supported")
+                    _ => throw new NotSupportedException(Messages.ElementCollectionExtensions_Throw_UnsupportedElementType.FormatInvariant(element.GetType().FullName))
                 };
 
                 jsonElements.Add(jsonElement);

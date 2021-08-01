@@ -57,7 +57,7 @@ namespace Askaiser.Marionette
         public TimeSpan ScreenshotCacheDuration
         {
             get => this._screenshotCacheDuration;
-            init => this._screenshotCacheDuration = value >= TimeSpan.Zero ? value : throw new ArgumentOutOfRangeException(nameof(this.ScreenshotCacheDuration), "Screenshot cache duration cannot be negative.");
+            init => this._screenshotCacheDuration = value >= TimeSpan.Zero ? value : throw new ArgumentOutOfRangeException(nameof(this.ScreenshotCacheDuration), Messages.DriverOptions_Throw_NegativeScreenshotCacheDuration);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Askaiser.Marionette
         public TimeSpan DefaultWaitForDuration
         {
             get => this._defaultWaitForDuration;
-            init => this._defaultWaitForDuration = value >= TimeSpan.Zero ? value : throw new ArgumentOutOfRangeException(nameof(this.DefaultWaitForDuration), "Default 'waitFor' duration cannot be negative.");
+            init => this._defaultWaitForDuration = value >= TimeSpan.Zero ? value : throw new ArgumentOutOfRangeException(nameof(this.DefaultWaitForDuration), Messages.DriverOptions_Throw_NegativeDefaultWaitForDuration);
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Askaiser.Marionette
         public TimeSpan DefaultKeyboardSleepAfterDuration
         {
             get => this._defaultKeyboardSleepAfterDuration;
-            init => this._defaultKeyboardSleepAfterDuration = value >= TimeSpan.Zero ? value : throw new ArgumentOutOfRangeException(nameof(this.DefaultKeyboardSleepAfterDuration), "Default 'sleepAfter' duration cannot be negative.");
+            init => this._defaultKeyboardSleepAfterDuration = value >= TimeSpan.Zero ? value : throw new ArgumentOutOfRangeException(nameof(this.DefaultKeyboardSleepAfterDuration), Messages.DriverOptions_Throw_NegativeDefaultKeyboardSleepAfterDuration);
         }
 
         /// <summary>

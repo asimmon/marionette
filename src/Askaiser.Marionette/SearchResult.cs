@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace Askaiser.Marionette
@@ -64,7 +63,7 @@ namespace Askaiser.Marionette
 
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, "Search results for '{0}': {1}", this.Element, this.Locations.Count > 0 ? this.Locations.ToCenterString() : "none");
+            return Messages.SearchResult_ToString.FormatInvariant(this.Element, this.Locations.Count > 0 ? this.Locations.ToCenterString() : "none");
         }
 
         public static SearchResult NotFound(IElement element)

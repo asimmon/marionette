@@ -57,7 +57,7 @@ namespace Askaiser.Marionette
             var monitor = monitors.FirstOrDefault(x => x.Index == index);
             if (monitor == null)
             {
-                throw new InvalidOperationException($"Requested monitor index {index} not found.");
+                throw new InvalidOperationException(Messages.MonitorService_Throw_MonitorNotFound.FormatInvariant(index));
             }
 
             return monitor;

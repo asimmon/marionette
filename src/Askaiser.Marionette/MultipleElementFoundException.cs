@@ -1,11 +1,9 @@
-﻿using System.Globalization;
-
-namespace Askaiser.Marionette
+﻿namespace Askaiser.Marionette
 {
     public sealed class MultipleElementFoundException : MarionetteException
     {
         public MultipleElementFoundException(SearchResult result)
-            : base(string.Format(CultureInfo.InvariantCulture, "Element '{0}' was found at multiple locations: {1}.", result.Element, result.Locations.ToCenterString()))
+            : base(Messages.MultipleElementFoundException_Message.FormatInvariant(result.Element, result.Locations.ToCenterString()))
         {
             this.Result = result;
         }

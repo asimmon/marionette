@@ -24,7 +24,7 @@ namespace Askaiser.Marionette
 
             if (this._results.Count == 0)
             {
-                throw new ArgumentException("Results cannot be empty.", nameof(results));
+                throw new ArgumentException(Messages.SearchResultCollection_Throw_ResultsEmpty, nameof(results));
             }
         }
 
@@ -40,7 +40,7 @@ namespace Askaiser.Marionette
 
         public SearchResult this[string name]
         {
-            get => this._results.TryGetValue(name, out var result) ? result : throw new ArgumentException($"Element {name} not found.", nameof(name));
+            get => this._results.TryGetValue(name, out var result) ? result : throw new ArgumentException(Messages.Element_Throw_ElementNotFound.FormatInvariant(name), nameof(name));
         }
 
         public IEnumerator<SearchResult> GetEnumerator()

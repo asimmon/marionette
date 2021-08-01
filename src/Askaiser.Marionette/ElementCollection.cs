@@ -65,7 +65,7 @@ namespace Askaiser.Marionette
 
         public IElement this[string name]
         {
-            get => this.TryGetValue(name, out var element) ? element : throw new ArgumentException($"There is no element named {name}.", nameof(name));
+            get => this.TryGetValue(name, out var element) ? element : throw new ArgumentException(Messages.Element_Throw_ElementNotFound.FormatInvariant(name), nameof(name));
         }
 
         public bool TryGetValue(string name, out IElement value)

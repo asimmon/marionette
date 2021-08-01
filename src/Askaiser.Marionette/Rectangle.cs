@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 
 namespace Askaiser.Marionette
 {
@@ -11,12 +10,12 @@ namespace Askaiser.Marionette
         {
             if (left > right)
             {
-                throw new ArgumentOutOfRangeException(nameof(left), $"Left property {left} is greater than the Right property {right}.");
+                throw new ArgumentOutOfRangeException(nameof(left), Messages.Rectangle_Throw_LeftGreaterThanRight.FormatInvariant(left, right));
             }
 
             if (top > bottom)
             {
-                throw new ArgumentOutOfRangeException(nameof(top), $"Top property {top} is greater than the Bottom property {bottom}.");
+                throw new ArgumentOutOfRangeException(nameof(top), Messages.Rectangle_Throw_TopGreaterThanBottom.FormatInvariant(top, bottom));
             }
 
             this.Left = left;
@@ -367,7 +366,7 @@ namespace Askaiser.Marionette
 
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, "({0},{1},{2},{3})", this.Left, this.Top, this.Right, this.Bottom);
+            return Messages.Rectangle_ToString.FormatInvariant(this.Left, this.Top, this.Right, this.Bottom);
         }
     }
 }

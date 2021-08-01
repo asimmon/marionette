@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -31,7 +30,7 @@ namespace Askaiser.Marionette.Commands
         {
             if (command.WaitFor < TimeSpan.Zero)
             {
-                throw new ArgumentOutOfRangeException(nameof(command.WaitFor), $"{nameof(command.WaitFor)} duration must be greater or equal to zero");
+                throw new ArgumentOutOfRangeException(nameof(command), Messages.Throw_NegativeWaitFor);
             }
 
             var monitor = await this._monitorService.GetMonitor(command.MonitorIndex).ConfigureAwait(false);
@@ -154,7 +153,7 @@ namespace Askaiser.Marionette.Commands
         private static string MakeFailureScreenshotFileName(IElement element)
         {
             var elementDescriptor = NotAlphanumericRegex.Replace(WhitespaceRegex.Replace(element.ToString()?.Trim() ?? string.Empty, "-"), string.Empty);
-            return string.Format(CultureInfo.InvariantCulture, "{0:yyyy-MM-dd-HH-mm-ss-ffff}_{1}.png", DateTime.UtcNow, elementDescriptor.ToLowerInvariant());
+            return Messages.FailureScreenshotFileNameFormat.FormatInvariant(DateTime.UtcNow, elementDescriptor.ToLowerInvariant());
         }
     }
 }

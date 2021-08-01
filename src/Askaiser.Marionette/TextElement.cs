@@ -33,13 +33,13 @@ namespace Askaiser.Marionette
         public string Name
         {
             get => this._name;
-            init => this._name = value?.Trim() is { Length: > 0 } trimmedValue ? trimmedValue : throw new ArgumentException("Name cannot be null or empty.", nameof(this.Name));
+            init => this._name = value?.Trim() is { Length: > 0 } trimmedValue ? trimmedValue : throw new ArgumentException(Messages.Element_Throw_InvalidName, nameof(this.Name));
         }
 
         public string Content
         {
             get => this._content;
-            init => this._content = value is { Length: > 0 } ? value : throw new ArgumentException("Content cannot be null or empty.", nameof(this.Content));
+            init => this._content = value is { Length: > 0 } ? value : throw new ArgumentException(Messages.TextElement_Throw_EmptyContent, nameof(this.Content));
         }
 
         public TextOptions Options { get; init; }

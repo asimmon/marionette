@@ -136,10 +136,9 @@ namespace Askaiser.Marionette
             }
 
             var enumeratedElements = new List<IElement>(elements);
-
             if (enumeratedElements.Count == 0)
             {
-                throw new ArgumentException("Elements cannot be empty", nameof(elements));
+                throw new ArgumentException(Messages.MarionetteDriver_Throw_ElementsEmpty, nameof(elements));
             }
 
             var effectiveWaitFor = waitFor.GetValueOrDefault(this._defaultWaitForDuration);
@@ -159,10 +158,9 @@ namespace Askaiser.Marionette
             }
 
             var enumeratedElements = new List<IElement>(elements);
-
             if (enumeratedElements.Count == 0)
             {
-                throw new ArgumentException("Elements cannot be empty", nameof(elements));
+                throw new ArgumentException(Messages.MarionetteDriver_Throw_ElementsEmpty, nameof(elements));
             }
 
             var effectiveWaitFor = waitFor.GetValueOrDefault(this._defaultWaitForDuration);
@@ -213,7 +211,7 @@ namespace Askaiser.Marionette
         {
             if (scrollTicks <= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(scrollTicks), "Scroll ticks must be a positive integer.");
+                throw new ArgumentOutOfRangeException(nameof(scrollTicks), Messages.MarionetteDriver_Throw_ScrollTicksNotGreaterThanZero);
             }
 
             for (var i = 0; i < scrollTicks; i++)
@@ -226,7 +224,7 @@ namespace Askaiser.Marionette
         {
             if (scrollTicks <= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(scrollTicks), "Scroll ticks must be a positive integer.");
+                throw new ArgumentOutOfRangeException(nameof(scrollTicks), Messages.MarionetteDriver_Throw_ScrollTicksNotGreaterThanZero);
             }
 
             for (var i = 0; i < scrollTicks; i++)
@@ -235,24 +233,24 @@ namespace Askaiser.Marionette
             }
         }
 
-        public Task ScrollUpUntilVisible(IElement element, TimeSpan totalDuration, int scrollTicks = 1, Rectangle searchRect = default)
+        public Task ScrollUpUntilVisible(IElement element, TimeSpan waitFor, int scrollTicks = 1, Rectangle searchRect = default)
         {
-            return this.ScrollUntilVisible(element, totalDuration, isUp: true, scrollTicks, searchRect);
+            return this.ScrollUntilVisible(element, waitFor, isUp: true, scrollTicks, searchRect);
         }
 
-        public Task ScrollDownUntilVisible(IElement element, TimeSpan totalDuration, int scrollTicks = 1, Rectangle searchRect = default)
+        public Task ScrollDownUntilVisible(IElement element, TimeSpan waitFor, int scrollTicks = 1, Rectangle searchRect = default)
         {
-            return this.ScrollUntilVisible(element, totalDuration, isUp: false, scrollTicks, searchRect);
+            return this.ScrollUntilVisible(element, waitFor, isUp: false, scrollTicks, searchRect);
         }
 
-        private async Task ScrollUntilVisible(IElement element, TimeSpan totalDuration, bool isUp, int scrollTicks, Rectangle searchRect)
+        private async Task ScrollUntilVisible(IElement element, TimeSpan waitFor, bool isUp, int scrollTicks, Rectangle searchRect)
         {
-            if (totalDuration <= TimeSpan.Zero)
+            if (waitFor <= TimeSpan.Zero)
             {
-                throw new ArgumentException("Total duration must be greater than zero.", nameof(totalDuration));
+                throw new ArgumentException(Messages.Throw_NegativeWaitFor, nameof(waitFor));
             }
 
-            for (var sw = Stopwatch.StartNew(); sw.Elapsed < totalDuration;)
+            for (var sw = Stopwatch.StartNew(); sw.Elapsed < waitFor;)
             {
                 if (await this.IsVisible(element, TimeSpan.Zero, searchRect).ConfigureAwait(false))
                 {
@@ -263,7 +261,7 @@ namespace Askaiser.Marionette
                 await scrollTask.ConfigureAwait(false);
             }
 
-            throw new ElementNotFoundException(element, totalDuration);
+            throw new ElementNotFoundException(element, waitFor);
         }
 
         public async Task TypeText(string text, TimeSpan? sleepAfter = default)
@@ -330,7 +328,7 @@ namespace Askaiser.Marionette
 
             if (keyCodes.Length == 0)
             {
-                throw new ArgumentException("Key codes cannot be empty", nameof(keyCodes));
+                throw new ArgumentException(Messages.MarionetteDriver_Throw_EmptyKeyCodes, nameof(keyCodes));
             }
         }
 
@@ -360,7 +358,7 @@ namespace Askaiser.Marionette
         {
             if (defaultWaitFor < TimeSpan.Zero)
             {
-                throw new ArgumentOutOfRangeException(nameof(defaultWaitFor), "Default 'waitFor' duration cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(defaultWaitFor), Messages.DriverOptions_Throw_NegativeDefaultWaitForDuration);
             }
 
             this._defaultWaitForDuration = defaultWaitFor;
@@ -371,7 +369,7 @@ namespace Askaiser.Marionette
         {
             if (defaultKeyboardSleepAfter < TimeSpan.Zero)
             {
-                throw new ArgumentOutOfRangeException(nameof(defaultKeyboardSleepAfter), "Default 'sleepAfter' duration cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(defaultKeyboardSleepAfter), Messages.DriverOptions_Throw_NegativeDefaultKeyboardSleepAfterDuration);
             }
 
             this._defaultKeyboardSleepAfterDuration = defaultKeyboardSleepAfter;

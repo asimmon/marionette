@@ -9,15 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Askaiser.Marionette.SourceGenerator\Askaiser.Marionette.SourceGenerator.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\Askaiser.Marionette.SourceGenerator\Askaiser.Marionette.SourceGenerator.csproj" PrivateAssets="All"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenCvSharp4" Version="4.5.2.20210404" />
-    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.5.2.20210404" />
-    <PackageReference Include="System.Text.Json" Version="5.0.2" Condition=" '$(TargetFramework)' != 'net5.0' " />
-    <PackageReference Include="Tesseract" Version="4.1.1" IncludeAssets="All" PrivateAssets="None" />
-    <PackageReference Include="Tesseract.Drawing" Version="4.1.1" />
+    <PackageReference Include="OpenCvSharp4" Version="4.5.2.20210404"/>
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.5.2.20210404"/>
+    <PackageReference Include="System.Text.Json" Version="5.0.2" Condition=" '$(TargetFramework)' != 'net5.0' "/>
+    <PackageReference Include="Tesseract" Version="4.1.1" IncludeAssets="All" PrivateAssets="None"/>
+    <PackageReference Include="Tesseract.Drawing" Version="4.1.1"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +29,21 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Update="Messages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Messages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Messages.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
   <PropertyGroup>
     <!-- Insert custom target to pack our source generator into generated package (https://stackoverflow.com/q/40396161/825695) -->
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
@@ -36,7 +51,7 @@
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
     <ItemGroup>
-      <_ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')-&gt;WithMetadataValue('PrivateAssets', 'All'))" />
+      <_ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')-&gt;WithMetadataValue('PrivateAssets', 'All'))"/>
     </ItemGroup>
 
     <!-- Prevent copying the source generator files multiple times (for each targeted framework) -->
