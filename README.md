@@ -114,9 +114,9 @@ Sleep(TimeSpan delay)
 ### Basic methods
 
 ```csharp
-WaitFor(IElement element, TimeSpan waitFor, Rectangle searchRect)
-WaitForAll(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect)
-WaitForAny(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect)
+WaitFor(IElement element, TimeSpan? waitFor, Rectangle searchRect)
+WaitForAll(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
+WaitForAny(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
 SingleClick(int x, int y)
 DoubleClick(int x, int y)
 TripleClick(int x, int y)
@@ -124,7 +124,7 @@ RightClick(int x, int y)
 MoveTo(int x, int y)
 DragFrom(int x, int y)
 DropTo(int x, int y)
-TypeText(string text, TimeSpan sleepAfter)
+TypeText(string text, TimeSpan? sleepAfter)
 KeyPress(VirtualKeyCode[] keyCodes)
 KeyDown(VirtualKeyCode[] keyCodes)
 KeyUp(VirtualKeyCode[] keyCodes)
@@ -137,47 +137,47 @@ ScrollUpUntilVisible(IElement element, TimeSpan totalDuration, int scrollTicks, 
 ### Mouse interaction with an element
 
 ```csharp
-MoveTo(IElement element, TimeSpan waitFor, Rectangle searchRect)
-SingleClick(IElement element, TimeSpan waitFor, Rectangle searchRect)
-DoubleClick(IElement element, TimeSpan waitFor, Rectangle searchRect)
-TripleClick(IElement element, TimeSpan waitFor, Rectangle searchRect)
-RightClick(IElement element, TimeSpan waitFor, Rectangle searchRect)
-DragFrom(IElement element, TimeSpan waitFor, Rectangle searchRect)
-DropTo(IElement element, TimeSpan waitFor, Rectangle searchRect)
+MoveTo(IElement element, TimeSpan? waitFor, Rectangle searchRect)
+SingleClick(IElement element, TimeSpan? waitFor, Rectangle searchRect)
+DoubleClick(IElement element, TimeSpan? waitFor, Rectangle searchRect)
+TripleClick(IElement element, TimeSpan? waitFor, Rectangle searchRect)
+RightClick(IElement element, TimeSpan? waitFor, Rectangle searchRect)
+DragFrom(IElement element, TimeSpan? waitFor, Rectangle searchRect)
+DropTo(IElement element, TimeSpan? waitFor, Rectangle searchRect)
 ```
 
 ### Check for element visibility
 
 ```csharp
-IsVisible(IElement element, TimeSpan waitFor, Rectangle searchRect)
-IsAnyVisible(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect)
-AreAllVisible(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect)
+IsVisible(IElement element, TimeSpan? waitFor, Rectangle searchRect)
+IsAnyVisible(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
+AreAllVisible(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
 ```
 
 ### Mouse interaction with the first available element of a collection
 
 ```csharp
-MoveToAny(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect)
-SingleClickAny(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect)
-DoubleClickAny(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect)
-TripleClickAny(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect)
-RightClickAny(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect)
-DragFromAny(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect)
-DropToAny(IEnumerable<IElement> elements, TimeSpan waitFor, Rectangle searchRect)
+MoveToAny(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
+SingleClickAny(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
+DoubleClickAny(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
+TripleClickAny(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
+RightClickAny(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
+DragFromAny(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
+DropToAny(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
 ```
 
 ### Text-based actions
 
 ```csharp
-WaitFor(string text, TimeSpan waitFor, Rectangle searchRect, TextOptions textOptions)
-MoveTo(string text, TimeSpan waitFor, Rectangle searchRect, TextOptions textOptions)
-SingleClick(string text, TimeSpan waitFor, Rectangle searchRect, TextOptions textOptions)
-DoubleClick(string text, TimeSpan waitFor, Rectangle searchRect, TextOptions textOptions)
-TripleClick(string text, TimeSpan waitFor, Rectangle searchRect, TextOptions textOptions)
-RightClick(string text, TimeSpan waitFor, Rectangle searchRect, TextOptions textOptions)
-DragFrom(string text, TimeSpan waitFor, Rectangle searchRect, TextOptions textOptions)
-DropTo(string text, TimeSpan waitFor, Rectangle searchRect, TextOptions textOptions)
-IsVisible(string text, TimeSpan waitFor, Rectangle searchRect, TextOptions textOptions)
+WaitFor(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
+MoveTo(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
+SingleClick(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
+DoubleClick(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
+TripleClick(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
+RightClick(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
+DragFrom(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
+DropTo(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
+IsVisible(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
 ```
 
 ### Mouse interaction with points
@@ -207,29 +207,29 @@ DropTo(SearchResult searchResult)
 ### Key press with single key code
 
 ```csharp
-KeyPress(VirtualKeyCode keyCode, TimeSpan sleepAfter)
-KeyDown(VirtualKeyCode keyCode, TimeSpan sleepAfter)
-KeyUp(VirtualKeyCode keyCode, TimeSpan sleepAfter)
+KeyPress(VirtualKeyCode keyCode, TimeSpan? sleepAfter)
+KeyDown(VirtualKeyCode keyCode, TimeSpan? sleepAfter)
+KeyUp(VirtualKeyCode keyCode, TimeSpan? sleepAfter)
 ```
 
 ### `System.Drawing.Image`-based actions
 
 ```csharp
-WaitFor(Image image, TimeSpan waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-MoveTo(Image image, TimeSpan waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-SingleClick(Image image, TimeSpan waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-DoubleClick(Image image, TimeSpan waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-TripleClick(Image image, TimeSpan waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-RightClick(Image image, TimeSpan waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-DragFrom(Image image, TimeSpan waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-DropTo(Image image, TimeSpan waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-IsVisible(Image image, TimeSpan waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
+WaitFor(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
+MoveTo(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
+SingleClick(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
+DoubleClick(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
+TripleClick(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
+RightClick(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
+DragFrom(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
+DropTo(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
+IsVisible(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
 ```
 
 ### Finding elements locations without throwing not found exceptions or multiple element found exceptions
 
 ```csharp
-FindLocations(IElement element, TimeSpan waitFor, Rectangle searchRect)
-FindLocations(string text, TimeSpan waitFor, Rectangle searchRect, TextOptions textOptions)
-FindLocations(Image image, TimeSpan waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
+FindLocations(IElement element, TimeSpan? waitFor, Rectangle searchRect)
+FindLocations(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
+FindLocations(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
 ```
