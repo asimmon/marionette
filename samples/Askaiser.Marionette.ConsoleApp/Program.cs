@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Askaiser.Marionette.ConsoleApp
@@ -42,7 +41,7 @@ namespace Askaiser.Marionette.ConsoleApp
         {
             var library = new ElementCollection();
 
-            var currentDirectoryPath = GetCurrentAssemblyDirectoryPath();
+            var currentDirectoryPath = AppContext.BaseDirectory;
             var serializedLibraryPath = Path.Combine(currentDirectoryPath, "library.json");
 
             if (File.Exists(serializedLibraryPath))
@@ -67,12 +66,6 @@ namespace Askaiser.Marionette.ConsoleApp
             {
                 await driver.MoveToAny(new[] { library["rider-logo"], library["vs-logo"] }, waitFor: TimeSpan.FromSeconds(2));
             }
-        }
-
-        private static string GetCurrentAssemblyDirectoryPath()
-        {
-            var currentAssemblyPath = new Uri(Assembly.GetExecutingAssembly().CodeBase!).AbsolutePath;
-            return Path.GetDirectoryName(currentAssemblyPath);
         }
     }
 }

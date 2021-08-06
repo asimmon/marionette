@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 
 namespace Askaiser.Marionette
 {
@@ -89,13 +88,7 @@ namespace Askaiser.Marionette
 
         private static string GetCurrentAssemblyDirectoryPath()
         {
-            if (Assembly.GetExecutingAssembly() is not { Location: { Length: > 0 } asmLocation })
-            {
-                return ".";
-            }
-
-            var asmAbsolutePath = new Uri(asmLocation).AbsolutePath;
-            return Path.GetDirectoryName(asmAbsolutePath);
+            return AppContext.BaseDirectory is { Length: > 0 } baseDir ? baseDir : ".";
         }
     }
 }
