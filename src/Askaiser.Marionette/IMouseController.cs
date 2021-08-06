@@ -4,6 +4,8 @@ namespace Askaiser.Marionette
 {
     internal interface IMouseController
     {
+        Point GetCurrentPosition();
+
         Task Move(int x, int y, MouseSpeed speed);
 
         Task SingleClick(int x, int y, MouseSpeed speed);

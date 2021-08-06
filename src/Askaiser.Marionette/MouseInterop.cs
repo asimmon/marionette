@@ -7,7 +7,7 @@ namespace Askaiser.Marionette
     {
         // One wheel click is defined as WHEEL_DELTA, which is 120.
         // https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-mouse_event
-        internal const int WheelDelta = 120;
+        private const int WheelDelta = 120;
 
         [DllImport("user32.dll", EntryPoint = "SetCursorPos")]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -25,20 +25,15 @@ namespace Askaiser.Marionette
             SetCursorPositionInterop(x, y);
         }
 
-        public static void SetCursorPosition(System.Drawing.Point point)
+        public static Point GetCursorPosition()
         {
-            SetCursorPositionInterop(point.X, point.Y);
-        }
-
-        public static System.Drawing.Point GetCursorPosition()
-        {
-            return GetCursorPositionInterop(out var position) ? new System.Drawing.Point(position.X, position.Y) : System.Drawing.Point.Empty;
+            return GetCursorPositionInterop(out var position) ? new Point(position.X, position.Y) : Point.Empty;
         }
 
         public static void MouseClickEvent(MouseEventFlags value)
         {
-            var position = GetCursorPosition();
-            MouseEventInterop((int)value, position.X, position.Y, 0, 0);
+            var (x, y) = GetCursorPosition();
+            MouseEventInterop((int)value, x, y, 0, 0);
         }
 
         public static void MouseWheelEventUp() => MouseWheelEvent(true);

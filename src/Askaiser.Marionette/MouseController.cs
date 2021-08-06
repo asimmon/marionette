@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Askaiser.Marionette
@@ -10,30 +10,38 @@ namespace Askaiser.Marionette
         private const int AverageHumanDoubleClickDuration = 70;
         private const int DelayBeforeFirstClickAction = 100;
 
-        private static readonly Dictionary<MouseSpeed, int> MouseSpeedSteps = new Dictionary<MouseSpeed, int>()
+        private static readonly Dictionary<MouseSpeed, int> MouseSpeedSteps = new Dictionary<MouseSpeed, int>
         {
             [MouseSpeed.Immediate] = 0,
             [MouseSpeed.Fast] = 60,
             [MouseSpeed.Slow] = 160,
         };
 
+        public Point GetCurrentPosition()
+        {
+            return MouseInterop.GetCursorPosition();
+        }
+
         public async Task Move(int x, int y, MouseSpeed speed)
         {
-            var steps = MouseSpeedSteps[speed];
+            float steps = MouseSpeedSteps[speed];
 
             if (steps > 0)
             {
                 var startPos = MouseInterop.GetCursorPosition();
-                var slope = new PointF(x - startPos.X, y - startPos.Y);
 
-                slope.X /= steps;
-                slope.Y /= steps;
+                var slopeX = (x - startPos.X) / steps;
+                var slopeY = (y - startPos.Y) / steps;
 
-                PointF iterPos = startPos;
+                float iterPosX = startPos.X;
+                float iterPosY = startPos.Y;
+
                 for (var i = 0; i < steps; i++)
                 {
-                    iterPos = new PointF(iterPos.X + slope.X, iterPos.Y + slope.Y);
-                    MouseInterop.SetCursorPosition(System.Drawing.Point.Round(iterPos));
+                    iterPosX += slopeX;
+                    iterPosY += slopeY;
+
+                    MouseInterop.SetCursorPosition(unchecked((int)Math.Round(iterPosX)), unchecked((int)Math.Round(iterPosY)));
                     await Task.Delay(1).ConfigureAwait(false);
                 }
             }

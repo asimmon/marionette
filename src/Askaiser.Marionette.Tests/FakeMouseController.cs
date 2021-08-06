@@ -17,6 +17,11 @@ namespace Askaiser.Marionette.Tests
             get => this._actions;
         }
 
+        public Point GetCurrentPosition()
+        {
+            return Point.Empty;
+        }
+
         public Task Move(int x, int y, MouseSpeed speed)
         {
             this.AddAction("Move", x, y, speed);

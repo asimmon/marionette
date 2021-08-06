@@ -1,9 +1,13 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 
 namespace Askaiser.Marionette
 {
     public sealed class DriverOptions
     {
+        private static readonly Lazy<string> LazyCurrentAssemblyDirectoryPath = new Lazy<string>(GetCurrentAssemblyDirectoryPath);
+
         private readonly string _tesseractDataPath;
         private readonly string _tesseractLanguage;
         private readonly string _failureScreenshotPath;
@@ -13,7 +17,7 @@ namespace Askaiser.Marionette
 
         public DriverOptions()
         {
-            this._tesseractDataPath = "./tessdata";
+            this._tesseractDataPath = Path.Combine(LazyCurrentAssemblyDirectoryPath.Value, "tessdata");
             this._tesseractLanguage = "eng";
             this._failureScreenshotPath = null;
             this._screenshotCacheDuration = TimeSpan.FromMilliseconds(100);
@@ -82,5 +86,16 @@ namespace Askaiser.Marionette
         /// Gets or sets the initial mouse speed of the driver
         /// </summary>
         public MouseSpeed MouseSpeed { get; init; }
+
+        private static string GetCurrentAssemblyDirectoryPath()
+        {
+            if (Assembly.GetExecutingAssembly() is not { Location: { Length: > 0 } asmLocation })
+            {
+                return ".";
+            }
+
+            var asmAbsolutePath = new Uri(asmLocation).AbsolutePath;
+            return Path.GetDirectoryName(asmAbsolutePath);
+        }
     }
 }

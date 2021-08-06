@@ -4,6 +4,8 @@ namespace Askaiser.Marionette
 {
     public record Point(int X, int Y)
     {
+        public static readonly Point Empty = new Point(0, 0);
+
         public void Deconstruct(out int x, out int y)
         {
             x = this.X;

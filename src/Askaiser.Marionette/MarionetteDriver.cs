@@ -16,6 +16,7 @@ namespace Askaiser.Marionette
     public sealed class MarionetteDriver : IDisposable
     {
         private readonly IMonitorService _monitorService;
+        private readonly IMouseController _mouseController;
         private readonly IDisposable[] _disposables;
         private readonly WaitForCommandHandler _waitForHandler;
         private readonly WaitForAnyCommandHandler _waitForAnyHandler;
@@ -48,6 +49,7 @@ namespace Askaiser.Marionette
             params IDisposable[] disposables)
         {
             this._monitorService = monitorService;
+            this._mouseController = mouseController;
             this._disposables = disposables;
 
             this._waitForHandler = new WaitForCommandHandler(options, fileWriter, monitorService, elementRecognizer);
@@ -110,6 +112,11 @@ namespace Askaiser.Marionette
         {
             var monitor = await this.GetCurrentMonitor().ConfigureAwait(false);
             return await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
+        }
+
+        public Point GetMousePosition()
+        {
+            return this._mouseController.GetCurrentPosition();
         }
 
         internal async Task<SearchResult> WaitFor(IElement element, TimeSpan? waitFor, Rectangle searchRect, NoSingleResultBehavior noSingleResultBehavior)
