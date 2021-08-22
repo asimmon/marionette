@@ -62,6 +62,9 @@
   <data name="DriverOptions_Throw_NegativeScreenshotCacheDuration" xml:space="preserve">
     <value>Screenshot cache duration cannot be negative.</value>
   </data>
+  <data name="DriverOptions_Throw_NegativeWaitForThrottlingInterval" xml:space="preserve">
+    <value>'waitFor' throttling interval cannot be negative.</value>
+  </data>
   <data name="DriverOptions_Throw_NegativeDefaultWaitForDuration" xml:space="preserve">
     <value>Default 'waitFor' duration cannot be negative.</value>
   </data>

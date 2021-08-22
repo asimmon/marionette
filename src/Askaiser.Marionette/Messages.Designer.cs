@@ -142,6 +142,15 @@ namespace Askaiser.Marionette {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;waitFor&apos; throttling interval cannot be negative..
+        /// </summary>
+        internal static string DriverOptions_Throw_NegativeWaitForThrottlingInterval {
+            get {
+                return ResourceManager.GetString("DriverOptions_Throw_NegativeWaitForThrottlingInterval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Element &apos;{0}&apos; was not found..
         /// </summary>
         internal static string Element_Throw_ElementNotFound {

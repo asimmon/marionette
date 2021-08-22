@@ -11,8 +11,6 @@ namespace Askaiser.Marionette.Commands
 {
     internal abstract class BaseWaitForCommandHandler
     {
-        private static readonly TimeSpan ThrottlingInterval = TimeSpan.FromMilliseconds(50);
-
         private readonly DriverOptions _options;
         private readonly IFileWriter _fileWriter;
         private readonly IMonitorService _monitorService;
@@ -66,13 +64,16 @@ namespace Askaiser.Marionette.Commands
                     return new RecognizerSearchResult(recognizerResult.TransformedScreenshot, adjustedResult);
                 }
 
-                try
+                if (this._options.WaitForThrottlingInterval > TimeSpan.Zero)
                 {
-                    await Task.Delay(ThrottlingInterval, token).ConfigureAwait(false);
-                }
-                catch (TaskCanceledException)
-                {
-                    break;
+                    try
+                    {
+                        await Task.Delay(this._options.WaitForThrottlingInterval, token).ConfigureAwait(false);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
                 }
             }
             while (watch.Elapsed < command.WaitFor);

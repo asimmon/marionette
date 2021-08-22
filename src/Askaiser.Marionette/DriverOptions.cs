@@ -11,6 +11,7 @@ namespace Askaiser.Marionette
         private readonly string _tesseractLanguage;
         private readonly string _failureScreenshotPath;
         private readonly TimeSpan _screenshotCacheDuration;
+        private readonly TimeSpan _waitForThrottlingInterval;
         private readonly TimeSpan _defaultWaitForDuration;
         private readonly TimeSpan _defaultKeyboardSleepAfterDuration;
 
@@ -20,6 +21,7 @@ namespace Askaiser.Marionette
             this._tesseractLanguage = "eng";
             this._failureScreenshotPath = null;
             this._screenshotCacheDuration = TimeSpan.FromMilliseconds(100);
+            this._waitForThrottlingInterval = TimeSpan.FromMilliseconds(50);
             this._defaultWaitForDuration = TimeSpan.Zero;
             this._defaultKeyboardSleepAfterDuration = TimeSpan.Zero;
             this.MouseSpeed = MouseSpeed.Fast;
@@ -61,6 +63,15 @@ namespace Askaiser.Marionette
         {
             get => this._screenshotCacheDuration;
             init => this._screenshotCacheDuration = value >= TimeSpan.Zero ? value : throw new ArgumentOutOfRangeException(nameof(this.ScreenshotCacheDuration), Messages.DriverOptions_Throw_NegativeScreenshotCacheDuration);
+        }
+
+        /// <summary>
+        /// Default value: 50 milliseconds.
+        /// </summary>
+        public TimeSpan WaitForThrottlingInterval
+        {
+            get => this._waitForThrottlingInterval;
+            init => this._waitForThrottlingInterval = value >= TimeSpan.Zero ? value : throw new ArgumentOutOfRangeException(nameof(this.WaitForThrottlingInterval), Messages.DriverOptions_Throw_NegativeWaitForThrottlingInterval);
         }
 
         /// <summary>
