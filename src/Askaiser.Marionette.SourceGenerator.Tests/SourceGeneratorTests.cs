@@ -340,6 +340,64 @@ public partial class MyLibrary
         }
 
         [Fact]
+        public void WhenSingleImageWithoutLongNamespace_GeneratesLibrary()
+        {
+            const string userSource = @"
+namespace A.B.C.D.E.F
+{
+    [Askaiser.Marionette.ImageLibrary(""."")]
+    public partial class MyLibrary { }
+
+    public class MyClass
+    {
+        public void DoSomething()
+        {
+            var library = new MyLibrary();
+            var logo = library.Logo;
+        }
+    }
+}";
+
+            this.FileSystem.SetFileBytes("./logo.png", new byte[] { 1, 2, 3 });
+
+            var result = this.Compile(userSource);
+
+            Assert.Empty(result.Diagnostics);
+
+            var sourceFile = Assert.Single(result.SourceFiles);
+            Assert.NotNull(sourceFile);
+            Assert.Equal("A.B.C.D.E.F.MyLibrary.images.cs", sourceFile.Filename);
+
+            const string expectedSource =
+                @"// Code generated at 2021-01-01T00:00:00.0000000
+// From directory: .
+using Askaiser.Marionette;
+
+namespace A.B.C.D.E.F
+{
+    public partial class MyLibrary
+    {
+        private readonly ElementCollection _elements;
+
+        public MyLibrary()
+        {
+            this._elements = new ElementCollection();
+            this.CreateElements();
+        }
+
+        public IElement Logo => this._elements[""Root.Logo.0""];
+
+        private void CreateElements()
+        {
+            this._elements.Add(new ImageElement(""Root.Logo.0"", ""AQID"", 0.95m, false));
+        }
+    }
+}
+";
+            Assert.Equal(expectedSource, sourceFile.Code);
+        }
+
+        [Fact]
         public void WhenMultipleImagesInCurrentDirectory_GeneratesLibrary()
         {
             const string userSource = @"
