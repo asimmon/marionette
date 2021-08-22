@@ -51,5 +51,13 @@ namespace Askaiser.Marionette.SourceGenerator
             category: nameof(LibrarySourceGenerator),
             DiagnosticSeverity.Warning,
             isEnabledByDefault: true);
+
+        public static readonly DiagnosticDescriptor StaticClassNotAllowed = new DiagnosticDescriptor(
+            id: "AMSG007",
+            title: "Static modifier not allowed",
+            messageFormat: Constants.ExpectedAttributeFullName + " cannot be used on a static class.",
+            category: nameof(LibrarySourceGenerator),
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true);
     }
 }

@@ -15,6 +15,8 @@ namespace Askaiser.Marionette.SourceGenerator
 
         public string ClassName { get; set; }
 
+        public string ModifierNames { get; set; }
+
         public string ImageDirectoryPath { get; set; }
 
         public SyntaxNode SyntaxNode { get; set; }

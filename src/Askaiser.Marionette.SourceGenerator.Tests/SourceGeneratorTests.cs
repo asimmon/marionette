@@ -877,5 +877,68 @@ namespace MyCode
             Assert.Equal(DiagnosticsDescriptors.NestedClassNotAllowed.Id, warning.Id);
             Assert.Empty(result.SourceFiles);
         }
+
+        [Theory]
+        [InlineData("partial")]
+        [InlineData("public partial")]
+        [InlineData("internal partial")]
+        public void WhenMultipleMultipliers_Works(string modifiers)
+        {
+            const string userSourceFormat = @"
+namespace MyCode
+{{
+    [Askaiser.Marionette.ImageLibrary(""."")]
+    {0} class MyLibrary {{ }}
+
+    public class MyClass
+    {{
+        public void DoSomething()
+        {{
+            var library = new MyLibrary();
+            var logo = library.Logo;
+        }}
+    }}
+}}";
+
+            var userSource = string.Format(CultureInfo.InvariantCulture, userSourceFormat, modifiers);
+            this.FileSystem.SetFileBytes("./logo.png", new byte[] { 1, 2, 3 });
+
+            var result = this.Compile(userSource);
+
+            Assert.Empty(result.Diagnostics);
+
+            var sourceFile = Assert.Single(result.SourceFiles);
+            Assert.NotNull(sourceFile);
+            Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
+
+            const string expectedSourceFormat =
+                @"// Code generated at 2021-01-01T00:00:00.0000000
+// From directory: .
+using Askaiser.Marionette;
+
+namespace MyCode
+{{
+    {0} class MyLibrary
+    {{
+        private readonly ElementCollection _elements;
+
+        public MyLibrary()
+        {{
+            this._elements = new ElementCollection();
+            this.CreateElements();
+        }}
+
+        public IElement Logo => this._elements[""Root.Logo.0""];
+
+        private void CreateElements()
+        {{
+            this._elements.Add(new ImageElement(""Root.Logo.0"", ""AQID"", 0.95m, false));
+        }}
+    }}
+}}
+";
+            var expectedSource = string.Format(CultureInfo.InvariantCulture, expectedSourceFormat, modifiers);
+            Assert.Equal(expectedSource, sourceFile.Code);
+        }
     }
 }

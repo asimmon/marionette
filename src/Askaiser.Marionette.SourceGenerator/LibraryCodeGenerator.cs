@@ -140,7 +140,7 @@ namespace Askaiser.Marionette.SourceGenerator
                 cw.AppendLine();
             }
 
-            using (cw.BeginClass("public partial", className))
+            using (cw.BeginClass(this._target.ModifierNames, className))
             {
                 cw.AppendLine("private readonly ElementCollection _elements;");
                 cw.AppendLine();

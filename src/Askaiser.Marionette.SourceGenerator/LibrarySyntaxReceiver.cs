@@ -53,6 +53,12 @@ namespace Askaiser.Marionette.SourceGenerator
                 return;
             }
 
+            if (classSyntax.Modifiers.Any(SyntaxKind.StaticKeyword))
+            {
+                this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.StaticClassNotAllowed, context.Node.GetLocation()));
+                return;
+            }
+
             if (classSyntax.Parent is ClassDeclarationSyntax)
             {
                 this._diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.NestedClassNotAllowed, context.Node.GetLocation()));
@@ -67,10 +73,13 @@ namespace Askaiser.Marionette.SourceGenerator
                     validImageDirPath = Path.Combine(codeDirPath, validImageDirPath);
                 }
 
+                var modifierNames = string.Join(" ", classSyntax.Modifiers.Select(x => x.ValueText));
+
                 this._targetedClasses.Add(new TargetedClassInfo
                 {
                     ClassName = classModel.Name,
                     NamespaceName = classModel.GetNamespace(),
+                    ModifierNames = modifierNames,
                     ImageDirectoryPath = validImageDirPath,
                     SyntaxNode = context.Node,
                 });
