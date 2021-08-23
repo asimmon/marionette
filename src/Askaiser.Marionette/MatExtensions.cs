@@ -3,9 +3,9 @@ using OpenCvSharp;
 
 namespace Askaiser.Marionette
 {
-    public static class MatExtensions
+    internal static class MatExtensions
     {
-        internal static Mat ToGrayscale(this Mat mat)
+        public static Mat ToGrayscale(this Mat mat)
         {
             var channelCount = mat.Channels();
 
@@ -18,7 +18,7 @@ namespace Askaiser.Marionette
             };
         }
 
-        internal static Mat ToBGR(this Mat mat)
+        public static Mat ToBGR(this Mat mat)
         {
             var channelCount = mat.Channels();
 

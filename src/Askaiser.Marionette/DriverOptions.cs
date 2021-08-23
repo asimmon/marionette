@@ -57,6 +57,8 @@ namespace Askaiser.Marionette
         }
 
         /// <summary>
+        /// Gets or sets how long previous screenshot bytes will be reused in subsequent searches. The cache will be evicted if the current monitor is changed.
+        /// It can be useful when searching for multiple elements at the same time, but it can also make the driver miss some frames.
         /// Default value: 100 milliseconds.
         /// </summary>
         public TimeSpan ScreenshotCacheDuration
@@ -66,6 +68,7 @@ namespace Askaiser.Marionette
         }
 
         /// <summary>
+        /// When an element is not found and the driver is allowed to try again to find it, it will wait for this specific duration before retrying.
         /// Default value: 50 milliseconds.
         /// </summary>
         public TimeSpan WaitForThrottlingInterval
