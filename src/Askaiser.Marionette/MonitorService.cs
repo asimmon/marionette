@@ -87,7 +87,7 @@ namespace Askaiser.Marionette
                 await using (screenshotStream.ConfigureAwait(false))
 #endif
                 {
-                    screenshot.Save(screenshotStream, ImageFormat.Png);
+                    screenshot.Save(screenshotStream, ImageFormat.Bmp);
                     this._cachedBitmapBytes = screenshotStream.ToArray();
                     this._cacheDate = DateTime.UtcNow;
                     this._cacheMonitorIndex = monitor.Index;
@@ -112,8 +112,8 @@ namespace Askaiser.Marionette
                 return false;
             }
 
-            var isAnotherMonitor = this._cacheMonitorIndex != monitorIndex;
-            if (isAnotherMonitor)
+            var isAnotherMonitorRequested = this._cacheMonitorIndex != monitorIndex;
+            if (isAnotherMonitorRequested)
             {
                 return false;
             }
