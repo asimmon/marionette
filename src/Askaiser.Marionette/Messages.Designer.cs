@@ -286,6 +286,15 @@ namespace Askaiser.Marionette {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Provided image has {0} channels, but only one (grayscale), 3 (BGR/RGB) and 4 (BGRA/RGBA) channels are supported..
+        /// </summary>
+        internal static string MatExtensions_Throw_InvalidImageChannelCount {
+            get {
+                return ResourceManager.GetString("MatExtensions_Throw_InvalidImageChannelCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Monitor #{0} {1} {2}x{3}.
         /// </summary>
         internal static string MonitorDescription_ToString {

@@ -122,8 +122,7 @@ namespace Askaiser.Marionette
 
         private static Mat Grayscale(Mat mat)
         {
-            var isAlreadyGrayscaled = mat.Channels() == 1;
-            return isAlreadyGrayscaled ? mat : mat.CvtColor(ColorConversionCodes.BGRA2GRAY);
+            return mat.ToGrayscale();
         }
 
         private static Mat Binarize(Mat mat)

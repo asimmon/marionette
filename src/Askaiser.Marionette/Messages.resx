@@ -128,4 +128,7 @@
   <data name="ElementCollectionExtensions_Throw_UnsupportedElementType" xml:space="preserve">
     <value>Element of type '{0}' is not supported.</value>
   </data>
+  <data name="MatExtensions_Throw_InvalidImageChannelCount" xml:space="preserve">
+    <value>Provided image has {0} channels, but only one (grayscale), 3 (BGR/RGB) and 4 (BGRA/RGBA) channels are supported.</value>
+  </data>
 </root>

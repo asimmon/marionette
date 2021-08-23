@@ -15,7 +15,7 @@ namespace Askaiser.Marionette
             {
                 var imageElement = (ImageElement)element;
 
-                using var preprocessedScreenshotMat = screenshot.ToMat().ConvertAndDispose(x => imageElement.Grayscale && x.Channels() > 1 ? x.CvtColor(ColorConversionCodes.BGRA2GRAY) : x);
+                using var preprocessedScreenshotMat = screenshot.ToMat().ConvertAndDispose(x => NormalizeMatChannels(x, imageElement.Grayscale));
 
                 if (token.IsCancellationRequested)
                 {
@@ -24,7 +24,7 @@ namespace Askaiser.Marionette
 
                 using var elementTemplate = imageElement.ToBitmap()
                     .ConvertAndDispose(x => x.ToMat())
-                    .ConvertAndDispose(x => imageElement.Grayscale && x.Channels() > 1 ? x.CvtColor(ColorConversionCodes.BGRA2GRAY) : x);
+                    .ConvertAndDispose(x => NormalizeMatChannels(x, imageElement.Grayscale));
 
                 if (token.IsCancellationRequested)
                 {
@@ -66,6 +66,11 @@ namespace Askaiser.Marionette
 
             // ReSharper disable once MethodSupportsCancellation
             return await Task.Run(RecognizeInternal).ConfigureAwait(false);
+        }
+
+        private static Mat NormalizeMatChannels(Mat mat, bool isGrayscale)
+        {
+            return isGrayscale ? mat.ToGrayscale() : mat.ToBGR();
         }
     }
 }
