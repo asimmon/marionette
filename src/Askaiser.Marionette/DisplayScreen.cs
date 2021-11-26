@@ -82,6 +82,7 @@ namespace Askaiser.Marionette
             IntPtr monitorHandle,
             ref MonitorInfo monitorInfo);
 
+        [SuppressMessage("Globalization", "CA2101", Justification = "We use the strictest character mapping security by disabling BestFitMapping and enabling ThrowOnUnmappableChar")]
         [DllImport("user32.dll", CharSet = CharSet.Ansi, BestFitMapping = false, ThrowOnUnmappableChar = true)]
         private static extern bool EnumDisplaySettings(
             string deviceName,
