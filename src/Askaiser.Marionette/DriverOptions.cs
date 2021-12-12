@@ -14,6 +14,7 @@ namespace Askaiser.Marionette
         private readonly TimeSpan _waitForThrottlingInterval;
         private readonly TimeSpan _defaultWaitForDuration;
         private readonly TimeSpan _defaultKeyboardSleepAfterDuration;
+        private readonly IScreenshotProvider _screenshotProvider;
 
         public DriverOptions()
         {
@@ -24,6 +25,7 @@ namespace Askaiser.Marionette
             this._waitForThrottlingInterval = TimeSpan.FromMilliseconds(50);
             this._defaultWaitForDuration = TimeSpan.Zero;
             this._defaultKeyboardSleepAfterDuration = TimeSpan.Zero;
+            this._screenshotProvider = null;
             this.MouseSpeed = MouseSpeed.Fast;
         }
 
@@ -99,6 +101,16 @@ namespace Askaiser.Marionette
         /// Gets or sets the initial mouse speed of the driver
         /// </summary>
         public MouseSpeed MouseSpeed { get; init; }
+
+        /// <summary>
+        /// Gets or sets a way of overriding the way screenshots are retrieved. Instead of capturing your display output, you can use this interface to
+        /// provide your own implementation of what to capture screenshots, such as a mobile device, or screenshots from a video, etc.
+        /// </summary>
+        public IScreenshotProvider ScreenshotProvider
+        {
+            get => this._screenshotProvider;
+            init => this._screenshotProvider = value ?? throw new ArgumentNullException(nameof(this.ScreenshotProvider));
+        }
 
         private static string GetCurrentAssemblyDirectoryPath()
         {

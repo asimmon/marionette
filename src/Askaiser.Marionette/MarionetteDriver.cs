@@ -50,7 +50,6 @@ namespace Askaiser.Marionette
         {
             this._monitorService = monitorService;
             this._mouseController = mouseController;
-            this._disposables = disposables;
 
             this._waitForHandler = new WaitForCommandHandler(options, fileWriter, monitorService, elementRecognizer);
             this._waitForAnyHandler = new WaitForAnyCommandHandler(options, fileWriter, monitorService, elementRecognizer);
@@ -72,6 +71,17 @@ namespace Askaiser.Marionette
             this._mouseSpeed = options.MouseSpeed;
             this._defaultWaitForDuration = options.DefaultWaitForDuration;
             this._defaultKeyboardSleepAfterDuration = options.DefaultKeyboardSleepAfterDuration;
+
+            if (options.ScreenshotProvider is { } customScreenshotProvider)
+            {
+                this._monitorService.OverrideScreenshotProvider(customScreenshotProvider);
+                var disposableList = new List<IDisposable>(disposables) { customScreenshotProvider };
+                this._disposables = disposableList.ToArray();
+            }
+            else
+            {
+                this._disposables = disposables;
+            }
         }
 
         public static MarionetteDriver Create()

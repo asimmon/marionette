@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Askaiser.Marionette
 {
-    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",  Justification = "We do not use SemaphoreSlim's AvailableWaitHandle.")]
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "We do not use SemaphoreSlim's AvailableWaitHandle.")]
     internal sealed class MonitorService : IMonitorService
     {
         private readonly SemaphoreSlim _monitorsMutex = new SemaphoreSlim(1);
@@ -20,6 +20,7 @@ namespace Askaiser.Marionette
         private byte[] _cachedBitmapBytes;
         private DateTime? _cacheDate;
         private int _cacheMonitorIndex;
+        private IScreenshotProvider _customProvider;
 
         public MonitorService(TimeSpan cacheDuration)
         {
@@ -44,10 +45,24 @@ namespace Askaiser.Marionette
                     return this._monitors;
                 }
 
-                this._monitors = await DisplayScreen.GetMonitors().ConfigureAwait(false);
+                this._monitors = await this.GetMonitorsInternal().ConfigureAwait(false);
             }
 
             return this._monitors;
+        }
+
+        private async Task<MonitorDescription[]> GetMonitorsInternal()
+        {
+            if (this._customProvider is not { } customProvider)
+            {
+                return await DisplayScreen.GetMonitors().ConfigureAwait(false);
+            }
+
+            var customWidth = await customProvider.GetScreenWidth().ConfigureAwait(false);
+            var customHeight = await customProvider.GetScreenHeight().ConfigureAwait(false);
+            var customMonitor = new MonitorDescription(Index: 0, Left: 0, Top: 0, Right: customWidth, Bottom: customHeight);
+
+            return new[] { customMonitor };
         }
 
         public async Task<MonitorDescription> GetMonitor(int index)
@@ -77,7 +92,9 @@ namespace Askaiser.Marionette
                     return cachedScreenshot;
                 }
 
-                var screenshot = await ScreenshotService.Take(monitor).ConfigureAwait(false);
+                var screenshot = this._customProvider is { } customProvider
+                    ? await customProvider.GetScreenshot().ConfigureAwait(false)
+                    : await ScreenshotService.Take(monitor).ConfigureAwait(false);
 
                 var screenshotStream = new MemoryStream();
 
@@ -94,6 +111,11 @@ namespace Askaiser.Marionette
                     return screenshot;
                 }
             }
+        }
+
+        public void OverrideScreenshotProvider(IScreenshotProvider provider)
+        {
+            this._customProvider = provider;
         }
 
         private bool TryGetNonExpiredCachedBitmapClone(int monitorIndex, out Bitmap bitmap)

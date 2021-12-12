@@ -10,5 +10,7 @@ namespace Askaiser.Marionette
         public Task<MonitorDescription> GetMonitor(int index);
 
         public Task<Bitmap> GetScreenshot(MonitorDescription monitor);
+
+        public void OverrideScreenshotProvider(IScreenshotProvider provider);
     }
 }

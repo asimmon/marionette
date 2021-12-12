@@ -41,5 +41,9 @@ namespace Askaiser.Marionette.Tests
         {
             return Task.FromResult(BitmapUtils.FromBytes(this._screenshotBytes));
         }
+
+        public void OverrideScreenshotProvider(IScreenshotProvider provider)
+        {
+        }
     }
 }
