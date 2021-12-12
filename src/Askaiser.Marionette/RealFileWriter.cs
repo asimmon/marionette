@@ -13,7 +13,7 @@ namespace Askaiser.Marionette
                 await fileStream.WriteAsync(screenshotBytes, 0, screenshotBytes.Length).ConfigureAwait(false);
             }
 #else
-            Stream fileStream;
+            FileStream fileStream;
             await using ((fileStream = File.Open(path, FileMode.Create)).ConfigureAwait(false))
             {
                 await fileStream.WriteAsync(screenshotBytes).ConfigureAwait(false);
