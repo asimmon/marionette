@@ -3,13 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Askaiser.Marionette.Commands;
-
-[assembly: InternalsVisibleTo("Askaiser.Marionette.Tests")]
-[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace Askaiser.Marionette;
 
@@ -104,8 +99,7 @@ public sealed class MarionetteDriver : IDisposable
 
     public async Task<MonitorDescription> GetCurrentMonitor()
     {
-        var monitors = await this.GetMonitors().ConfigureAwait(false);
-        return monitors.FirstOrDefault(x => x.Index == this._monitorIndex);
+        return await this._monitorService.GetMonitor(this._monitorIndex).ConfigureAwait(false);
     }
 
     public async Task<Bitmap> GetScreenshot()
@@ -119,7 +113,7 @@ public sealed class MarionetteDriver : IDisposable
         return this._mouseController.GetCurrentPosition();
     }
 
-    internal async Task<SearchResult> WaitFor(IElement element, TimeSpan? waitFor, Rectangle searchRect, NoSingleResultBehavior noSingleResultBehavior)
+    internal async Task<SearchResult> WaitFor(IElement element, TimeSpan? waitFor, Rectangle? searchRect, NoSingleResultBehavior noSingleResultBehavior)
     {
         if (element == null)
         {
@@ -130,12 +124,12 @@ public sealed class MarionetteDriver : IDisposable
         return await this._waitForHandler.Execute(new WaitForCommand(new[] { element }, effectiveWaitFor, searchRect, this._monitorIndex, noSingleResultBehavior)).ConfigureAwait(false);
     }
 
-    public async Task<SearchResult> WaitFor(IElement element, TimeSpan? waitFor = default, Rectangle searchRect = default)
+    public async Task<SearchResult> WaitFor(IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
         return await this.WaitFor(element, waitFor, searchRect, NoSingleResultBehavior.Throw).ConfigureAwait(false);
     }
 
-    internal async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect, NoSingleResultBehavior noSingleResultBehavior)
+    internal async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect, NoSingleResultBehavior noSingleResultBehavior)
     {
         if (elements == null)
         {
@@ -152,12 +146,12 @@ public sealed class MarionetteDriver : IDisposable
         return await this._waitForAnyHandler.Execute(new WaitForCommand(enumeratedElements, effectiveWaitFor, searchRect, this._monitorIndex, noSingleResultBehavior)).ConfigureAwait(false);
     }
 
-    public async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle searchRect = default)
+    public async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
         return await this.WaitForAny(elements, waitFor, searchRect, NoSingleResultBehavior.Throw).ConfigureAwait(false);
     }
 
-    internal async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect, NoSingleResultBehavior noSingleResultBehavior)
+    internal async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect, NoSingleResultBehavior noSingleResultBehavior)
     {
         if (elements == null)
         {
@@ -174,7 +168,7 @@ public sealed class MarionetteDriver : IDisposable
         return await this._waitForAllHandler.Execute(new WaitForCommand(enumeratedElements, effectiveWaitFor, searchRect, this._monitorIndex, noSingleResultBehavior)).ConfigureAwait(false);
     }
 
-    public async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle searchRect = default)
+    public async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
         return await this.WaitForAll(elements, waitFor, searchRect, NoSingleResultBehavior.Throw).ConfigureAwait(false);
     }
@@ -240,17 +234,17 @@ public sealed class MarionetteDriver : IDisposable
         }
     }
 
-    public Task ScrollUpUntilVisible(IElement element, TimeSpan waitFor, int scrollTicks = 1, Rectangle searchRect = default)
+    public Task ScrollUpUntilVisible(IElement element, TimeSpan waitFor, int scrollTicks = 1, Rectangle? searchRect = default)
     {
         return this.ScrollUntilVisible(element, waitFor, isUp: true, scrollTicks, searchRect);
     }
 
-    public Task ScrollDownUntilVisible(IElement element, TimeSpan waitFor, int scrollTicks = 1, Rectangle searchRect = default)
+    public Task ScrollDownUntilVisible(IElement element, TimeSpan waitFor, int scrollTicks = 1, Rectangle? searchRect = default)
     {
         return this.ScrollUntilVisible(element, waitFor, isUp: false, scrollTicks, searchRect);
     }
 
-    private async Task ScrollUntilVisible(IElement element, TimeSpan waitFor, bool isUp, int scrollTicks, Rectangle searchRect)
+    private async Task ScrollUntilVisible(IElement element, TimeSpan waitFor, bool isUp, int scrollTicks, Rectangle? searchRect)
     {
         if (waitFor <= TimeSpan.Zero)
         {

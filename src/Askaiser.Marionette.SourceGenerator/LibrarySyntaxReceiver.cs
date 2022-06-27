@@ -75,14 +75,7 @@ public class LibrarySyntaxReceiver : ISyntaxContextReceiver
 
             var modifierNames = string.Join(" ", classSyntax.Modifiers.Select(x => x.ValueText));
 
-            this._targetedClasses.Add(new TargetedClassInfo
-            {
-                ClassName = classModel.Name,
-                NamespaceName = classModel.GetNamespace(),
-                ModifierNames = modifierNames,
-                ImageDirectoryPath = validImageDirPath,
-                SyntaxNode = context.Node,
-            });
+            this._targetedClasses.Add(new TargetedClassInfo(classModel.Name, classModel.GetNamespace(), modifierNames, validImageDirPath, context.Node));
         }
         else
         {
@@ -90,7 +83,7 @@ public class LibrarySyntaxReceiver : ISyntaxContextReceiver
         }
     }
 
-    private static AttributeData FindImageLibraryAttribute(ISymbol symbol)
+    private static AttributeData? FindImageLibraryAttribute(ISymbol symbol)
     {
         return symbol.GetAttributes().FirstOrDefault(IsImageLibraryAttribute);
     }
@@ -117,7 +110,7 @@ public class LibrarySyntaxReceiver : ISyntaxContextReceiver
 
     private static bool TryValidatePath(string rawPath, out string validPath)
     {
-        validPath = null;
+        validPath = string.Empty;
 
         if (rawPath.Trim() is not { Length: > 0 } trimmedPath)
         {

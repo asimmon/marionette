@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Askaiser.Marionette.Commands;
 
-internal record WaitForCommand(IReadOnlyCollection<IElement> Elements, TimeSpan WaitFor, Rectangle SearchRectangle, int MonitorIndex, NoSingleResultBehavior Behavior);
+internal record WaitForCommand(IReadOnlyCollection<IElement> Elements, TimeSpan WaitFor, Rectangle? SearchRectangle, int MonitorIndex, NoSingleResultBehavior Behavior);
 
 internal record MouseLocationCommand(int X, int Y, MouseSpeed Speed);
 

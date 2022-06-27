@@ -1,4 +1,6 @@
-﻿using System;
+﻿#pragma warning disable CS8618
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -55,7 +57,7 @@ internal static class DisplayScreen
 
         if (monitors.Count == 0)
         {
-            throw new InvalidOperationException("No monitors were found.");
+            return monitors;
         }
 
         for (var index = 0; index < monitors.Count; index++)

@@ -16,7 +16,7 @@ internal sealed class MonitorService : IMonitorService
     private readonly SemaphoreSlim _screenshotMutex = new SemaphoreSlim(1);
 
     private readonly TimeSpan _cacheDuration;
-    private MonitorDescription[] _monitors;
+    private MonitorDescription[]? _monitors;
     private byte[] _cachedBitmapBytes;
     private DateTime? _cacheDate;
     private int _cacheMonitorIndex;
@@ -25,7 +25,7 @@ internal sealed class MonitorService : IMonitorService
     {
         this._cacheDuration = cacheDuration;
         this._monitors = null;
-        this._cachedBitmapBytes = null;
+        this._cachedBitmapBytes = Array.Empty<byte>();
         this._cacheDate = null;
         this._cacheMonitorIndex = 0;
     }
@@ -65,14 +65,14 @@ internal sealed class MonitorService : IMonitorService
 
     public async Task<Bitmap> GetScreenshot(MonitorDescription monitor)
     {
-        if (this.TryGetNonExpiredCachedBitmapClone(monitor.Index, out var cachedScreenshot))
+        if (this.TryGetNonExpiredCachedBitmapClone(monitor.Index, out var cachedScreenshot) && cachedScreenshot != null)
         {
             return cachedScreenshot;
         }
 
         using (await SemaphoreWaiter.EnterAsync(this._screenshotMutex).ConfigureAwait(false))
         {
-            if (this.TryGetNonExpiredCachedBitmapClone(monitor.Index, out cachedScreenshot))
+            if (this.TryGetNonExpiredCachedBitmapClone(monitor.Index, out cachedScreenshot) && cachedScreenshot != null)
             {
                 return cachedScreenshot;
             }
@@ -96,7 +96,7 @@ internal sealed class MonitorService : IMonitorService
         }
     }
 
-    private bool TryGetNonExpiredCachedBitmapClone(int monitorIndex, out Bitmap bitmap)
+    private bool TryGetNonExpiredCachedBitmapClone(int monitorIndex, out Bitmap? bitmap)
     {
         bitmap = default;
 
@@ -106,8 +106,7 @@ internal sealed class MonitorService : IMonitorService
             return false;
         }
 
-        var isCacheEmpty = !this._cacheDate.HasValue;
-        if (isCacheEmpty)
+        if (!this._cacheDate.HasValue)
         {
             return false;
         }

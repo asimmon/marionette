@@ -6,8 +6,8 @@ namespace Askaiser.Marionette;
 [DebuggerDisplay("{Name}")]
 public sealed class TextElement : IElement
 {
-    private readonly string _name;
-    private readonly string _content;
+    private readonly string _name = string.Empty;
+    private readonly string _content = string.Empty;
 
     public TextElement(string name, string content, TextOptions options)
     {

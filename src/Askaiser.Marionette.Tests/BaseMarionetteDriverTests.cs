@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿#pragma warning disable CS8618
+
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Askaiser.Marionette.Tests;
@@ -29,7 +31,7 @@ public class BaseMarionetteDriverTests : IAsyncLifetime
         this.KeyboardController = new FakeKeyboardController();
     }
 
-    protected MarionetteDriver CreateDriver(DriverOptions options = null)
+    protected MarionetteDriver CreateDriver(DriverOptions? options = null)
     {
         options ??= new DriverOptions();
 
@@ -41,7 +43,7 @@ public class BaseMarionetteDriverTests : IAsyncLifetime
         return Task.CompletedTask;
     }
 
-    protected static void AssertSearchResult(SearchResult expected, SearchResult actual, Rectangle searchRect = null)
+    protected static void AssertSearchResult(SearchResult expected, SearchResult actual, Rectangle? searchRect = null)
     {
         Assert.NotNull(actual);
         Assert.NotNull(expected);

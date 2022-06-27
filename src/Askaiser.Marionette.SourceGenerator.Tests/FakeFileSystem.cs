@@ -22,6 +22,7 @@ public class FakeFileSystem : IFileSystem
     }
 
     public FakeFileSystem(params string[] entries)
+        : this()
     {
         this.AddEntries(entries);
     }
@@ -100,20 +101,20 @@ public class FakeFileSystem : IFileSystem
 
     public byte[] GetFileBytes(string path)
     {
-        return this.TryGetFile(path, out var file) ? file.Bytes : Array.Empty<byte>();
+        return this.TryGetFile(path, out var file) && file != null ? file.Bytes : Array.Empty<byte>();
     }
 
     public void SetFileBytes(string path, byte[] bytes)
     {
         this.AddEntry(path);
 
-        if (this.TryGetFile(path, out var file))
+        if (this.TryGetFile(path, out var file) && file != null)
         {
             file.Bytes = bytes;
         }
     }
 
-    private bool TryGetFile(string path, out FakeFileInfo file)
+    private bool TryGetFile(string path, out FakeFileInfo? file)
     {
         file = null;
 
@@ -138,7 +139,7 @@ public class FakeFileSystem : IFileSystem
         public FakeFileInfo(string path)
         {
             this.Path = path ?? throw new ArgumentNullException(nameof(path));
-            this.Bytes = Array.Empty<byte>();
+            this._bytes = Array.Empty<byte>();
         }
 
         public string Path { get; }
@@ -154,7 +155,7 @@ public class FakeFileSystem : IFileSystem
             return this.Path == other.Path;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || (obj is FakeFileInfo other && this.Equals(other));
         }

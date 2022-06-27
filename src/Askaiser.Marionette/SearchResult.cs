@@ -50,7 +50,7 @@ public class SearchResult : IEnumerable<Rectangle>
         return new SearchResult(this.Element, newLocations);
     }
 
-    internal SearchResult AdjustToSearchRectangle(Rectangle rect)
+    internal SearchResult AdjustToSearchRectangle(Rectangle? rect)
     {
         if (rect == null)
         {

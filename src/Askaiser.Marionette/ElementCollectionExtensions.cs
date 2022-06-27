@@ -14,7 +14,7 @@ public static class ElementCollectionExtensions
 {
     public static async Task LoadAsync(this ElementCollection elements, Stream stream)
     {
-        JsonDocument jsonDocument = null;
+        JsonDocument? jsonDocument = null;
 
         try
         {
@@ -86,7 +86,7 @@ public static class ElementCollectionExtensions
             {
                 ImageElement imageElement => new JsonImageElement(imageElement),
                 TextElement textElement => new JsonTextElement(textElement),
-                _ => throw new NotSupportedException(Messages.ElementCollectionExtensions_Throw_UnsupportedElementType.FormatInvariant(element.GetType().FullName)),
+                _ => throw new NotSupportedException(Messages.ElementCollectionExtensions_Throw_UnsupportedElementType.FormatInvariant(element.GetType().FullName ?? "unknown")),
             };
 
             jsonElements.Add(jsonElement);
@@ -127,7 +127,7 @@ public static class ElementCollectionExtensions
     {
 #if NETSTANDARD2_0
         var json = element.GetRawText();
-        return JsonSerializer.Deserialize<T>(json);
+        return JsonSerializer.Deserialize<T>(json) ?? throw new InvalidOperationException("Cound not deserialize JSON element");
 #else
         var bufferWriter = new ArrayBufferWriter<byte>();
         using (var writer = new Utf8JsonWriter(bufferWriter))
@@ -135,7 +135,7 @@ public static class ElementCollectionExtensions
             element.WriteTo(writer);
         }
 
-        return JsonSerializer.Deserialize<T>(bufferWriter.WrittenSpan);
+        return JsonSerializer.Deserialize<T>(bufferWriter.WrittenSpan) ?? throw new InvalidOperationException("Cound not deserialize JSON element");
 #endif
     }
 }

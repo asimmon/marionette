@@ -55,12 +55,12 @@ internal sealed class CodeWriter
 
     public IDisposable BeginClass(string modifier, string name)
     {
-        if ((modifier = modifier?.Trim()) is not { Length: > 0 })
+        if ((modifier = modifier.Trim()) is not { Length: > 0 })
         {
             throw new ArgumentException(nameof(modifier));
         }
 
-        if ((name = name?.Trim()) is not { Length: > 0 })
+        if ((name = name.Trim()) is not { Length: > 0 })
         {
             throw new ArgumentException(nameof(name));
         }
@@ -74,7 +74,7 @@ internal sealed class CodeWriter
 
     public IDisposable BeginNamespace(string name)
     {
-        if ((name = name?.Trim()) is not { Length: > 0 })
+        if ((name = name.Trim()) is not { Length: > 0 })
         {
             throw new ArgumentException(nameof(name));
         }

@@ -20,7 +20,7 @@ public sealed class ElementCollection : IEnumerable<IElement>
 
     public IElement this[string name]
     {
-        get => this.TryGetValue(name, out var element) ? element : throw new ArgumentException(Messages.Element_Throw_ElementNotFound.FormatInvariant(name), nameof(name));
+        get => this.TryGetValue(name, out var element) && element != null ? element : throw new ArgumentException(Messages.Element_Throw_ElementNotFound.FormatInvariant(name), nameof(name));
     }
 
     public void Add(IElement element)
@@ -68,7 +68,7 @@ public sealed class ElementCollection : IEnumerable<IElement>
         this._elements.Clear();
     }
 
-    public bool TryGetValue(string name, out IElement value)
+    public bool TryGetValue(string name, out IElement? value)
     {
         return this._elements.TryGetValue(name, out value);
     }

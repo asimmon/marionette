@@ -171,7 +171,7 @@ internal sealed class TextElementRecognizer : IElementRecognizer, IDisposable
         private readonly string _searchedText;
         private readonly List<Rectangle> _confirmedResults;
         private readonly Func<char, char, bool> _charEquals;
-        private Rectangle _currentResult;
+        private Rectangle? _currentResult;
         private int _characterIndex;
 
         private TesseractResultHandler(ResultIterator iterator, TextElement element, CancellationToken token)
@@ -219,7 +219,7 @@ internal sealed class TextElementRecognizer : IElementRecognizer, IDisposable
         {
             this.HandleBeginningOfNewWord();
 
-            if (this.TryGetNextSymbolRectangle(out var symbolRectangle))
+            if (this.TryGetNextSymbolRectangle(out var symbolRectangle) && symbolRectangle != null)
             {
                 this.AppendSymbolRectangleToCurrentResult(symbolRectangle);
             }
@@ -248,7 +248,7 @@ internal sealed class TextElementRecognizer : IElementRecognizer, IDisposable
             this._currentResult = null;
         }
 
-        private bool TryGetNextSymbolRectangle(out Rectangle symbolRectangle)
+        private bool TryGetNextSymbolRectangle(out Rectangle? symbolRectangle)
         {
             symbolRectangle = default;
 

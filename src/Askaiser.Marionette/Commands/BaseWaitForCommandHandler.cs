@@ -38,7 +38,7 @@ internal abstract class BaseWaitForCommandHandler
         var searchRect = AdjustSearchRectangleRelativeToMonitorSize(monitor, command.SearchRectangle);
         var watch = Stopwatch.StartNew();
 
-        RecognizerSearchResult recognizerResult = null;
+        RecognizerSearchResult? recognizerResult = null;
         do
         {
             if (token.IsCancellationRequested)
@@ -84,7 +84,7 @@ internal abstract class BaseWaitForCommandHandler
         return RecognizerSearchResult.NotFound(recognizerResult?.TransformedScreenshot, element);
     }
 
-    private static Rectangle AdjustSearchRectangleRelativeToMonitorSize(MonitorDescription monitor, Rectangle searchRect)
+    private static Rectangle? AdjustSearchRectangleRelativeToMonitorSize(MonitorDescription monitor, Rectangle? searchRect)
     {
         if (searchRect == null)
         {
@@ -97,7 +97,7 @@ internal abstract class BaseWaitForCommandHandler
         return new Rectangle(offsetLeft, offsetTop, offsetLeft + searchRect.Width, offsetTop + searchRect.Height);
     }
 
-    private async Task<Bitmap> GetScreenshot(MonitorDescription monitor, Rectangle searchRect)
+    private async Task<Bitmap> GetScreenshot(MonitorDescription monitor, Rectangle? searchRect)
     {
         var screenshot = await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
         if (searchRect == null)

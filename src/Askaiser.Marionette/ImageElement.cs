@@ -8,8 +8,8 @@ public sealed class ImageElement : IElement
 {
     internal const decimal DefaultThreshold = 0.95m;
 
-    private readonly string _name;
-    private readonly byte[] _content;
+    private readonly string _name = string.Empty;
+    private readonly byte[] _content = Array.Empty<byte>();
     private readonly decimal _threshold;
 
     public ImageElement(string name, string base64Content, decimal threshold, bool grayscale)

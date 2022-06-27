@@ -6,14 +6,14 @@ namespace Askaiser.Marionette.SourceGenerator;
 
 internal class GeneratedLibrary
 {
-    private readonly GeneratedLibrary _parent;
+    private readonly GeneratedLibrary? _parent;
 
     public GeneratedLibrary(string name)
         : this(name, null)
     {
     }
 
-    private GeneratedLibrary(string name, GeneratedLibrary parent)
+    private GeneratedLibrary(string name, GeneratedLibrary? parent)
     {
         this.Name = name.ToCSharpPropertyName();
         this.Level = parent?.Level + 1 ?? 0;

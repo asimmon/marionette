@@ -115,7 +115,7 @@ public class LibraryCodeGenerator
         cw.AppendLine("#nullable enable");
         cw.AppendLine();
 
-        IDisposable namespaceBlock = null;
+        IDisposable? namespaceBlock = null;
         try
         {
             if (!string.IsNullOrWhiteSpace(this._target.NamespaceName))

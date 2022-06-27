@@ -9,7 +9,7 @@ public sealed class DriverOptions
 
     private readonly string _tesseractDataPath;
     private readonly string _tesseractLanguage;
-    private readonly string _failureScreenshotPath;
+    private readonly string? _failureScreenshotPath;
     private readonly TimeSpan _screenshotCacheDuration;
     private readonly TimeSpan _waitForThrottlingInterval;
     private readonly TimeSpan _defaultWaitForDuration;
@@ -50,7 +50,7 @@ public sealed class DriverOptions
     /// The directory path where screenshots can be saved when an element recognition fails.
     /// Default value: null, no screenshots are saved.
     /// </summary>
-    public string FailureScreenshotPath
+    public string? FailureScreenshotPath
     {
         get => this._failureScreenshotPath;
         init => this._failureScreenshotPath = value?.Trim() is { Length: > 0 } trimmedValue ? trimmedValue : throw new ArgumentException(nameof(this.FailureScreenshotPath));

@@ -4,20 +4,25 @@ namespace Askaiser.Marionette.SourceGenerator;
 
 public sealed class TargetedClassInfo
 {
-    public TargetedClassInfo()
+    public TargetedClassInfo(string className, string namespaceName, string modifierNames, string imageDirectoryPath, SyntaxNode syntaxNode)
     {
         this.MaxImageSize = Constants.DefaultMaxImageSize;
+        this.ClassName = className;
+        this.NamespaceName = namespaceName;
+        this.ModifierNames = modifierNames;
+        this.ImageDirectoryPath = imageDirectoryPath;
+        this.SyntaxNode = syntaxNode;
     }
 
-    public long MaxImageSize { get; set; }
+    public long MaxImageSize { get; }
 
-    public string NamespaceName { get; set; }
+    public string NamespaceName { get; }
 
-    public string ClassName { get; set; }
+    public string ClassName { get; }
 
-    public string ModifierNames { get; set; }
+    public string ModifierNames { get; }
 
-    public string ImageDirectoryPath { get; set; }
+    public string ImageDirectoryPath { get; }
 
-    public SyntaxNode SyntaxNode { get; set; }
+    public SyntaxNode SyntaxNode { get; }
 }
