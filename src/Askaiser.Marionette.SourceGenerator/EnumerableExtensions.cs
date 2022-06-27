@@ -1,17 +1,16 @@
 ﻿using System.Collections.Generic;
 
-namespace Askaiser.Marionette.SourceGenerator
+namespace Askaiser.Marionette.SourceGenerator;
+
+internal static class EnumerableExtensions
 {
-    internal static class EnumerableExtensions
+    public static IEnumerable<string> TrimAndRemoveEmptyEntries(this IEnumerable<string> elements)
     {
-        public static IEnumerable<string> TrimAndRemoveEmptyEntries(this IEnumerable<string> elements)
+        foreach (var element in elements)
         {
-            foreach (var element in elements)
+            if (element.Trim() is { Length: > 0 } trimmedElement)
             {
-                if (element.Trim() is { Length: > 0 } trimmedElement)
-                {
-                    yield return trimmedElement;
-                }
+                yield return trimmedElement;
             }
         }
     }

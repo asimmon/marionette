@@ -9,15 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Askaiser.Marionette.SourceGenerator\Askaiser.Marionette.SourceGenerator.csproj" PrivateAssets="All"/>
+    <ProjectReference Include="..\Askaiser.Marionette.SourceGenerator\Askaiser.Marionette.SourceGenerator.csproj" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenCvSharp4" Version="4.5.2.20210404"/>
-    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.5.2.20210404"/>
-    <PackageReference Include="System.Text.Json" Version="6.0.0" Condition=" '$(TargetFramework)' != 'net6.0' "/>
-    <PackageReference Include="Tesseract" Version="4.1.1" IncludeAssets="All" PrivateAssets="None"/>
-    <PackageReference Include="Tesseract.Drawing" Version="4.1.1"/>
+    <PackageReference Include="OpenCvSharp4" Version="4.5.2.20210404" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.5.2.20210404" />
+    <PackageReference Include="System.Text.Json" Version="6.0.0" Condition=" '$(TargetFramework)' != 'net6.0' " />
+    <PackageReference Include="Tesseract" Version="4.1.1" IncludeAssets="All" PrivateAssets="None" />
+    <PackageReference Include="Tesseract.Drawing" Version="4.1.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -51,7 +51,7 @@
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
     <ItemGroup>
-      <_ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')-&gt;WithMetadataValue('PrivateAssets', 'All'))"/>
+      <_ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')-&gt;WithMetadataValue('PrivateAssets', 'All'))" />
     </ItemGroup>
 
     <!-- Prevent copying the source generator files multiple times (for each targeted framework) -->

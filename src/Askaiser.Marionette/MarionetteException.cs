@@ -1,12 +1,11 @@
 ﻿using System;
 
-namespace Askaiser.Marionette
+namespace Askaiser.Marionette;
+
+public abstract class MarionetteException : Exception
 {
-    public abstract class MarionetteException : Exception
+    protected MarionetteException(string message)
+        : base(message)
     {
-        protected MarionetteException(string message)
-            : base(message)
-        {
-        }
     }
 }

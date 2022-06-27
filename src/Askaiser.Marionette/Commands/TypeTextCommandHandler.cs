@@ -1,19 +1,18 @@
 ﻿using System.Threading.Tasks;
 
-namespace Askaiser.Marionette.Commands
+namespace Askaiser.Marionette.Commands;
+
+internal class TypeTextCommandHandler
 {
-    internal class TypeTextCommandHandler
+    private readonly IKeyboardController _keyboardController;
+
+    public TypeTextCommandHandler(IKeyboardController keyboardController)
     {
-        private readonly IKeyboardController _keyboardController;
+        this._keyboardController = keyboardController;
+    }
 
-        public TypeTextCommandHandler(IKeyboardController keyboardController)
-        {
-            this._keyboardController = keyboardController;
-        }
-
-        public async Task Execute(KeyboardTextCommand command)
-        {
-            await this._keyboardController.TypeText(command.Text).ConfigureAwait(false);
-        }
+    public async Task Execute(KeyboardTextCommand command)
+    {
+        await this._keyboardController.TypeText(command.Text).ConfigureAwait(false);
     }
 }

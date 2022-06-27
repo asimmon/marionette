@@ -1,14 +1,13 @@
 ﻿using System.Threading.Tasks;
 
-namespace Askaiser.Marionette.Commands
-{
-    internal class DropLocationCommandHandler : BaseClickLocationCommandHandler
-    {
-        public DropLocationCommandHandler(IMouseController mouseController)
-            : base(mouseController)
-        {
-        }
+namespace Askaiser.Marionette.Commands;
 
-        public override Task Execute(MouseLocationCommand command) => Execute(command, this.MouseController.DropTo);
+internal class DropLocationCommandHandler : BaseClickLocationCommandHandler
+{
+    public DropLocationCommandHandler(IMouseController mouseController)
+        : base(mouseController)
+    {
     }
+
+    public override Task Execute(MouseLocationCommand command) => Execute(command, this.MouseController.DropTo);
 }

@@ -1,9 +1,8 @@
 using System;
 
-namespace Askaiser.Marionette.SourceGenerator
+namespace Askaiser.Marionette.SourceGenerator;
+
+internal interface IDateTimeProvider
 {
-    internal interface IDateTimeProvider
-    {
-        public DateTime Now { get; }
-    }
+    public DateTime Now { get; }
 }

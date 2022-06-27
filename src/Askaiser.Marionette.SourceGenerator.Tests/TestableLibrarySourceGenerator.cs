@@ -1,27 +1,26 @@
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace Askaiser.Marionette.SourceGenerator.Tests
+namespace Askaiser.Marionette.SourceGenerator.Tests;
+
+public class TestableLibrarySourceGenerator : LibrarySourceGenerator
 {
-    public class TestableLibrarySourceGenerator : LibrarySourceGenerator
+    private readonly List<GeneratedSourceFile> _generatedSources;
+
+    internal TestableLibrarySourceGenerator(IFileSystem fileSystem, IDateTimeProvider dateTimeProvider)
+        : base(fileSystem, dateTimeProvider)
     {
-        private readonly List<GeneratedSourceFile> _generatedSources;
+        this._generatedSources = new List<GeneratedSourceFile>();
+    }
 
-        internal TestableLibrarySourceGenerator(IFileSystem fileSystem, IDateTimeProvider dateTimeProvider)
-            : base(fileSystem, dateTimeProvider)
-        {
-            this._generatedSources = new List<GeneratedSourceFile>();
-        }
+    public IReadOnlyList<GeneratedSourceFile> GeneratedSources
+    {
+        get => this._generatedSources;
+    }
 
-        public IReadOnlyList<GeneratedSourceFile> GeneratedSources
-        {
-            get => this._generatedSources;
-        }
-
-        protected override void AddSource(GeneratorExecutionContext context, CodeGeneratorResult result)
-        {
-            base.AddSource(context, result);
-            this._generatedSources.Add(new GeneratedSourceFile(result.Filename, result.Code));
-        }
+    protected override void AddSource(GeneratorExecutionContext context, CodeGeneratorResult result)
+    {
+        base.AddSource(context, result);
+        this._generatedSources.Add(new GeneratedSourceFile(result.Filename, result.Code));
     }
 }

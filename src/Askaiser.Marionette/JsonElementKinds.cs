@@ -1,8 +1,7 @@
-﻿namespace Askaiser.Marionette
+﻿namespace Askaiser.Marionette;
+
+internal static class JsonElementKinds
 {
-    internal static class JsonElementKinds
-    {
-        public const string Image = "image";
-        public const string Text = "text";
-    }
+    public const string Image = "image";
+    public const string Text = "text";
 }

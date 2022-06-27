@@ -3,115 +3,115 @@ using System.Globalization;
 using Microsoft.CodeAnalysis;
 using Xunit;
 
-namespace Askaiser.Marionette.SourceGenerator.Tests
+namespace Askaiser.Marionette.SourceGenerator.Tests;
+
+public class SourceGeneratorTests : BaseSourceGeneratorTest
 {
-    public class SourceGeneratorTests : BaseSourceGeneratorTest
+    private static readonly string AssemblyVersion = typeof(SourceGeneratorTests).Assembly.GetName().Version?.ToString() ?? "1.0.0.0";
+
+    [Fact]
+    public void NoSourceCode_GeneratesNothing()
     {
-        private static readonly string AssemblyVersion = typeof(SourceGeneratorTests).Assembly.GetName().Version?.ToString() ?? "1.0.0.0";
+        var result = this.Compile(string.Empty);
 
-        [Fact]
-        public void NoSourceCode_GeneratesNothing()
-        {
-            var result = this.Compile(string.Empty);
+        Assert.Empty(result.Diagnostics);
+        Assert.Empty(result.SourceFiles);
+    }
 
-            Assert.Empty(result.Diagnostics);
-            Assert.Empty(result.SourceFiles);
-        }
-
-        [Fact]
-        public void PartialClassWithoutAttribute_GeneratesNothing()
-        {
-            const string userSource = @"
+    [Fact]
+    public void PartialClassWithoutAttribute_GeneratesNothing()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     public partial class MyLibrary { }
 }";
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics);
-            Assert.Empty(result.SourceFiles);
-        }
+        Assert.Empty(result.Diagnostics);
+        Assert.Empty(result.SourceFiles);
+    }
 
-        [Fact]
-        public void NotPartialClassWithAttribute_GeneratesNothing()
-        {
-            const string userSource = @"
+    [Fact]
+    public void NotPartialClassWithAttribute_GeneratesNothing()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     [Askaiser.Marionette.ImageLibrary(""ignored"")]
     public class MyLibrary { }
 }";
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            var warning = Assert.Single(result.Diagnostics);
-            Assert.NotNull(warning);
-            Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
-            Assert.Equal(DiagnosticsDescriptors.MissingPartialModifier.Id, warning.Id);
-            Assert.Empty(result.SourceFiles);
-        }
+        var warning = Assert.Single(result.Diagnostics);
+        Assert.NotNull(warning);
+        Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
+        Assert.Equal(DiagnosticsDescriptors.MissingPartialModifier.Id, warning.Id);
+        Assert.Empty(result.SourceFiles);
+    }
 
-        [Fact]
-        public void WhenNullImageLibraryPath_GeneratesNothing()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenNullImageLibraryPath_GeneratesNothing()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     [Askaiser.Marionette.ImageLibrary(null)]
     public partial class MyLibrary { }
 }";
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            var warning = Assert.Single(result.Diagnostics);
-            Assert.NotNull(warning);
-            Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
-            Assert.Equal(DiagnosticsDescriptors.InvalidDirectoryPath.Id, warning.Id);
+        var warning = Assert.Single(result.Diagnostics);
+        Assert.NotNull(warning);
+        Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
+        Assert.Equal(DiagnosticsDescriptors.InvalidDirectoryPath.Id, warning.Id);
 
-            Assert.Empty(result.SourceFiles);
-        }
+        Assert.Empty(result.SourceFiles);
+    }
 
-        [Fact]
-        public void WhenEmptyImageLibraryPath_GeneratesNothing()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenEmptyImageLibraryPath_GeneratesNothing()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     [Askaiser.Marionette.ImageLibrary("""")]
     public partial class MyLibrary { }
 }";
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            var warning = Assert.Single(result.Diagnostics);
-            Assert.NotNull(warning);
-            Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
-            Assert.Equal(DiagnosticsDescriptors.InvalidDirectoryPath.Id, warning.Id);
+        var warning = Assert.Single(result.Diagnostics);
+        Assert.NotNull(warning);
+        Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
+        Assert.Equal(DiagnosticsDescriptors.InvalidDirectoryPath.Id, warning.Id);
 
-            Assert.Empty(result.SourceFiles);
-        }
+        Assert.Empty(result.SourceFiles);
+    }
 
-        [Fact]
-        public void WhenNoImagesInCurrentDirectory_GeneratesEmptyLibrary()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenNoImagesInCurrentDirectory_GeneratesEmptyLibrary()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 }";
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics);
+        Assert.Empty(result.Diagnostics);
 
-            var sourceFile = Assert.Single(result.SourceFiles);
-            Assert.NotNull(sourceFile);
-            Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
+        var sourceFile = Assert.Single(result.SourceFiles);
+        Assert.NotNull(sourceFile);
+        Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
 
-            var expectedSource =
-                @"// Code generated at 2021-01-01T00:00:00.0000000
+        var expectedSource =
+            @"// Code generated at 2021-01-01T00:00:00.0000000
 // From directory: .
 // <auto-generated/>
 #nullable enable
@@ -137,13 +137,13 @@ namespace MyCode
     }
 }
 ";
-            Assert.Equal(expectedSource, sourceFile.Code);
-        }
+        Assert.Equal(expectedSource, sourceFile.Code);
+    }
 
-        [Fact]
-        public void WhenReferencedEmptyImage_GeneratesEmptyLibrary_AndDoesNotCompile()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenReferencedEmptyImage_GeneratesEmptyLibrary_AndDoesNotCompile()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     [Askaiser.Marionette.ImageLibrary(""."")]
@@ -159,21 +159,21 @@ namespace MyCode
     }
 }";
 
-            this.FileSystem.SetFileBytes("./logo.png", Array.Empty<byte>());
+        this.FileSystem.SetFileBytes("./logo.png", Array.Empty<byte>());
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            var error = Assert.Single(result.Diagnostics);
-            Assert.NotNull(error);
-            Assert.Equal("CS1061", error.Id);
-            Assert.Equal(DiagnosticSeverity.Error, error.Severity);
+        var error = Assert.Single(result.Diagnostics);
+        Assert.NotNull(error);
+        Assert.Equal("CS1061", error.Id);
+        Assert.Equal(DiagnosticSeverity.Error, error.Severity);
 
-            var sourceFile = Assert.Single(result.SourceFiles);
-            Assert.NotNull(sourceFile);
-            Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
+        var sourceFile = Assert.Single(result.SourceFiles);
+        Assert.NotNull(sourceFile);
+        Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
 
-            var expectedSource =
-                @"// Code generated at 2021-01-01T00:00:00.0000000
+        var expectedSource =
+            @"// Code generated at 2021-01-01T00:00:00.0000000
 // From directory: .
 // <auto-generated/>
 #nullable enable
@@ -199,31 +199,31 @@ namespace MyCode
     }
 }
 ";
-            Assert.Equal(expectedSource, sourceFile.Code);
-        }
+        Assert.Equal(expectedSource, sourceFile.Code);
+    }
 
-        [Fact]
-        public void WhenNotAnImageInCurrentDirectory_GeneratesEmptyLibrary()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenNotAnImageInCurrentDirectory_GeneratesEmptyLibrary()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 }";
 
-            this.FileSystem.SetFileBytes("./readme.md", new byte[] { 0 });
+        this.FileSystem.SetFileBytes("./readme.md", new byte[] { 0 });
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics);
+        Assert.Empty(result.Diagnostics);
 
-            var sourceFile = Assert.Single(result.SourceFiles);
-            Assert.NotNull(sourceFile);
-            Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
+        var sourceFile = Assert.Single(result.SourceFiles);
+        Assert.NotNull(sourceFile);
+        Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
 
-            var expectedSource =
-                @"// Code generated at 2021-01-01T00:00:00.0000000
+        var expectedSource =
+            @"// Code generated at 2021-01-01T00:00:00.0000000
 // From directory: .
 // <auto-generated/>
 #nullable enable
@@ -249,13 +249,13 @@ namespace MyCode
     }
 }
 ";
-            Assert.Equal(expectedSource, sourceFile.Code);
-        }
+        Assert.Equal(expectedSource, sourceFile.Code);
+    }
 
-        [Fact]
-        public void WhenSingleImageInCurrentDirectory_GeneratesLibrary()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenSingleImageInCurrentDirectory_GeneratesLibrary()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     [Askaiser.Marionette.ImageLibrary(""."")]
@@ -271,18 +271,18 @@ namespace MyCode
     }
 }";
 
-            this.FileSystem.SetFileBytes("./logo.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("./logo.png", new byte[] { 1, 2, 3 });
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics);
+        Assert.Empty(result.Diagnostics);
 
-            var sourceFile = Assert.Single(result.SourceFiles);
-            Assert.NotNull(sourceFile);
-            Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
+        var sourceFile = Assert.Single(result.SourceFiles);
+        Assert.NotNull(sourceFile);
+        Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
 
-            var expectedSource =
-                @"// Code generated at 2021-01-01T00:00:00.0000000
+        var expectedSource =
+            @"// Code generated at 2021-01-01T00:00:00.0000000
 // From directory: .
 // <auto-generated/>
 #nullable enable
@@ -312,28 +312,28 @@ namespace MyCode
     }
 }
 ";
-            Assert.Equal(expectedSource, sourceFile.Code);
-        }
+        Assert.Equal(expectedSource, sourceFile.Code);
+    }
 
-        [Fact]
-        public void WhenSingleImageWithoutNamespace_GeneratesLibrary()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenSingleImageWithoutNamespace_GeneratesLibrary()
+    {
+        const string userSource = @"
 [Askaiser.Marionette.ImageLibrary(""."")]
 public partial class MyLibrary { }";
 
-            this.FileSystem.SetFileBytes("./logo.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("./logo.png", new byte[] { 1, 2, 3 });
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics);
+        Assert.Empty(result.Diagnostics);
 
-            var sourceFile = Assert.Single(result.SourceFiles);
-            Assert.NotNull(sourceFile);
-            Assert.Equal("MyLibrary.images.cs", sourceFile.Filename);
+        var sourceFile = Assert.Single(result.SourceFiles);
+        Assert.NotNull(sourceFile);
+        Assert.Equal("MyLibrary.images.cs", sourceFile.Filename);
 
-            var expectedSource =
-                @"// Code generated at 2021-01-01T00:00:00.0000000
+        var expectedSource =
+            @"// Code generated at 2021-01-01T00:00:00.0000000
 // From directory: .
 // <auto-generated/>
 #nullable enable
@@ -360,13 +360,13 @@ public partial class MyLibrary
     }
 }
 ";
-            Assert.Equal(expectedSource, sourceFile.Code);
-        }
+        Assert.Equal(expectedSource, sourceFile.Code);
+    }
 
-        [Fact]
-        public void WhenSingleImageWithoutLongNamespace_GeneratesLibrary()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenSingleImageWithoutLongNamespace_GeneratesLibrary()
+    {
+        const string userSource = @"
 namespace A.B.C.D.E.F
 {
     [Askaiser.Marionette.ImageLibrary(""."")]
@@ -382,18 +382,18 @@ namespace A.B.C.D.E.F
     }
 }";
 
-            this.FileSystem.SetFileBytes("./logo.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("./logo.png", new byte[] { 1, 2, 3 });
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics);
+        Assert.Empty(result.Diagnostics);
 
-            var sourceFile = Assert.Single(result.SourceFiles);
-            Assert.NotNull(sourceFile);
-            Assert.Equal("A.B.C.D.E.F.MyLibrary.images.cs", sourceFile.Filename);
+        var sourceFile = Assert.Single(result.SourceFiles);
+        Assert.NotNull(sourceFile);
+        Assert.Equal("A.B.C.D.E.F.MyLibrary.images.cs", sourceFile.Filename);
 
-            var expectedSource =
-                @"// Code generated at 2021-01-01T00:00:00.0000000
+        var expectedSource =
+            @"// Code generated at 2021-01-01T00:00:00.0000000
 // From directory: .
 // <auto-generated/>
 #nullable enable
@@ -423,32 +423,32 @@ namespace A.B.C.D.E.F
     }
 }
 ";
-            Assert.Equal(expectedSource, sourceFile.Code);
-        }
+        Assert.Equal(expectedSource, sourceFile.Code);
+    }
 
-        [Fact]
-        public void WhenMultipleImagesInCurrentDirectory_GeneratesLibrary()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenMultipleImagesInCurrentDirectory_GeneratesLibrary()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 }";
 
-            this.FileSystem.SetFileBytes("./logo.png", new byte[] { 1, 2, 3 });
-            this.FileSystem.SetFileBytes("./sidebar.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("./logo.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("./sidebar.png", new byte[] { 1, 2, 3 });
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics);
+        Assert.Empty(result.Diagnostics);
 
-            var sourceFile = Assert.Single(result.SourceFiles);
-            Assert.NotNull(sourceFile);
-            Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
+        var sourceFile = Assert.Single(result.SourceFiles);
+        Assert.NotNull(sourceFile);
+        Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
 
-            var expectedSource =
-                @"// Code generated at 2021-01-01T00:00:00.0000000
+        var expectedSource =
+            @"// Code generated at 2021-01-01T00:00:00.0000000
 // From directory: .
 // <auto-generated/>
 #nullable enable
@@ -482,32 +482,32 @@ namespace MyCode
     }
 }
 ";
-            Assert.Equal(expectedSource, sourceFile.Code);
-        }
+        Assert.Equal(expectedSource, sourceFile.Code);
+    }
 
-        [Fact]
-        public void WhenMultipleImagesInDifferentDirectories_GeneratesLibrary()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenMultipleImagesInDifferentDirectories_GeneratesLibrary()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 }";
 
-            this.FileSystem.SetFileBytes("./foo/logo-large.png", new byte[] { 1, 2, 3 });
-            this.FileSystem.SetFileBytes("./bar/sidebar.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("./foo/logo-large.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("./bar/sidebar.png", new byte[] { 1, 2, 3 });
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics);
+        Assert.Empty(result.Diagnostics);
 
-            var sourceFile = Assert.Single(result.SourceFiles);
-            Assert.NotNull(sourceFile);
-            Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
+        var sourceFile = Assert.Single(result.SourceFiles);
+        Assert.NotNull(sourceFile);
+        Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
 
-            var expectedSource =
-                @"// Code generated at 2021-01-01T00:00:00.0000000
+        var expectedSource =
+            @"// Code generated at 2021-01-01T00:00:00.0000000
 // From directory: .
 // <auto-generated/>
 #nullable enable
@@ -574,32 +574,32 @@ namespace MyCode
     }
 }
 ";
-            Assert.Equal(expectedSource, sourceFile.Code);
-        }
+        Assert.Equal(expectedSource, sourceFile.Code);
+    }
 
-        [Fact]
-        public void WhenMultipleImagesWithSuffixes_GeneratesLibrary()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenMultipleImagesWithSuffixes_GeneratesLibrary()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 }";
 
-            this.FileSystem.SetFileBytes("./logo_0.85_0.png", new byte[] { 1, 2, 3 });
-            this.FileSystem.SetFileBytes("./logo_gs_0.78_1.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("./logo_0.85_0.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("./logo_gs_0.78_1.png", new byte[] { 1, 2, 3 });
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics);
+        Assert.Empty(result.Diagnostics);
 
-            var sourceFile = Assert.Single(result.SourceFiles);
-            Assert.NotNull(sourceFile);
-            Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
+        var sourceFile = Assert.Single(result.SourceFiles);
+        Assert.NotNull(sourceFile);
+        Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
 
-            var expectedSource =
-                @"// Code generated at 2021-01-01T00:00:00.0000000
+        var expectedSource =
+            @"// Code generated at 2021-01-01T00:00:00.0000000
 // From directory: .
 // <auto-generated/>
 #nullable enable
@@ -634,34 +634,34 @@ namespace MyCode
     }
 }
 ";
-            Assert.Equal(expectedSource, sourceFile.Code);
-        }
+        Assert.Equal(expectedSource, sourceFile.Code);
+    }
 
-        [Fact]
-        public void WhenSingleImageAndMultipleEmptyDirectories_GeneratesLibraryWithSingleImage()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenSingleImageAndMultipleEmptyDirectories_GeneratesLibraryWithSingleImage()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 }";
 
-            this.FileSystem.SetFileBytes("./foo/logo.png", new byte[] { 1, 2, 3 });
-            this.FileSystem.AddEntry("./foo/bar");
-            this.FileSystem.AddEntry("./foo/qux/baz");
-            this.FileSystem.AddEntry("./empty");
+        this.FileSystem.SetFileBytes("./foo/logo.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.AddEntry("./foo/bar");
+        this.FileSystem.AddEntry("./foo/qux/baz");
+        this.FileSystem.AddEntry("./empty");
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics);
+        Assert.Empty(result.Diagnostics);
 
-            var sourceFile = Assert.Single(result.SourceFiles);
-            Assert.NotNull(sourceFile);
-            Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
+        var sourceFile = Assert.Single(result.SourceFiles);
+        Assert.NotNull(sourceFile);
+        Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
 
-            var expectedSource =
-                @"// Code generated at 2021-01-01T00:00:00.0000000
+        var expectedSource =
+            @"// Code generated at 2021-01-01T00:00:00.0000000
 // From directory: .
 // <auto-generated/>
 #nullable enable
@@ -708,32 +708,32 @@ namespace MyCode
     }
 }
 ";
-            Assert.Equal(expectedSource, sourceFile.Code);
-        }
+        Assert.Equal(expectedSource, sourceFile.Code);
+    }
 
-        [Fact]
-        public void WhenMultipleImagesWithDoubleCarets_GeneratesLibrary()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenMultipleImagesWithDoubleCarets_GeneratesLibrary()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     [Askaiser.Marionette.ImageLibrary(""."")]
     public partial class MyLibrary { }
 }";
 
-            this.FileSystem.SetFileBytes("./foo--bar--logo.png", new byte[] { 1, 2, 3 });
-            this.FileSystem.SetFileBytes("./qux--baz--title.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("./foo--bar--logo.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("./qux--baz--title.png", new byte[] { 1, 2, 3 });
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics);
+        Assert.Empty(result.Diagnostics);
 
-            var sourceFile = Assert.Single(result.SourceFiles);
-            Assert.NotNull(sourceFile);
-            Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
+        var sourceFile = Assert.Single(result.SourceFiles);
+        Assert.NotNull(sourceFile);
+        Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
 
-            var expectedSource =
-                @"// Code generated at 2021-01-01T00:00:00.0000000
+        var expectedSource =
+            @"// Code generated at 2021-01-01T00:00:00.0000000
 // From directory: .
 // <auto-generated/>
 #nullable enable
@@ -832,35 +832,35 @@ namespace MyCode
     }
 }
 ";
-            Assert.Equal(expectedSource, sourceFile.Code);
-        }
+        Assert.Equal(expectedSource, sourceFile.Code);
+    }
 
-        [Fact]
-        public void WhenDuplicateImageIndexes_AddsDiagnostic()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenDuplicateImageIndexes_AddsDiagnostic()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     [Askaiser.Marionette.ImageLibrary(""C:\\"")]
     public partial class MyLibrary { }
 }";
 
-            this.FileSystem.SetFileBytes("C:\\foo_0.99_gs_0.png", new byte[] { 1, 2, 3 });
-            this.FileSystem.SetFileBytes("C:\\foo_0.80_0.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("C:\\foo_0.99_gs_0.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("C:\\foo_0.80_0.png", new byte[] { 1, 2, 3 });
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            var warning = Assert.Single(result.Diagnostics);
-            Assert.NotNull(warning);
-            Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
-            Assert.Equal(DiagnosticsDescriptors.DuplicateImageName.Id, warning.Id);
+        var warning = Assert.Single(result.Diagnostics);
+        Assert.NotNull(warning);
+        Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
+        Assert.Equal(DiagnosticsDescriptors.DuplicateImageName.Id, warning.Id);
 
-            var sourceFile = Assert.Single(result.SourceFiles);
-            Assert.NotNull(sourceFile);
-            Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
+        var sourceFile = Assert.Single(result.SourceFiles);
+        Assert.NotNull(sourceFile);
+        Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
 
-            var expectedSource =
-                @"// Code generated at 2021-01-01T00:00:00.0000000
+        var expectedSource =
+            @"// Code generated at 2021-01-01T00:00:00.0000000
 // From directory: C:\
 // <auto-generated/>
 #nullable enable
@@ -890,31 +890,31 @@ namespace MyCode
     }
 }
 ";
-            Assert.Equal(expectedSource, sourceFile.Code);
-        }
+        Assert.Equal(expectedSource, sourceFile.Code);
+    }
 
-        [Fact]
-        public void WhenFileTooLarge_AddsDiagnostic()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenFileTooLarge_AddsDiagnostic()
+    {
+        const string userSource = @"
 [Askaiser.Marionette.ImageLibrary(""."")]
 public partial class MyLibrary { }";
 
-            this.FileSystem.SetFileBytes("./logo.png", new byte[Constants.DefaultMaxImageSize + 1]);
+        this.FileSystem.SetFileBytes("./logo.png", new byte[Constants.DefaultMaxImageSize + 1]);
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            var warning = Assert.Single(result.Diagnostics);
-            Assert.NotNull(warning);
-            Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
-            Assert.Equal(DiagnosticsDescriptors.FileTooLarge.Id, warning.Id);
+        var warning = Assert.Single(result.Diagnostics);
+        Assert.NotNull(warning);
+        Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
+        Assert.Equal(DiagnosticsDescriptors.FileTooLarge.Id, warning.Id);
 
-            var sourceFile = Assert.Single(result.SourceFiles);
-            Assert.NotNull(sourceFile);
-            Assert.Equal("MyLibrary.images.cs", sourceFile.Filename);
+        var sourceFile = Assert.Single(result.SourceFiles);
+        Assert.NotNull(sourceFile);
+        Assert.Equal("MyLibrary.images.cs", sourceFile.Filename);
 
-            var expectedSource =
-                @"// Code generated at 2021-01-01T00:00:00.0000000
+        var expectedSource =
+            @"// Code generated at 2021-01-01T00:00:00.0000000
 // From directory: .
 // <auto-generated/>
 #nullable enable
@@ -937,13 +937,13 @@ public partial class MyLibrary
     }
 }
 ";
-            Assert.Equal(expectedSource, sourceFile.Code);
-        }
+        Assert.Equal(expectedSource, sourceFile.Code);
+    }
 
-        [Fact]
-        public void WhenMultipleLibraries_GeneratesMultipleLibraries()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenMultipleLibraries_GeneratesMultipleLibraries()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     [Askaiser.Marionette.ImageLibrary(""foo"")]
@@ -953,23 +953,23 @@ namespace MyCode
     public partial class BarLibrary { }
 }";
 
-            this.FileSystem.SetFileBytes("foo/logo.png", new byte[] { 1, 2, 3 });
-            this.FileSystem.SetFileBytes("bar/title.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("foo/logo.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("bar/title.png", new byte[] { 1, 2, 3 });
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics);
+        Assert.Empty(result.Diagnostics);
 
-            Assert.Equal(2, result.SourceFiles.Count);
+        Assert.Equal(2, result.SourceFiles.Count);
 
-            var fooSourceFile = Assert.Single(result.SourceFiles, x => x.Filename == "MyCode.FooLibrary.images.cs");
-            var barSourceFile = Assert.Single(result.SourceFiles, x => x.Filename == "MyCode.BarLibrary.images.cs");
+        var fooSourceFile = Assert.Single(result.SourceFiles, x => x.Filename == "MyCode.FooLibrary.images.cs");
+        var barSourceFile = Assert.Single(result.SourceFiles, x => x.Filename == "MyCode.BarLibrary.images.cs");
 
-            Assert.NotNull(fooSourceFile);
-            Assert.NotNull(barSourceFile);
+        Assert.NotNull(fooSourceFile);
+        Assert.NotNull(barSourceFile);
 
-            var expectedSource =
-                @"// Code generated at 2021-01-01T00:00:00.0000000
+        var expectedSource =
+            @"// Code generated at 2021-01-01T00:00:00.0000000
 // From directory: {0}
 // <auto-generated/>
 #nullable enable
@@ -999,14 +999,14 @@ namespace MyCode
     }}
 }}
 ";
-            Assert.Equal(string.Format(CultureInfo.InvariantCulture, expectedSource, "foo", "Foo", "Logo"), fooSourceFile.Code);
-            Assert.Equal(string.Format(CultureInfo.InvariantCulture, expectedSource, "bar", "Bar", "Title"), barSourceFile.Code);
-        }
+        Assert.Equal(string.Format(CultureInfo.InvariantCulture, expectedSource, "foo", "Foo", "Logo"), fooSourceFile.Code);
+        Assert.Equal(string.Format(CultureInfo.InvariantCulture, expectedSource, "bar", "Bar", "Title"), barSourceFile.Code);
+    }
 
-        [Fact]
-        public void WhenNestedClass_AddsDiagnostic()
-        {
-            const string userSource = @"
+    [Fact]
+    public void WhenNestedClass_AddsDiagnostic()
+    {
+        const string userSource = @"
 namespace MyCode
 {
     public class ParentClass
@@ -1016,25 +1016,25 @@ namespace MyCode
     }
 }";
 
-            this.FileSystem.SetFileBytes("foo/logo.png", new byte[] { 1, 2, 3 });
+        this.FileSystem.SetFileBytes("foo/logo.png", new byte[] { 1, 2, 3 });
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            var warning = Assert.Single(result.Diagnostics);
+        var warning = Assert.Single(result.Diagnostics);
 
-            Assert.NotNull(warning);
-            Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
-            Assert.Equal(DiagnosticsDescriptors.NestedClassNotAllowed.Id, warning.Id);
-            Assert.Empty(result.SourceFiles);
-        }
+        Assert.NotNull(warning);
+        Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
+        Assert.Equal(DiagnosticsDescriptors.NestedClassNotAllowed.Id, warning.Id);
+        Assert.Empty(result.SourceFiles);
+    }
 
-        [Theory]
-        [InlineData("partial")]
-        [InlineData("public partial")]
-        [InlineData("internal partial")]
-        public void WhenMultipleMultipliers_Works(string modifiers)
-        {
-            const string userSourceFormat = @"
+    [Theory]
+    [InlineData("partial")]
+    [InlineData("public partial")]
+    [InlineData("internal partial")]
+    public void WhenMultipleMultipliers_Works(string modifiers)
+    {
+        const string userSourceFormat = @"
 namespace MyCode
 {{
     [Askaiser.Marionette.ImageLibrary(""."")]
@@ -1050,19 +1050,19 @@ namespace MyCode
     }}
 }}";
 
-            var userSource = string.Format(CultureInfo.InvariantCulture, userSourceFormat, modifiers);
-            this.FileSystem.SetFileBytes("./logo.png", new byte[] { 1, 2, 3 });
+        var userSource = string.Format(CultureInfo.InvariantCulture, userSourceFormat, modifiers);
+        this.FileSystem.SetFileBytes("./logo.png", new byte[] { 1, 2, 3 });
 
-            var result = this.Compile(userSource);
+        var result = this.Compile(userSource);
 
-            Assert.Empty(result.Diagnostics);
+        Assert.Empty(result.Diagnostics);
 
-            var sourceFile = Assert.Single(result.SourceFiles);
-            Assert.NotNull(sourceFile);
-            Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
+        var sourceFile = Assert.Single(result.SourceFiles);
+        Assert.NotNull(sourceFile);
+        Assert.Equal("MyCode.MyLibrary.images.cs", sourceFile.Filename);
 
-            var expectedSourceFormat =
-                @"// Code generated at 2021-01-01T00:00:00.0000000
+        var expectedSourceFormat =
+            @"// Code generated at 2021-01-01T00:00:00.0000000
 // From directory: .
 // <auto-generated/>
 #nullable enable
@@ -1092,8 +1092,7 @@ namespace MyCode
     }}
 }}
 ";
-            var expectedSource = string.Format(CultureInfo.InvariantCulture, expectedSourceFormat, modifiers);
-            Assert.Equal(expectedSource, sourceFile.Code);
-        }
+        var expectedSource = string.Format(CultureInfo.InvariantCulture, expectedSourceFormat, modifiers);
+        Assert.Equal(expectedSource, sourceFile.Code);
     }
 }

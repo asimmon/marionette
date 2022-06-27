@@ -2,10 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Askaiser.Marionette
+namespace Askaiser.Marionette;
+
+internal interface IElementRecognizer
 {
-    internal interface IElementRecognizer
-    {
-        Task<RecognizerSearchResult> Recognize(Bitmap screenshot, IElement element, CancellationToken token);
-    }
+    Task<RecognizerSearchResult> Recognize(Bitmap screenshot, IElement element, CancellationToken token);
 }

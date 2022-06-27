@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace Askaiser.Marionette
+namespace Askaiser.Marionette;
+
+internal interface IFileWriter
 {
-    internal interface IFileWriter
-    {
-        Task SaveScreenshot(string path, byte[] screenshotBytes);
-    }
+    Task SaveScreenshot(string path, byte[] screenshotBytes);
 }

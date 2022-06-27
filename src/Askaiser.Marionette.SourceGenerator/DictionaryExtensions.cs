@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Askaiser.Marionette.SourceGenerator
+namespace Askaiser.Marionette.SourceGenerator;
+
+internal static class DictionaryExtensions
 {
-    internal static class DictionaryExtensions
+    public static TVal GetOrCreate<TKey, TVal>(this Dictionary<TKey, TVal> dictionary, TKey key, Func<TKey, TVal> valueFactory)
     {
-        public static TVal GetOrCreate<TKey, TVal>(this Dictionary<TKey, TVal> dictionary, TKey key, Func<TKey, TVal> valueFactory)
-        {
-            return dictionary.TryGetValue(key, out var value) ? value : dictionary[key] = valueFactory(key);
-        }
+        return dictionary.TryGetValue(key, out var value) ? value : dictionary[key] = valueFactory(key);
     }
 }

@@ -1,12 +1,11 @@
 using System;
 
-namespace Askaiser.Marionette.SourceGenerator
+namespace Askaiser.Marionette.SourceGenerator;
+
+public class UtcDateTimeProvider : IDateTimeProvider
 {
-    public class UtcDateTimeProvider : IDateTimeProvider
+    public DateTime Now
     {
-        public DateTime Now
-        {
-            get => DateTime.UtcNow;
-        }
+        get => DateTime.UtcNow;
     }
 }

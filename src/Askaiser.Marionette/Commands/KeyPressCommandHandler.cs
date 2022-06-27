@@ -1,19 +1,18 @@
 ﻿using System.Threading.Tasks;
 
-namespace Askaiser.Marionette.Commands
+namespace Askaiser.Marionette.Commands;
+
+internal class KeyPressCommandHandler
 {
-    internal class KeyPressCommandHandler
+    private readonly IKeyboardController _keyboardController;
+
+    public KeyPressCommandHandler(IKeyboardController keyboardController)
     {
-        private readonly IKeyboardController _keyboardController;
+        this._keyboardController = keyboardController;
+    }
 
-        public KeyPressCommandHandler(IKeyboardController keyboardController)
-        {
-            this._keyboardController = keyboardController;
-        }
-
-        public async Task Execute(KeyboardKeysCommand command)
-        {
-            await this._keyboardController.KeyPress(command.KeyCodes).ConfigureAwait(false);
-        }
+    public async Task Execute(KeyboardKeysCommand command)
+    {
+        await this._keyboardController.KeyPress(command.KeyCodes).ConfigureAwait(false);
     }
 }
