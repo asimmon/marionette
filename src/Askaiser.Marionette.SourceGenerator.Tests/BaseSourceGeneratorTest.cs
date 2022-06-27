@@ -36,7 +36,7 @@ namespace Askaiser.Marionette.SourceGenerator.Tests
 
         private static Compilation CreateCompilation(string source) => CSharpCompilation.Create(
             assemblyName: "compilation",
-            syntaxTrees: ImmutableArray.Create(new[] { CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.CSharp9)) }),
+            syntaxTrees: ImmutableArray.Create(new[] { CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.CSharp10)) }),
             references: GetRequiredAssemblyReferences(),
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
