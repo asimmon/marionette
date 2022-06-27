@@ -1,4 +1,5 @@
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
@@ -45,7 +46,11 @@ namespace Askaiser.Marionette.SourceGenerator.Tests
         private static IEnumerable<MetadataReference> GetRequiredAssemblyReferences() => AppDomain.CurrentDomain.GetAssemblies()
             .Where(x => !x.IsDynamic && !string.IsNullOrEmpty(x.Location))
             .Select(x => MetadataReference.CreateFromFile(x.Location))
-            .Concat(new[] { MetadataReference.CreateFromFile(typeof(ImageLibraryAttribute).GetTypeInfo().Assembly.Location) });
+            .Concat(new[]
+            {
+                MetadataReference.CreateFromFile(typeof(ImageLibraryAttribute).GetTypeInfo().Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(GeneratedCodeAttribute).GetTypeInfo().Assembly.Location),
+            });
 
         private static Compilation RunGenerators(GeneratorDriver driver, Compilation compilation, out ImmutableArray<Diagnostic> diagnostics)
         {
