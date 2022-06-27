@@ -8,6 +8,7 @@ public class FakeFileSystem : IFileSystem
 {
     private const char ForwardSlash = '/';
     private const char BackSlash = '\\';
+    private const string BackSlashStr = "\\";
     private static readonly char[] Slashes = { ForwardSlash, BackSlash };
 
     private readonly Dictionary<string, HashSet<string>> _childDirectories;
@@ -56,18 +57,18 @@ public class FakeFileSystem : IFileSystem
 
         for (var i = 1; i <= pathParts.Length; i++)
         {
-            var left = pathParts[..^i];
-            var right = pathParts[..^(i - 1)];
+            var left = new ArraySegment<string>(pathParts, 0, pathParts.Length - i).ToArray();
+            var right = new ArraySegment<string>(pathParts, 0, pathParts.Length - i + 1).ToArray();
 
             if (left.Length == 0)
             {
                 continue;
             }
 
-            var dirPath = string.Join(BackSlash, left);
-            var itemPath = string.Join(BackSlash, right);
+            var dirPath = string.Join(BackSlashStr, left);
+            var itemPath = string.Join(BackSlashStr, right);
 
-            var isFile = right[^1].Contains('.');
+            var isFile = right[right.Length - 1].Contains('.');
             if (isFile)
             {
                 var subItems = this._childFiles.TryGetValue(dirPath, out var x) ? x : this._childFiles[dirPath] = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
