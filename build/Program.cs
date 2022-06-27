@@ -1,19 +1,20 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using Cake.Codecov;
 using Cake.Common;
 using Cake.Common.Diagnostics;
 using Cake.Common.IO;
-using Cake.Common.Tools.DotNetCore;
-using Cake.Common.Tools.DotNetCore.Build;
-using Cake.Common.Tools.DotNetCore.MSBuild;
-using Cake.Common.Tools.DotNetCore.Pack;
-using Cake.Common.Tools.DotNetCore.Restore;
+using Cake.Common.Tools.DotNet;
+using Cake.Common.Tools.DotNet.Build;
+using Cake.Common.Tools.DotNet.MSBuild;
+using Cake.Common.Tools.DotNet.NuGet.Push;
+using Cake.Common.Tools.DotNet.Pack;
+using Cake.Common.Tools.DotNet.Restore;
 using Cake.Common.Tools.DotNetCore.Test;
 using Cake.Common.Tools.GitVersion;
 using Cake.Common.Tools.ReportGenerator;
 using Cake.Core;
+using Cake.Core.Diagnostics;
 using Cake.Coverlet;
 using Cake.Frosting;
 using Path = System.IO.Path;
@@ -23,7 +24,7 @@ using Path = System.IO.Path;
 public static class Program
 {
     public static int Main(string[] args) => new CakeHost()
-        .InstallTool(new Uri("nuget:?package=GitVersion.CommandLine&version=5.6.10"))
+        .InstallTool(new Uri("dotnet:?package=GitVersion.Tool&version=5.10.1"))
         .InstallTool(new Uri("nuget:?package=ReportGenerator&version=4.8.12"))
         .InstallTool(new Uri("nuget:?package=Codecov&version=1.13.0"))
         .UseContext<BuildContext>()
@@ -47,95 +48,41 @@ public class BuildContext : FrostingContext
     public BuildContext(ICakeContext context)
         : base(context)
     {
-        this.MsBuildConfiguration = context.Argument("configuration", Constants.Release);
-        this.SharedMSBuildSettings = new DotNetCoreMSBuildSettings();
+        this.MSBuildSettings = new DotNetMSBuildSettings();
 
-        if (Guid.TryParse(context.Argument("codecov-token", string.Empty), out var codecovToken))
+        this.NugetApiKey = context.Argument("nuget-api-key", string.Empty);
+        this.NugetSource = context.Argument("nuget-source", string.Empty);
+        this.CodecovToken = context.Argument("codecov-token", string.Empty);
+
+        if (!string.IsNullOrEmpty(this.CodecovToken))
         {
             context.Information("Code coverage is enabled.");
-            this.CodecovToken = codecovToken;
         }
     }
 
-    public string MsBuildConfiguration { get; }
+    public DotNetMSBuildSettings MSBuildSettings { get; }
 
-    public DotNetCoreMSBuildSettings SharedMSBuildSettings { get; }
+    public string CodecovToken { get; }
 
-    public Guid? CodecovToken { get; }
+    public string NugetApiKey { get; }
 
-    public void AddMSBuildProperty(string name, string value)
+    public string NugetSource { get; }
+
+    public void AddMSBuildSetting(string name, string value, bool log = false)
     {
-        this.SharedMSBuildSettings.Properties[name] = new[] { value };
-    }
-}
-
-[TaskName("Metadata")]
-[TaskDescription("Add MSBuild shared properties that will be used with dotnet restore, build and pack.")]
-public sealed class MetadataTask : FrostingTask<BuildContext>
-{
-    public override bool ShouldRun(BuildContext context)
-    {
-        return context.SharedMSBuildSettings.Properties.Count <= 0 && base.ShouldRun(context);
-    }
-
-    public override void Run(BuildContext context)
-    {
-        AddMSBuildAssemblyVersion(context);
-        AddMSBuildPackageMetadata(context);
-    }
-
-    private static void AddMSBuildAssemblyVersion(BuildContext context)
-    {
-        if (context.Argument("package-version", string.Empty).Trim() is { Length: > 0 } userVersion)
+        if (log)
         {
-            if (userVersion.Split('-', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) is { Length: 2 } versionParts)
-            {
-                context.AddMSBuildProperty("VersionPrefix", versionParts[0]);
-                context.AddMSBuildProperty("VersionSuffix", versionParts[1]);
-            }
-            else
-            {
-                context.AddMSBuildProperty("Version", context.Argument<string>("package-version"));
-            }
+            this.Log.Information(name + ": " + value);
         }
-        else
+
+        if (!string.IsNullOrWhiteSpace(value))
         {
-            var gitVersion = context.GitVersion();
-            var informationalVersion = gitVersion.AssemblySemVer + "-" + gitVersion.Sha;
-
-            context.Information("Generated assembly version: " + gitVersion.AssemblySemVer);
-            context.Information("Generated file version: " + gitVersion.AssemblySemFileVer);
-            context.Information("Generated informational version: " + informationalVersion);
-
-            if (context.HasArgument("alpha"))
-            {
-                context.AddMSBuildProperty("VersionPrefix", gitVersion.AssemblySemVer);
-                context.AddMSBuildProperty("VersionSuffix", "alpha" + gitVersion.CommitsSinceVersionSource.GetValueOrDefault(0).ToString(CultureInfo.InvariantCulture));
-            }
-            else
-            {
-                context.AddMSBuildProperty("Version", gitVersion.AssemblySemVer);
-            }
-
-            context.AddMSBuildProperty("FileVersion", gitVersion.AssemblySemFileVer);
-            context.AddMSBuildProperty("InformationalVersion", informationalVersion);
+            this.MSBuildSettings.Properties[name] = new[] { value };
         }
-    }
-
-    private static void AddMSBuildPackageMetadata(BuildContext context)
-    {
-        context.AddMSBuildProperty("Description", Constants.ProjectName + " is a test automation framework based on image and text recognition.");
-        context.AddMSBuildProperty("Authors", "Anthony Simmon");
-        context.AddMSBuildProperty("Owners", "Anthony Simmon");
-        context.AddMSBuildProperty("PackageProjectUrl", "https://github.com/asimmon/askaiser-marionette");
-        context.AddMSBuildProperty("Copyright", "Copyright © Anthony Simmon " + DateTime.UtcNow.Year);
-        context.AddMSBuildProperty("PackageLicenseExpression", "GPL-3.0-or-later");
-        context.AddMSBuildProperty("TreatWarningsAsErrors", "True");
     }
 }
 
 [TaskName("Clean")]
-[TaskDescription("Delete generated files and directories that are not versioned, such as compiled binaries.")]
 public sealed class CleanTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
@@ -150,34 +97,56 @@ public sealed class CleanTask : FrostingTask<BuildContext>
     }
 }
 
+[TaskName("GitVersion")]
+public sealed class GitVersionTask : FrostingTask<BuildContext>
+{
+    public override void Run(BuildContext context)
+    {
+        var gitVersion = context.GitVersion();
+
+        context.AddMSBuildSetting("Version", gitVersion.NuGetVersion, log: true);
+        context.AddMSBuildSetting("VersionPrefix", gitVersion.MajorMinorPatch, log: true);
+        context.AddMSBuildSetting("VersionSuffix", gitVersion.PreReleaseTag, log: true);
+        context.AddMSBuildSetting("PackageVersion", gitVersion.FullSemVer, log: true);
+        context.AddMSBuildSetting("InformationalVersion", gitVersion.InformationalVersion, log: true);
+        context.AddMSBuildSetting("AssemblyVersion", gitVersion.AssemblySemVer, log: true);
+        context.AddMSBuildSetting("FileVersion", gitVersion.AssemblySemFileVer, log: true);
+        context.AddMSBuildSetting("RepositoryBranch", gitVersion.BranchName, log: true);
+        context.AddMSBuildSetting("RepositoryCommit", gitVersion.Sha, log: true);
+    }
+}
+
 [TaskName("Restore")]
-[TaskDescription("Restore nuget packages for the whole solution.")]
-[IsDependentOn(typeof(MetadataTask))]
+[IsDependentOn(typeof(CleanTask))]
+[IsDependentOn(typeof(GitVersionTask))]
 public sealed class RestoreTask : FrostingTask<BuildContext>
 {
-    public override void Run(BuildContext context) => context.DotNetCoreRestore(Constants.SolutionPath, new DotNetCoreRestoreSettings
+    public override void Run(BuildContext context) => context.DotNetRestore(Constants.SolutionPath, new DotNetRestoreSettings
     {
-        MSBuildSettings = context.SharedMSBuildSettings,
+        MSBuildSettings = context.MSBuildSettings,
     });
 }
 
 [TaskName("Build")]
-[TaskDescription("Build the whole solution.")]
-[IsDependentOn(typeof(CleanTask))]
 [IsDependentOn(typeof(RestoreTask))]
 public sealed class BuildTask : FrostingTask<BuildContext>
 {
-    public override void Run(BuildContext context) => context.DotNetCoreBuild(Constants.SolutionPath, new DotNetCoreBuildSettings
+    public override void Run(BuildContext context)
     {
-        Configuration = context.MsBuildConfiguration,
-        MSBuildSettings = context.SharedMSBuildSettings,
-        NoRestore = true,
-        NoLogo = true,
-    });
+        context.AddMSBuildSetting("Deterministic", "true");
+        context.AddMSBuildSetting("ContinuousIntegrationBuild", "true");
+
+        context.DotNetBuild(Constants.SolutionPath, new DotNetBuildSettings
+        {
+            Configuration = Constants.Release,
+            MSBuildSettings = context.MSBuildSettings,
+            NoRestore = true,
+            NoLogo = true,
+        });
+    }
 }
 
 [TaskName("Test")]
-[TaskDescription("Run discovered tests inside the whole solution.")]
 [IsDependentOn(typeof(BuildTask))]
 public sealed class TestTask : FrostingTask<BuildContext>
 {
@@ -185,7 +154,7 @@ public sealed class TestTask : FrostingTask<BuildContext>
     {
         var testSettings = new DotNetCoreTestSettings
         {
-            Configuration = context.MsBuildConfiguration,
+            Configuration = Constants.Release,
             NoBuild = true,
             NoLogo = true,
         };
@@ -205,22 +174,17 @@ public sealed class TestTask : FrostingTask<BuildContext>
                 CollectCoverage = false,
             };
 
-            if (context.CodecovToken.HasValue)
-            {
-                coverletSettings.CollectCoverage = true;
-                coverletSettings.CoverletOutputFormat = CoverletOutputFormat.cobertura;
-                coverletSettings.CoverletOutputDirectory = coverageDirectoryPath;
-                coverletSettings.CoverletOutputName = outputFileName;
-                coverletSettings.IncludeTestAssembly = false;
-            }
+            coverletSettings.CollectCoverage = true;
+            coverletSettings.CoverletOutputFormat = CoverletOutputFormat.cobertura;
+            coverletSettings.CoverletOutputDirectory = coverageDirectoryPath;
+            coverletSettings.CoverletOutputName = outputFileName;
+            coverletSettings.IncludeTestAssembly = false;
 
             context.DotNetCoreTest(testProjectFilePath, testSettings, coverletSettings);
         }
 
-        if (context.CodecovToken.HasValue)
+        if (!string.IsNullOrEmpty(context.CodecovToken))
         {
-            var codecovToken = context.CodecovToken.Value;
-
             var inputCoverageFilePaths = context.GetFiles(Path.Combine(Constants.CoverageDirectoryPath, "*" + outputFileExtension));
             var outputCoverageFilePath = Path.Combine(Constants.CoverageDirectoryPath, "Cobertura.xml");
 
@@ -229,25 +193,42 @@ public sealed class TestTask : FrostingTask<BuildContext>
                 ReportTypes = new[] { ReportGeneratorReportType.Cobertura },
             });
 
-            context.Codecov(outputCoverageFilePath, codecovToken.ToString("D"));
+            context.Codecov(outputCoverageFilePath, context.CodecovToken);
         }
     }
 }
 
 [TaskName("Pack")]
-[TaskDescription("Create a nuget package.")]
 [IsDependentOn(typeof(TestTask))]
 public sealed class PackTask : FrostingTask<BuildContext>
 {
-    public override void Run(BuildContext context) => context.DotNetCorePack(Constants.MainProjectPath, new DotNetCorePackSettings
+    public override void Run(BuildContext context) => context.DotNetPack(Constants.MainProjectPath, new DotNetPackSettings
     {
-        Configuration = context.MsBuildConfiguration,
-        MSBuildSettings = context.SharedMSBuildSettings,
+        Configuration = Constants.Release,
+        MSBuildSettings = context.MSBuildSettings,
         OutputDirectory = Constants.OutputDirectoryPath,
         NoBuild = false, // required to also pack the already built source generator DLL
         NoRestore = true,
         NoLogo = true,
     });
+}
+
+[TaskName("Push")]
+[IsDependentOn(typeof(PackTask))]
+public sealed class PushTask : FrostingTask<BuildContext>
+{
+    public override void Run(BuildContext context)
+    {
+        foreach (var packageFilePath in context.GetFiles(Path.Combine(Constants.OutputDirectoryPath, "*.nupkg")))
+        {
+            context.DotNetNuGetPush(packageFilePath, new DotNetNuGetPushSettings
+            {
+                ApiKey = context.NugetApiKey,
+                Source = context.NugetSource,
+                IgnoreSymbols = false,
+            });
+        }
+    }
 }
 
 [TaskName("Default")]

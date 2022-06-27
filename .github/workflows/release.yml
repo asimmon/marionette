@@ -1,0 +1,29 @@
+name: NuGet push
+
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: |
+            3.1.x
+            6.0.x
+
+      - run: ./build.ps1 --target=push --nuget-api-key=${{ secrets.nuget_api_key }} --nuget-source=${{ secrets.nuget_source }} --codecov-token=${{ secrets.codecov_token }}
+        shell: pwsh
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: packages
+          path: ./.output/**/*
