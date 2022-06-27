@@ -6,63 +6,62 @@ using Microsoft.CodeAnalysis.Text;
 
 [assembly: InternalsVisibleTo("Askaiser.Marionette.SourceGenerator.Tests")]
 
-namespace Askaiser.Marionette.SourceGenerator
+namespace Askaiser.Marionette.SourceGenerator;
+
+[Generator]
+public class LibrarySourceGenerator : ISourceGenerator
 {
-    [Generator]
-    public class LibrarySourceGenerator : ISourceGenerator
+    private readonly IFileSystem _fileSystem;
+    private readonly IDateTimeProvider _dateTimeProvider;
+
+    internal LibrarySourceGenerator(IFileSystem fileSystem, IDateTimeProvider dateTimeProvider)
     {
-        private readonly IFileSystem _fileSystem;
-        private readonly IDateTimeProvider _dateTimeProvider;
+        this._fileSystem = fileSystem;
+        this._dateTimeProvider = dateTimeProvider;
+    }
 
-        internal LibrarySourceGenerator(IFileSystem fileSystem, IDateTimeProvider dateTimeProvider)
+    public LibrarySourceGenerator()
+        : this(new FileSystem(), new UtcDateTimeProvider())
+    {
+    }
+
+    public void Initialize(GeneratorInitializationContext context)
+    {
+        context.RegisterForSyntaxNotifications(() => new LibrarySyntaxReceiver());
+    }
+
+    public void Execute(GeneratorExecutionContext context)
+    {
+        if (context.SyntaxContextReceiver is not LibrarySyntaxReceiver receiver)
         {
-            this._fileSystem = fileSystem;
-            this._dateTimeProvider = dateTimeProvider;
+            return;
         }
 
-        public LibrarySourceGenerator()
-            : this(new FileSystem(), new UtcDateTimeProvider())
+        foreach (var diagnostic in receiver.Diagnostics)
         {
+            context.ReportDiagnostic(diagnostic);
         }
 
-        public void Initialize(GeneratorInitializationContext context)
+        foreach (var targetedClass in receiver.TargetedClasses)
         {
-            context.RegisterForSyntaxNotifications(() => new LibrarySyntaxReceiver());
-        }
-
-        public void Execute(GeneratorExecutionContext context)
-        {
-            if (context.SyntaxContextReceiver is not LibrarySyntaxReceiver receiver)
+            try
             {
-                return;
+                this.AddSource(context, new LibraryCodeGenerator(this._fileSystem, this._dateTimeProvider, targetedClass).Generate());
             }
-
-            foreach (var diagnostic in receiver.Diagnostics)
+            catch (Exception ex)
             {
-                context.ReportDiagnostic(diagnostic);
-            }
-
-            foreach (var targetedClass in receiver.TargetedClasses)
-            {
-                try
-                {
-                    this.AddSource(context, new LibraryCodeGenerator(this._fileSystem, this._dateTimeProvider, targetedClass).Generate());
-                }
-                catch (Exception ex)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticsDescriptors.UnexpectedException, targetedClass.SyntaxNode.GetLocation(), ex.ToString()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(DiagnosticsDescriptors.UnexpectedException, targetedClass.SyntaxNode.GetLocation(), ex.ToString()));
             }
         }
+    }
 
-        protected virtual void AddSource(GeneratorExecutionContext context, CodeGeneratorResult result)
+    protected virtual void AddSource(GeneratorExecutionContext context, CodeGeneratorResult result)
+    {
+        foreach (var diagnostic in result.Diagnostics)
         {
-            foreach (var diagnostic in result.Diagnostics)
-            {
-                context.ReportDiagnostic(diagnostic);
-            }
-
-            context.AddSource(result.Filename, SourceText.From(result.Code, Encoding.UTF8));
+            context.ReportDiagnostic(diagnostic);
         }
+
+        context.AddSource(result.Filename, SourceText.From(result.Code, Encoding.UTF8));
     }
 }

@@ -7,154 +7,153 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Askaiser.Marionette.Commands
+namespace Askaiser.Marionette.Commands;
+
+internal abstract class BaseWaitForCommandHandler
 {
-    internal abstract class BaseWaitForCommandHandler
+    private static readonly Regex NotAlphanumericRegex = new Regex("[^a-z0-9\\-]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex WhitespaceRegex = new Regex("\\s+", RegexOptions.Compiled);
+
+    private readonly DriverOptions _options;
+    private readonly IFileWriter _fileWriter;
+    private readonly IMonitorService _monitorService;
+    private readonly IElementRecognizer _elementRecognizer;
+
+    protected BaseWaitForCommandHandler(DriverOptions options, IFileWriter fileWriter, IMonitorService monitorService, IElementRecognizer elementRecognizer)
     {
-        private readonly DriverOptions _options;
-        private readonly IFileWriter _fileWriter;
-        private readonly IMonitorService _monitorService;
-        private readonly IElementRecognizer _elementRecognizer;
+        this._options = options;
+        this._fileWriter = fileWriter;
+        this._monitorService = monitorService;
+        this._elementRecognizer = elementRecognizer;
+    }
 
-        protected BaseWaitForCommandHandler(DriverOptions options, IFileWriter fileWriter, IMonitorService monitorService, IElementRecognizer elementRecognizer)
+    protected async Task<RecognizerSearchResult> WaitFor(IElement element, WaitForCommand command, CancellationToken token)
+    {
+        if (command.WaitFor < TimeSpan.Zero)
         {
-            this._options = options;
-            this._fileWriter = fileWriter;
-            this._monitorService = monitorService;
-            this._elementRecognizer = elementRecognizer;
+            throw new ArgumentOutOfRangeException(nameof(command), Messages.Throw_NegativeWaitFor);
         }
 
-        protected async Task<RecognizerSearchResult> WaitFor(IElement element, WaitForCommand command, CancellationToken token)
+        var monitor = await this._monitorService.GetMonitor(command.MonitorIndex).ConfigureAwait(false);
+        var searchRect = AdjustSearchRectangleRelativeToMonitorSize(monitor, command.SearchRectangle);
+        var watch = Stopwatch.StartNew();
+
+        RecognizerSearchResult? recognizerResult = null;
+        do
         {
-            if (command.WaitFor < TimeSpan.Zero)
+            if (token.IsCancellationRequested)
             {
-                throw new ArgumentOutOfRangeException(nameof(command), Messages.Throw_NegativeWaitFor);
+                break;
             }
 
-            var monitor = await this._monitorService.GetMonitor(command.MonitorIndex).ConfigureAwait(false);
-            var searchRect = AdjustSearchRectangleRelativeToMonitorSize(monitor, command.SearchRectangle);
-            var watch = Stopwatch.StartNew();
+            using var screenshot = await this.GetScreenshot(monitor, searchRect).ConfigureAwait(false);
 
-            RecognizerSearchResult recognizerResult = null;
-            do
+            if (token.IsCancellationRequested)
             {
-                if (token.IsCancellationRequested)
+                break;
+            }
+
+            recognizerResult?.Dispose();
+            recognizerResult = await this._elementRecognizer.Recognize(screenshot, element, token).ConfigureAwait(false);
+
+            if (token.IsCancellationRequested)
+            {
+                break;
+            }
+
+            if (recognizerResult.Success)
+            {
+                var adjustedResult = recognizerResult.AdjustToMonitor(monitor).AdjustToSearchRectangle(searchRect);
+                return new RecognizerSearchResult(recognizerResult.TransformedScreenshot, adjustedResult);
+            }
+
+            if (this._options.WaitForThrottlingInterval > TimeSpan.Zero)
+            {
+                try
+                {
+                    await Task.Delay(this._options.WaitForThrottlingInterval, token).ConfigureAwait(false);
+                }
+                catch (TaskCanceledException)
                 {
                     break;
                 }
-
-                using var screenshot = await this.GetScreenshot(monitor, searchRect).ConfigureAwait(false);
-
-                if (token.IsCancellationRequested)
-                {
-                    break;
-                }
-
-                recognizerResult?.Dispose();
-                recognizerResult = await this._elementRecognizer.Recognize(screenshot, element, token).ConfigureAwait(false);
-
-                if (token.IsCancellationRequested)
-                {
-                    break;
-                }
-
-                if (recognizerResult.Success)
-                {
-                    var adjustedResult = recognizerResult.AdjustToMonitor(monitor).AdjustToSearchRectangle(searchRect);
-                    return new RecognizerSearchResult(recognizerResult.TransformedScreenshot, adjustedResult);
-                }
-
-                if (this._options.WaitForThrottlingInterval > TimeSpan.Zero)
-                {
-                    try
-                    {
-                        await Task.Delay(this._options.WaitForThrottlingInterval, token).ConfigureAwait(false);
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        break;
-                    }
-                }
             }
-            while (watch.Elapsed < command.WaitFor);
-
-            return RecognizerSearchResult.NotFound(recognizerResult?.TransformedScreenshot, element);
         }
+        while (watch.Elapsed < command.WaitFor);
 
-        private static Rectangle AdjustSearchRectangleRelativeToMonitorSize(MonitorDescription monitor, Rectangle searchRect)
+        return RecognizerSearchResult.NotFound(recognizerResult?.TransformedScreenshot, element);
+    }
+
+    private static Rectangle? AdjustSearchRectangleRelativeToMonitorSize(MonitorDescription monitor, Rectangle? searchRect)
+    {
+        if (searchRect == null)
         {
-            if (searchRect == null)
-            {
-                return null;
-            }
-
-            var offsetLeft = searchRect.Left - monitor.Left;
-            var offsetTop = searchRect.Top - monitor.Top;
-
-            return new Rectangle(offsetLeft, offsetTop, offsetLeft + searchRect.Width, offsetTop + searchRect.Height);
+            return null;
         }
 
-        private async Task<Bitmap> GetScreenshot(MonitorDescription monitor, Rectangle searchRect)
-        {
-            var screenshot = await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
-            if (searchRect == null)
-            {
-                return screenshot;
-            }
+        var offsetLeft = searchRect.Left - monitor.Left;
+        var offsetTop = searchRect.Top - monitor.Top;
 
-            using (screenshot)
-            {
-                return screenshot.Crop(searchRect);
-            }
+        return new Rectangle(offsetLeft, offsetTop, offsetLeft + searchRect.Width, offsetTop + searchRect.Height);
+    }
+
+    private async Task<Bitmap> GetScreenshot(MonitorDescription monitor, Rectangle? searchRect)
+    {
+        var screenshot = await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
+        if (searchRect == null)
+        {
+            return screenshot;
         }
 
-        protected async Task<SearchResult> TrimRecognizerResultAndThrowIfRequired(WaitForCommand command, RecognizerSearchResult disposableResult)
+        using (screenshot)
         {
-            try
+            return screenshot.Crop(searchRect);
+        }
+    }
+
+    protected async Task<SearchResult> TrimRecognizerResultAndThrowIfRequired(WaitForCommand command, RecognizerSearchResult disposableResult)
+    {
+        try
+        {
+            if (command.Behavior == NoSingleResultBehavior.Throw)
             {
-                if (command.Behavior == NoSingleResultBehavior.Throw)
+                disposableResult.EnsureSingleLocation(command.WaitFor);
+            }
+
+            return new SearchResult(disposableResult);
+        }
+        catch (MarionetteException)
+        {
+            if (disposableResult != null)
+            {
+                if (command.Behavior == NoSingleResultBehavior.Throw && disposableResult.TransformedScreenshot != null)
                 {
-                    disposableResult.EnsureSingleLocation(command.WaitFor);
+                    await this.SaveScreenshot(disposableResult.Element, disposableResult.TransformedScreenshot).ConfigureAwait(false);
                 }
 
-                return new SearchResult(disposableResult);
+                disposableResult.Dispose();
             }
-            catch (MarionetteException)
-            {
-                if (disposableResult != null)
-                {
-                    if (command.Behavior == NoSingleResultBehavior.Throw && disposableResult.TransformedScreenshot != null)
-                    {
-                        await this.SaveScreenshot(disposableResult.Element, disposableResult.TransformedScreenshot).ConfigureAwait(false);
-                    }
 
-                    disposableResult.Dispose();
-                }
-
-                throw;
-            }
+            throw;
         }
+    }
 
-        private static readonly Regex NotAlphanumericRegex = new Regex("[^a-z0-9\\-]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static readonly Regex WhitespaceRegex = new Regex("\\s+", RegexOptions.Compiled);
-
-        private async Task SaveScreenshot(IElement element, Image screenshot)
+    private async Task SaveScreenshot(IElement element, Image screenshot)
+    {
+        if (this._options.FailureScreenshotPath == null)
         {
-            if (this._options.FailureScreenshotPath == null)
-            {
-                return;
-            }
-
-            var fileName = MakeFailureScreenshotFileName(element);
-
-            var screenshotBytes = screenshot.GetBytes(ImageFormat.Png);
-            await this._fileWriter.SaveScreenshot(Path.Combine(this._options.FailureScreenshotPath, fileName.ToLowerInvariant()), screenshotBytes).ConfigureAwait(false);
+            return;
         }
 
-        private static string MakeFailureScreenshotFileName(IElement element)
-        {
-            var elementDescriptor = NotAlphanumericRegex.Replace(WhitespaceRegex.Replace(element.ToString()?.Trim() ?? string.Empty, "-"), string.Empty);
-            return Messages.FailureScreenshotFileNameFormat.FormatInvariant(DateTime.UtcNow, elementDescriptor.ToLowerInvariant());
-        }
+        var fileName = MakeFailureScreenshotFileName(element);
+
+        var screenshotBytes = screenshot.GetBytes(ImageFormat.Png);
+        await this._fileWriter.SaveScreenshot(Path.Combine(this._options.FailureScreenshotPath, fileName.ToLowerInvariant()), screenshotBytes).ConfigureAwait(false);
+    }
+
+    private static string MakeFailureScreenshotFileName(IElement element)
+    {
+        var elementDescriptor = NotAlphanumericRegex.Replace(WhitespaceRegex.Replace(element.ToString()?.Trim() ?? string.Empty, "-"), string.Empty);
+        return Messages.FailureScreenshotFileNameFormat.FormatInvariant(DateTime.UtcNow, elementDescriptor.ToLowerInvariant());
     }
 }

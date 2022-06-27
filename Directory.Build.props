@@ -1,11 +1,23 @@
 <Project>
   <PropertyGroup>
-    <LangVersion>9</LangVersion>
-    <CodeAnalysisRuleSet>..\..\stylecop.ruleset</CodeAnalysisRuleSet>
+    <Copyright>Copyright © Anthony Simmon $([System.DateTime]::UtcNow.ToString(yyyy))</Copyright>
+    <Authors>Anthony Simmon</Authors>
+    <Owners>Anthony Simmon</Owners>
+    <PackageProjectUrl>https://github.com/asimmon/askaiser-marionette</PackageProjectUrl>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <LangVersion>10</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <Description>Askaiser.Marionette is a test automation framework based on image and text recognition.</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.435">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

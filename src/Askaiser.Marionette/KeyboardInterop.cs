@@ -4,70 +4,69 @@ using System.Linq;
 using System.Threading.Tasks;
 using Askaiser.Marionette.Keyboard;
 
-namespace Askaiser.Marionette
+namespace Askaiser.Marionette;
+
+internal static class KeyboardInterop
 {
-    internal static class KeyboardInterop
+    private static readonly Lazy<InputSimulator> LazyInputSimulator = new Lazy<InputSimulator>(() => new InputSimulator());
+
+    private static readonly HashSet<VirtualKeyCode> KnownModifiers = new()
     {
-        private static readonly Lazy<InputSimulator> LazyInputSimulator = new Lazy<InputSimulator>(() => new InputSimulator());
+        VirtualKeyCode.LSHIFT,
+        VirtualKeyCode.LSHIFT,
+        VirtualKeyCode.SHIFT,
+        VirtualKeyCode.LWIN,
+        VirtualKeyCode.RWIN,
+        VirtualKeyCode.CONTROL,
+        VirtualKeyCode.LCONTROL,
+        VirtualKeyCode.RCONTROL,
+        VirtualKeyCode.LALT,
+        VirtualKeyCode.RALT,
+        VirtualKeyCode.ALT,
+    };
 
-        private static readonly HashSet<VirtualKeyCode> KnownModifiers = new ()
-        {
-            VirtualKeyCode.LSHIFT,
-            VirtualKeyCode.LSHIFT,
-            VirtualKeyCode.SHIFT,
-            VirtualKeyCode.LWIN,
-            VirtualKeyCode.RWIN,
-            VirtualKeyCode.CONTROL,
-            VirtualKeyCode.LCONTROL,
-            VirtualKeyCode.RCONTROL,
-            VirtualKeyCode.LALT,
-            VirtualKeyCode.RALT,
-            VirtualKeyCode.ALT,
-        };
+    public static async Task TypeText(string text)
+    {
+        await Task.Run(() => LazyInputSimulator.Value.Keyboard.TextEntry(text)).ConfigureAwait(false);
+    }
 
-        public static async Task TypeText(string text)
+    public static async Task KeyPress(params VirtualKeyCode[] keyCodes)
+    {
+        await Task.Run(() =>
         {
-            await Task.Run(() => LazyInputSimulator.Value.Keyboard.TextEntry(text)).ConfigureAwait(false);
-        }
+            var modifiers = new HashSet<VirtualKeyCode>();
+            var otherKeyCodes = new HashSet<VirtualKeyCode>();
 
-        public static async Task KeyPress(params VirtualKeyCode[] keyCodes)
-        {
-            await Task.Run(() =>
+            foreach (var keyCode in keyCodes)
             {
-                var modifiers = new HashSet<VirtualKeyCode>();
-                var otherKeyCodes = new HashSet<VirtualKeyCode>();
+                (KnownModifiers.Contains(keyCode) ? modifiers : otherKeyCodes).Add(keyCode);
+            }
 
-                foreach (var keyCode in keyCodes)
-                {
-                    (KnownModifiers.Contains(keyCode) ? modifiers : otherKeyCodes).Add(keyCode);
-                }
+            _ = modifiers.Count > 0
+                ? LazyInputSimulator.Value.Keyboard.ModifiedKeyStroke(modifiers, otherKeyCodes)
+                : LazyInputSimulator.Value.Keyboard.KeyPress(otherKeyCodes.ToArray());
+        }).ConfigureAwait(false);
+    }
 
-                _ = modifiers.Count > 0
-                    ? LazyInputSimulator.Value.Keyboard.ModifiedKeyStroke(modifiers, otherKeyCodes)
-                    : LazyInputSimulator.Value.Keyboard.KeyPress(otherKeyCodes.ToArray());
-            }).ConfigureAwait(false);
-        }
-
-        public static async Task KeyDown(params VirtualKeyCode[] keyCodes)
+    public static async Task KeyDown(params VirtualKeyCode[] keyCodes)
+    {
+        await Task.Run(() =>
         {
-            await Task.Run(() =>
+            foreach (var keyCode in keyCodes)
             {
-                foreach (var keyCode in keyCodes)
-                {
-                    LazyInputSimulator.Value.Keyboard.KeyDown(keyCode);
-                }
-            }).ConfigureAwait(false);
-        }
+                LazyInputSimulator.Value.Keyboard.KeyDown(keyCode);
+            }
+        }).ConfigureAwait(false);
+    }
 
-        public static async Task KeyUp(params VirtualKeyCode[] keyCodes)
+    public static async Task KeyUp(params VirtualKeyCode[] keyCodes)
+    {
+        await Task.Run(() =>
         {
-            await Task.Run(() =>
+            foreach (var keyCode in keyCodes)
             {
-                foreach (var keyCode in keyCodes)
-                {
-                    LazyInputSimulator.Value.Keyboard.KeyUp(keyCode);
-                }
-            }).ConfigureAwait(false);
-        }
+                LazyInputSimulator.Value.Keyboard.KeyUp(keyCode);
+            }
+        }).ConfigureAwait(false);
     }
 }

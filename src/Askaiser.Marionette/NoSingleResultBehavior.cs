@@ -1,8 +1,7 @@
-﻿namespace Askaiser.Marionette
+﻿namespace Askaiser.Marionette;
+
+internal enum NoSingleResultBehavior
 {
-    internal enum NoSingleResultBehavior
-    {
-        Throw,
-        Ignore,
-    }
+    Throw,
+    Ignore,
 }

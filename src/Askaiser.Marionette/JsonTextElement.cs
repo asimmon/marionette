@@ -1,28 +1,27 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Askaiser.Marionette
+namespace Askaiser.Marionette;
+
+internal sealed class JsonTextElement : JsonBaseElement
 {
-    internal sealed class JsonTextElement : JsonBaseElement
+    [JsonConstructor]
+    public JsonTextElement()
     {
-        [JsonConstructor]
-        public JsonTextElement()
-        {
-            this.Kind = JsonElementKinds.Text;
-        }
-
-        internal JsonTextElement(TextElement element)
-            : this()
-        {
-            this.Name = element.Name;
-            this.Content = element.Content;
-            this.Options = element.Options;
-            this.IgnoreCase = element.IgnoreCase;
-        }
-
-        [JsonPropertyName("options")]
-        public TextOptions Options { get; set; }
-
-        [JsonPropertyName("ignoreCase")]
-        public bool IgnoreCase { get; set; }
+        this.Kind = JsonElementKinds.Text;
     }
+
+    internal JsonTextElement(TextElement element)
+        : this()
+    {
+        this.Name = element.Name;
+        this.Content = element.Content;
+        this.Options = element.Options;
+        this.IgnoreCase = element.IgnoreCase;
+    }
+
+    [JsonPropertyName("options")]
+    public TextOptions Options { get; set; }
+
+    [JsonPropertyName("ignoreCase")]
+    public bool IgnoreCase { get; set; }
 }

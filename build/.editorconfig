@@ -1,4 +1,4 @@
-[*.{cs}]
+[*.cs]
 
 # DeclareTypesInNamespaces: Cake build readability is better without namespaces.
 dotnet_diagnostic.CA1050.severity = none

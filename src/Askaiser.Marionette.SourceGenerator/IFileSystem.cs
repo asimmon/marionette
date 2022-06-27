@@ -1,15 +1,14 @@
 using System.Collections.Generic;
 
-namespace Askaiser.Marionette.SourceGenerator
+namespace Askaiser.Marionette.SourceGenerator;
+
+internal interface IFileSystem
 {
-    internal interface IFileSystem
-    {
-        IEnumerable<string> EnumerateFiles(string path);
+    IEnumerable<string> EnumerateFiles(string path);
 
-        IEnumerable<string> EnumerateDirectories(string path);
+    IEnumerable<string> EnumerateDirectories(string path);
 
-        long GetFileSize(string path);
+    long GetFileSize(string path);
 
-        byte[] GetFileBytes(string path);
-    }
+    byte[] GetFileBytes(string path);
 }

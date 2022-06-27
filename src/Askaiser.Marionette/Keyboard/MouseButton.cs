@@ -1,23 +1,22 @@
-﻿namespace Askaiser.Marionette.Keyboard
+﻿namespace Askaiser.Marionette.Keyboard;
+
+/// <summary>
+/// The mouse button
+/// </summary>
+internal enum MouseButton
 {
     /// <summary>
-    /// The mouse button
+    /// Left mouse button
     /// </summary>
-    internal enum MouseButton
-    {
-        /// <summary>
-        /// Left mouse button
-        /// </summary>
-        LeftButton,
+    LeftButton,
 
-        /// <summary>
-        /// Middle mouse button
-        /// </summary>
-        MiddleButton,
+    /// <summary>
+    /// Middle mouse button
+    /// </summary>
+    MiddleButton,
 
-        /// <summary>
-        /// Right moust button
-        /// </summary>
-        RightButton,
-    }
+    /// <summary>
+    /// Right moust button
+    /// </summary>
+    RightButton,
 }

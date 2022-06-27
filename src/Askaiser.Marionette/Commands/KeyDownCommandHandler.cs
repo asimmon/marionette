@@ -1,19 +1,18 @@
 ﻿using System.Threading.Tasks;
 
-namespace Askaiser.Marionette.Commands
+namespace Askaiser.Marionette.Commands;
+
+internal class KeyDownCommandHandler
 {
-    internal class KeyDownCommandHandler
+    private readonly IKeyboardController _keyboardController;
+
+    public KeyDownCommandHandler(IKeyboardController keyboardController)
     {
-        private readonly IKeyboardController _keyboardController;
+        this._keyboardController = keyboardController;
+    }
 
-        public KeyDownCommandHandler(IKeyboardController keyboardController)
-        {
-            this._keyboardController = keyboardController;
-        }
-
-        public async Task Execute(KeyboardKeysCommand command)
-        {
-            await this._keyboardController.KeyDown(command.KeyCodes).ConfigureAwait(false);
-        }
+    public async Task Execute(KeyboardKeysCommand command)
+    {
+        await this._keyboardController.KeyDown(command.KeyCodes).ConfigureAwait(false);
     }
 }

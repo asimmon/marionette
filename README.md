@@ -35,7 +35,7 @@ https://user-images.githubusercontent.com/14242083/126416123-aebd0fce-825f-4ece-
 dotnet add package Askaiser.Marionette
 ```
 
-It supports **.NET Standard 2.0**, **.NET Standard 2.1** an **.NET 5**, but only on Windows for now.
+It supports **.NET Standard 2.0**, **.NET Standard 2.1** an **.NET 6**, but only on Windows for now.
 
 ```csharp
 using (var driver = MarionetteDriver.Create(/* optional DriverOptions */))
@@ -50,7 +50,7 @@ using (var driver = MarionetteDriver.Create(/* optional DriverOptions */))
 
     await driver.SingleClick(library.Pages.Login.Submit);
     
-    // insert moar magic here
+    // insert more magic here
 }
 ```
 

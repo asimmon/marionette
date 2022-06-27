@@ -1,9 +1,8 @@
-﻿namespace Askaiser.Marionette
+﻿namespace Askaiser.Marionette;
+
+public enum MouseSpeed
 {
-    public enum MouseSpeed
-    {
-        Immediate = 0,
-        Fast = 1,
-        Slow = 2,
-    }
+    Immediate = 0,
+    Fast = 1,
+    Slow = 2,
 }

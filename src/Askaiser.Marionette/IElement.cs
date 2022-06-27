@@ -1,7 +1,6 @@
-﻿namespace Askaiser.Marionette
+﻿namespace Askaiser.Marionette;
+
+public interface IElement
 {
-    public interface IElement
-    {
-        string Name { get; }
-    }
+    string Name { get; }
 }

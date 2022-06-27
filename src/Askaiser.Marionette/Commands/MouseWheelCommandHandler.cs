@@ -1,20 +1,19 @@
 ﻿using System.Threading.Tasks;
 
-namespace Askaiser.Marionette.Commands
+namespace Askaiser.Marionette.Commands;
+
+internal class MouseWheelCommandHandler
 {
-    internal class MouseWheelCommandHandler
+    private readonly IMouseController _mouseController;
+
+    public MouseWheelCommandHandler(IMouseController mouseController)
     {
-        private readonly IMouseController _mouseController;
+        this._mouseController = mouseController;
+    }
 
-        public MouseWheelCommandHandler(IMouseController mouseController)
-        {
-            this._mouseController = mouseController;
-        }
-
-        public async Task Execute(MouseWheelCommand command)
-        {
-            var task = command.IsUp ? this._mouseController.WheelUp() : this._mouseController.WheelDown();
-            await task.ConfigureAwait(false);
-        }
+    public async Task Execute(MouseWheelCommand command)
+    {
+        var task = command.IsUp ? this._mouseController.WheelUp() : this._mouseController.WheelDown();
+        await task.ConfigureAwait(false);
     }
 }
