@@ -25,6 +25,11 @@ jobs:
             6.0.x
 
       - run: ./build.ps1
+        if: github.ref != 'refs/heads/master'
+        shell: pwsh
+
+      - run: ./build.ps1 --codecov-token=${{ secrets.codecov_token }}
+        if: github.ref == 'refs/heads/master'
         shell: pwsh
 
       - uses: actions/upload-artifact@v3
