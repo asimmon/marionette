@@ -24,11 +24,11 @@ jobs:
             3.1.x
             6.0.x
 
-      - run: ./build.ps1
+      - run: ./build.ps1 --target=push --nuget-api-key=${{ secrets.myget_api_key }} --nuget-source=${{ secrets.myget_source }}
         if: github.ref != 'refs/heads/master'
         shell: pwsh
 
-      - run: ./build.ps1 --codecov-token=${{ secrets.codecov_token }}
+      - run: ./build.ps1 --target=push --nuget-api-key=${{ secrets.myget_api_key }} --nuget-source=${{ secrets.myget_source }} --codecov-token=${{ secrets.codecov_token }}
         if: github.ref == 'refs/heads/master'
         shell: pwsh
 
