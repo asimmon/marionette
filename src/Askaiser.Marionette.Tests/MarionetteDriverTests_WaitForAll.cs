@@ -34,7 +34,7 @@ public class MarionetteDriverTests_WaitForAll : BaseMarionetteDriverTests
             return expectedResult;
         });
 
-        var ex = await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitForAll(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(0.5)));
+        var ex = await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitForAllAsync(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(0.5)));
         await Task.Delay(TimeSpan.FromSeconds(1));
 
         Assert.Equal(needle1, ex.Element);
@@ -94,7 +94,7 @@ public class MarionetteDriverTests_WaitForAll : BaseMarionetteDriverTests
             return SearchResult.NotFound(needle3);
         });
 
-        await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitForAll(new[] { needle1, needle2, needle3 }, waitFor: TimeSpan.FromSeconds(2)));
+        await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitForAllAsync(new[] { needle1, needle2, needle3 }, waitFor: TimeSpan.FromSeconds(2)));
         await Task.Delay(TimeSpan.FromSeconds(1));
 
         Assert.True(recognizeCallCount >= 1);
@@ -135,7 +135,7 @@ public class MarionetteDriverTests_WaitForAll : BaseMarionetteDriverTests
             return SearchResult.NotFound(needle2);
         });
 
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => driver.WaitForAll(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(10)));
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => driver.WaitForAllAsync(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(10)));
         await Task.Delay(TimeSpan.FromSeconds(1));
 
         Assert.Equal("Yolo", ex.Message);
@@ -163,7 +163,7 @@ public class MarionetteDriverTests_WaitForAll : BaseMarionetteDriverTests
         this.ElementRecognizer.AddExpectedResult(needle3, expectedResult3);
 
         var searchRect = new Rectangle(20, 20, 50, 70);
-        var result = await driver.WaitForAll(new[] { needle1, needle2, needle3 }, searchRect: searchRect);
+        var result = await driver.WaitForAllAsync(new[] { needle1, needle2, needle3 }, searchRect: searchRect);
 
         var actualResult1 = Assert.Single(result, x => expectedResult1.Element == x.Element);
         var actualResult2 = Assert.Single(result, x => expectedResult2.Element == x.Element);

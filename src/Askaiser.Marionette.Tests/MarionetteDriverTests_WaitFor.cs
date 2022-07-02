@@ -10,7 +10,7 @@ public class MarionetteDriverTests_WaitFor : BaseMarionetteDriverTests
     public async Task WaitFor_WhenNegativeTimeout_Throws()
     {
         using var driver = this.CreateDriver();
-        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => driver.WaitFor(new FakeElement("needle"), waitFor: TimeSpan.FromSeconds(-1)));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => driver.WaitForAsync(new FakeElement("needle"), waitFor: TimeSpan.FromSeconds(-1)));
         Assert.Equal(0, this.ElementRecognizer.RecognizeCallCount);
         Assert.Empty(this.FileWriter.SavedFailures);
     }
@@ -23,7 +23,7 @@ public class MarionetteDriverTests_WaitFor : BaseMarionetteDriverTests
         var needle = new FakeElement("needle");
         var expectedResult = this.ElementRecognizer.AddExpectedResult(needle, new SearchResult(needle, new[] { new Rectangle(10, 40, 20, 50) }));
 
-        var actualResult = await driver.WaitFor(needle);
+        var actualResult = await driver.WaitForAsync(needle);
         AssertSearchResult(expectedResult, actualResult);
         Assert.Equal(1, this.ElementRecognizer.RecognizeCallCount);
         Assert.Empty(this.FileWriter.SavedFailures);
@@ -42,7 +42,7 @@ public class MarionetteDriverTests_WaitFor : BaseMarionetteDriverTests
         var needle = new FakeElement("needle");
         this.ElementRecognizer.AddExpectedResult(needle, new SearchResult(needle, Array.Empty<Rectangle>()));
 
-        var ex = await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitFor(needle, waitFor: TimeSpan.FromMilliseconds(waitForMs)));
+        var ex = await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitForAsync(needle, waitFor: TimeSpan.FromMilliseconds(waitForMs)));
 
         Assert.Equal(needle, ex.Element);
 
@@ -79,7 +79,7 @@ public class MarionetteDriverTests_WaitFor : BaseMarionetteDriverTests
         var needle = new FakeElement("needle");
         var expectedResult = this.ElementRecognizer.AddExpectedResult(needle, new SearchResult(needle, new[] { new Rectangle(10, 40, 20, 50), new Rectangle(100, 400, 200, 500) }));
 
-        var ex = await Assert.ThrowsAsync<MultipleElementFoundException>(() => driver.WaitFor(needle, waitFor: TimeSpan.FromMilliseconds(waitForMs)));
+        var ex = await Assert.ThrowsAsync<MultipleElementFoundException>(() => driver.WaitForAsync(needle, waitFor: TimeSpan.FromMilliseconds(waitForMs)));
 
         AssertSearchResult(expectedResult, ex.Result);
         Assert.Equal(1, this.ElementRecognizer.RecognizeCallCount);
@@ -107,7 +107,7 @@ public class MarionetteDriverTests_WaitFor : BaseMarionetteDriverTests
         this.ElementRecognizer.AddExpectedResult(needle, new SearchResult(needle, Array.Empty<Rectangle>()));
 
         var searchRect = new Rectangle(10, 20, 210, 320);
-        var ex = await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitFor(needle, searchRect: searchRect));
+        var ex = await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitForAsync(needle, searchRect: searchRect));
         Assert.Equal(needle, ex.Element);
         Assert.Equal(1, this.ElementRecognizer.RecognizeCallCount);
 
@@ -130,7 +130,7 @@ public class MarionetteDriverTests_WaitFor : BaseMarionetteDriverTests
         var expectedResult = this.ElementRecognizer.AddExpectedResult(needle, new SearchResult(needle, new[] { new Rectangle(10, 40, 20, 50), new Rectangle(100, 400, 200, 500) }));
 
         var searchRect = new Rectangle(5, 7, 450, 630);
-        var ex = await Assert.ThrowsAsync<MultipleElementFoundException>(() => driver.WaitFor(needle, searchRect: searchRect));
+        var ex = await Assert.ThrowsAsync<MultipleElementFoundException>(() => driver.WaitForAsync(needle, searchRect: searchRect));
 
         AssertSearchResult(expectedResult, ex.Result, searchRect);
         Assert.Equal(1, this.ElementRecognizer.RecognizeCallCount);

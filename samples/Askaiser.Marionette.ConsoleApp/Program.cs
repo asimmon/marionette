@@ -26,14 +26,14 @@ public static class Program
         using (var driver = MarionetteDriver.Create())
         {
             // We expect the IDE logo to be in a 200x200 square at the top left of the current monitor.
-            var monitor = await driver.GetCurrentMonitor();
+            var monitor = await driver.GetCurrentMonitorAsync();
             var ideLogoRect = monitor.FromTopLeft(200, 200);
 
             // RiderLogo and VsLogo properties will be generated from the *.png files
-            await driver.MoveToAny(new[] { library.RiderLogo, library.VsLogo }, waitFor: TimeSpan.FromSeconds(2), searchRect: ideLogoRect);
+            await driver.MoveToAnyAsync(new[] { library.RiderLogo, library.VsLogo }, waitFor: TimeSpan.FromSeconds(2), searchRect: ideLogoRect);
 
             // Also, in the same area, we expect to find the toolbar item "Edit". Negative preprocessing should be used if the IDE use a dark theme.
-            await driver.MoveTo("Edit", searchRect: ideLogoRect, textOptions: TextOptions.BlackAndWhite | TextOptions.Negative);
+            await driver.MoveToAsync("Edit", searchRect: ideLogoRect, textOptions: TextOptions.BlackAndWhite | TextOptions.Negative);
         }
     }
 
@@ -64,7 +64,7 @@ public static class Program
 
         using (var driver = MarionetteDriver.Create())
         {
-            await driver.MoveToAny(new[] { library["rider-logo"], library["vs-logo"] }, waitFor: TimeSpan.FromSeconds(2));
+            await driver.MoveToAnyAsync(new[] { library["rider-logo"], library["vs-logo"] }, waitFor: TimeSpan.FromSeconds(2));
         }
     }
 }

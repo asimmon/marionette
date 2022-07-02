@@ -19,7 +19,7 @@ public class MarionetteDriverTests_AreAllVisible : BaseMarionetteDriverTests
         this.ElementRecognizer.AddExpectedResult(needle1, SearchResult.NotFound(needle1));
         this.ElementRecognizer.AddExpectedResult(needle2, new SearchResult(needle2, new[] { new Rectangle(50, 100, 70, 200) }));
 
-        var result = await driver.AreAllVisible(new[] { needle1, needle2 });
+        var result = await driver.AreAllVisibleAsync(new[] { needle1, needle2 });
 
         Assert.False(result);
         Assert.Empty(this.FileWriter.SavedFailures);
@@ -48,7 +48,7 @@ public class MarionetteDriverTests_AreAllVisible : BaseMarionetteDriverTests
             return new SearchResult(needle2, new[] { new Rectangle(10, 75, 660, 230) });
         });
 
-        var result = await driver.AreAllVisible(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(1));
+        var result = await driver.AreAllVisibleAsync(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(1));
 
         Assert.False(result);
         Assert.Empty(this.FileWriter.SavedFailures);
@@ -66,7 +66,7 @@ public class MarionetteDriverTests_AreAllVisible : BaseMarionetteDriverTests
         this.ElementRecognizer.AddExpectedResult(needle1, new SearchResult(needle1, new[] { new Rectangle(50, 100, 70, 200) }));
         this.ElementRecognizer.AddExpectedResult(needle2, new SearchResult(needle2, new[] { new Rectangle(10, 75, 660, 230) }));
 
-        var result = await driver.AreAllVisible(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(0.5));
+        var result = await driver.AreAllVisibleAsync(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(0.5));
 
         Assert.True(result);
         Assert.Empty(this.FileWriter.SavedFailures);
