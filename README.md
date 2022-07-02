@@ -77,6 +77,8 @@ var image = new ImageElement(name: "sidebar-close-button", content: bytes, thres
 * `ImageElement.Threshold` is a floating number between 0 and 1. It defines the accuracy of the image search process. `0.95` is the default value.
 * `ImageElement.Grayscale` defines whether or not the engine will apply grayscaling preprocessing. Image search is faster with grayscaling.
 
+**Image recognition works best with PNG images.**
+
 #### Text search
 
 ```csharp
@@ -90,13 +92,42 @@ var text = new TextElement("Save changes", options: TextOptions.BlackAndWhite | 
 * `TextOptions.BlackAndWhite` : Use grayscaling and binarization (this is the default value),
 * `TextOptions.Negative` : Use negative preprocessing, very helpful with white text on dark background.
 
+## Change the source generator behavior
 
-## Source generator behavior
+Given the following partial image library class:
 
-*TODO: I will explain how to define settings for each individual image (threshold and grayscaling), as well as grouping images into an array property. All of this can be done by using special keywords in each image file name.*
+```csharp
+[ImageLibrary("source/screenshots")]
+public partial class MyLibrary
+{
+}
 
+var library = new MyLibrary();
+```
 
-## Show me the APIs
+The source generator will behave differently depending on the name of the screenshots/images added to the `ImageLibraryAttribute`'s directory path.
+
+> **Use lowercase characters**. Dashes (`-`) and underscores (`_`) are considered as special characters that will change the generated C# code as shown below.
+
+* Adding an image `okbutton.png` will create an image property `library.Okbutton`,
+* Adding an image `ok-button.png` will create an image property `library.OkButton` (here the **dash** is a word separator),
+* Adding an image in a **subdirectory** `my-feature\ok-button.png` will create an image property `library.MyFeature.OkButton`,
+* Adding an image with a **double dash** `my-feature--ok-button.png` simulates a subdirectory and will create an image property `library.MyFeature.OkButton`.
+
+Adding multiple images **suffixed with a zero-based incremental number** such as `ok-button_0.png`, `ok-button_1.png`, `ok-button_2.png`, etc. will create a single array property `library.OkButton` that can be interacted with methods that accept an array of elements (`MoveToAnyAsync`, `WaitForAnyAsync`, `SingleClickAnyAsync`, etc.).
+It is very convenient when you have screenshots of an element in multiple states, for instance a button in its normal, pressed, focus state and you want to click on the button no matter what its current state is.
+
+**Underscores** `_` can be also used to specify image recognition options:
+
+* Adding an image `foo_gs.png` will create an image property `library.Foo` which will be grayscaled during image recognition,
+* Adding an image `foo_0.8` will create an image property `library.Foo` that will use a search threshold of `0.8` instead of the default `0.95`,
+
+You can mix these modifiers. Here we will create an single array property `library.Header` with these images:
+* `header_gs_0.85_0.png` (first item of the array, grayscaled with a 0.85 threshold),
+* `header_gs_0.9_1.png` (second item of the array, grayscaled with a 0.9 threshold),
+* `header_2.png` (second and last item of the array, keep original colors with and use default threshold).
+
+## Show me the `MarionetteDriver` APIs
 
 Many parameters are optional. Most methods that look for an element (image or text) expect to find **only one occurrence** of this element. `ElementNotFoundException` and `MultipleElementFoundException` can be thrown.
 
