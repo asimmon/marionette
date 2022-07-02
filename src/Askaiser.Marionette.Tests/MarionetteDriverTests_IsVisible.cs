@@ -10,7 +10,7 @@ public class MarionetteDriverTests_IsVisible : BaseMarionetteDriverTests
     public async Task IsVisible_WhenNegativeTimeout_Throws()
     {
         using var driver = this.CreateDriver();
-        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => driver.IsVisible(new FakeElement("needle"), waitFor: TimeSpan.FromSeconds(-1)));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => driver.IsVisibleAsync(new FakeElement("needle"), waitFor: TimeSpan.FromSeconds(-1)));
         Assert.Equal(0, this.ElementRecognizer.RecognizeCallCount);
         Assert.Empty(this.FileWriter.SavedFailures);
     }
@@ -23,7 +23,7 @@ public class MarionetteDriverTests_IsVisible : BaseMarionetteDriverTests
         var needle = new FakeElement("needle");
         this.ElementRecognizer.AddExpectedResult(needle, new SearchResult(needle, new[] { new Rectangle(10, 40, 20, 50) }));
 
-        var isVisible = await driver.IsVisible(needle);
+        var isVisible = await driver.IsVisibleAsync(needle);
         Assert.True(isVisible);
         Assert.Equal(1, this.ElementRecognizer.RecognizeCallCount);
         Assert.Empty(this.FileWriter.SavedFailures);
@@ -42,7 +42,7 @@ public class MarionetteDriverTests_IsVisible : BaseMarionetteDriverTests
         var needle = new FakeElement("needle");
         this.ElementRecognizer.AddExpectedResult(needle, new SearchResult(needle, Array.Empty<Rectangle>()));
 
-        var isVisible = await driver.IsVisible(needle, waitFor: TimeSpan.FromMilliseconds(waitForMs));
+        var isVisible = await driver.IsVisibleAsync(needle, waitFor: TimeSpan.FromMilliseconds(waitForMs));
         Assert.False(isVisible);
 
         if (waitForMs == 0)
@@ -68,7 +68,7 @@ public class MarionetteDriverTests_IsVisible : BaseMarionetteDriverTests
         var needle = new FakeElement("needle");
         this.ElementRecognizer.AddExpectedResult(needle, new SearchResult(needle, new[] { new Rectangle(10, 40, 20, 50), new Rectangle(100, 400, 200, 500) }));
 
-        var isVisible = await driver.IsVisible(needle, waitFor: TimeSpan.FromMilliseconds(waitForMs));
+        var isVisible = await driver.IsVisibleAsync(needle, waitFor: TimeSpan.FromMilliseconds(waitForMs));
         Assert.True(isVisible);
         Assert.Equal(1, this.ElementRecognizer.RecognizeCallCount);
         Assert.Empty(this.FileWriter.SavedFailures);

@@ -92,28 +92,28 @@ public sealed class MarionetteDriver : IDisposable
         return new MarionetteDriver(options, fileWriter, monitorService, elementRecognizer, mouseController, keyboardController, textRecognizer);
     }
 
-    public async Task<MonitorDescription[]> GetMonitors()
+    public async Task<MonitorDescription[]> GetMonitorsAsync()
     {
         return await this._monitorService.GetMonitors().ConfigureAwait(false);
     }
 
-    public async Task<MonitorDescription> GetCurrentMonitor()
+    public async Task<MonitorDescription> GetCurrentMonitorAsync()
     {
         return await this._monitorService.GetMonitor(this._monitorIndex).ConfigureAwait(false);
     }
 
-    public async Task<Bitmap> GetScreenshot()
+    public async Task<Bitmap> GetScreenshotAsync()
     {
-        var monitor = await this.GetCurrentMonitor().ConfigureAwait(false);
+        var monitor = await this.GetCurrentMonitorAsync().ConfigureAwait(false);
         return await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
     }
 
-    public Point GetMousePosition()
+    public Point GetMousePositionAsync()
     {
         return this._mouseController.GetCurrentPosition();
     }
 
-    internal async Task<SearchResult> WaitFor(IElement element, TimeSpan? waitFor, Rectangle? searchRect, NoSingleResultBehavior noSingleResultBehavior)
+    internal async Task<SearchResult> WaitForAsync(IElement element, TimeSpan? waitFor, Rectangle? searchRect, NoSingleResultBehavior noSingleResultBehavior)
     {
         if (element == null)
         {
@@ -124,12 +124,12 @@ public sealed class MarionetteDriver : IDisposable
         return await this._waitForHandler.Execute(new WaitForCommand(new[] { element }, effectiveWaitFor, searchRect, this._monitorIndex, noSingleResultBehavior)).ConfigureAwait(false);
     }
 
-    public async Task<SearchResult> WaitFor(IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public async Task<SearchResult> WaitForAsync(IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        return await this.WaitFor(element, waitFor, searchRect, NoSingleResultBehavior.Throw).ConfigureAwait(false);
+        return await this.WaitForAsync(element, waitFor, searchRect, NoSingleResultBehavior.Throw).ConfigureAwait(false);
     }
 
-    internal async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect, NoSingleResultBehavior noSingleResultBehavior)
+    internal async Task<SearchResult> WaitForAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect, NoSingleResultBehavior noSingleResultBehavior)
     {
         if (elements == null)
         {
@@ -146,12 +146,12 @@ public sealed class MarionetteDriver : IDisposable
         return await this._waitForAnyHandler.Execute(new WaitForCommand(enumeratedElements, effectiveWaitFor, searchRect, this._monitorIndex, noSingleResultBehavior)).ConfigureAwait(false);
     }
 
-    public async Task<SearchResult> WaitForAny(IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public async Task<SearchResult> WaitForAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        return await this.WaitForAny(elements, waitFor, searchRect, NoSingleResultBehavior.Throw).ConfigureAwait(false);
+        return await this.WaitForAnyAsync(elements, waitFor, searchRect, NoSingleResultBehavior.Throw).ConfigureAwait(false);
     }
 
-    internal async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect, NoSingleResultBehavior noSingleResultBehavior)
+    internal async Task<SearchResultCollection> WaitForAllAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect, NoSingleResultBehavior noSingleResultBehavior)
     {
         if (elements == null)
         {
@@ -168,47 +168,47 @@ public sealed class MarionetteDriver : IDisposable
         return await this._waitForAllHandler.Execute(new WaitForCommand(enumeratedElements, effectiveWaitFor, searchRect, this._monitorIndex, noSingleResultBehavior)).ConfigureAwait(false);
     }
 
-    public async Task<SearchResultCollection> WaitForAll(IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public async Task<SearchResultCollection> WaitForAllAsync(IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        return await this.WaitForAll(elements, waitFor, searchRect, NoSingleResultBehavior.Throw).ConfigureAwait(false);
+        return await this.WaitForAllAsync(elements, waitFor, searchRect, NoSingleResultBehavior.Throw).ConfigureAwait(false);
     }
 
-    public async Task MoveTo(int x, int y)
+    public async Task MoveToAsync(int x, int y)
     {
         await this._moveToLocationHandler.Execute(new MouseLocationCommand(x, y, this._mouseSpeed)).ConfigureAwait(false);
     }
 
-    public async Task SingleClick(int x, int y)
+    public async Task SingleClickAsync(int x, int y)
     {
         await this._singleClickLocationHandler.Execute(new MouseLocationCommand(x, y, this._mouseSpeed)).ConfigureAwait(false);
     }
 
-    public async Task DoubleClick(int x, int y)
+    public async Task DoubleClickAsync(int x, int y)
     {
         await this._doubleClickLocationHandler.Execute(new MouseLocationCommand(x, y, this._mouseSpeed)).ConfigureAwait(false);
     }
 
-    public async Task TripleClick(int x, int y)
+    public async Task TripleClickAsync(int x, int y)
     {
         await this._tripleClickLocationHandler.Execute(new MouseLocationCommand(x, y, this._mouseSpeed)).ConfigureAwait(false);
     }
 
-    public async Task RightClick(int x, int y)
+    public async Task RightClickAsync(int x, int y)
     {
         await this._rightClickLocationHandler.Execute(new MouseLocationCommand(x, y, this._mouseSpeed)).ConfigureAwait(false);
     }
 
-    public async Task DragFrom(int x, int y)
+    public async Task DragFromAsync(int x, int y)
     {
         await this._dragLocationHandler.Execute(new MouseLocationCommand(x, y, this._mouseSpeed)).ConfigureAwait(false);
     }
 
-    public async Task DropTo(int x, int y)
+    public async Task DropToAsync(int x, int y)
     {
         await this._dropLocationHandler.Execute(new MouseLocationCommand(x, y, this._mouseSpeed)).ConfigureAwait(false);
     }
 
-    public async Task ScrollUp(int scrollTicks = 1)
+    public async Task ScrollUpAsync(int scrollTicks = 1)
     {
         if (scrollTicks <= 0)
         {
@@ -221,7 +221,7 @@ public sealed class MarionetteDriver : IDisposable
         }
     }
 
-    public async Task ScrollDown(int scrollTicks = 1)
+    public async Task ScrollDownAsync(int scrollTicks = 1)
     {
         if (scrollTicks <= 0)
         {
@@ -234,17 +234,17 @@ public sealed class MarionetteDriver : IDisposable
         }
     }
 
-    public Task ScrollUpUntilVisible(IElement element, TimeSpan waitFor, int scrollTicks = 1, Rectangle? searchRect = default)
+    public Task ScrollUpUntilVisibleAsync(IElement element, TimeSpan waitFor, int scrollTicks = 1, Rectangle? searchRect = default)
     {
-        return this.ScrollUntilVisible(element, waitFor, isUp: true, scrollTicks, searchRect);
+        return this.ScrollUntilVisibleAsync(element, waitFor, isUp: true, scrollTicks, searchRect);
     }
 
-    public Task ScrollDownUntilVisible(IElement element, TimeSpan waitFor, int scrollTicks = 1, Rectangle? searchRect = default)
+    public Task ScrollDownUntilVisibleAsync(IElement element, TimeSpan waitFor, int scrollTicks = 1, Rectangle? searchRect = default)
     {
-        return this.ScrollUntilVisible(element, waitFor, isUp: false, scrollTicks, searchRect);
+        return this.ScrollUntilVisibleAsync(element, waitFor, isUp: false, scrollTicks, searchRect);
     }
 
-    private async Task ScrollUntilVisible(IElement element, TimeSpan waitFor, bool isUp, int scrollTicks, Rectangle? searchRect)
+    private async Task ScrollUntilVisibleAsync(IElement element, TimeSpan waitFor, bool isUp, int scrollTicks, Rectangle? searchRect)
     {
         if (waitFor <= TimeSpan.Zero)
         {
@@ -253,19 +253,19 @@ public sealed class MarionetteDriver : IDisposable
 
         for (var sw = Stopwatch.StartNew(); sw.Elapsed < waitFor;)
         {
-            if (await this.IsVisible(element, TimeSpan.Zero, searchRect).ConfigureAwait(false))
+            if (await this.IsVisibleAsync(element, TimeSpan.Zero, searchRect).ConfigureAwait(false))
             {
                 return;
             }
 
-            var scrollTask = isUp ? this.ScrollUp(scrollTicks) : this.ScrollDown(scrollTicks);
+            var scrollTask = isUp ? this.ScrollUpAsync(scrollTicks) : this.ScrollDownAsync(scrollTicks);
             await scrollTask.ConfigureAwait(false);
         }
 
         throw new ElementNotFoundException(element, waitFor);
     }
 
-    public async Task TypeText(string text, TimeSpan? sleepAfter = default)
+    public async Task TypeTextAsync(string text, TimeSpan? sleepAfter = default)
     {
         if (text == null)
         {
@@ -279,12 +279,12 @@ public sealed class MarionetteDriver : IDisposable
             var effectiveSleepAfter = sleepAfter.GetValueOrDefault(this._defaultKeyboardSleepAfterDuration);
             if (effectiveSleepAfter > TimeSpan.Zero)
             {
-                await this.Sleep(effectiveSleepAfter).ConfigureAwait(false);
+                await this.SleepAsync(effectiveSleepAfter).ConfigureAwait(false);
             }
         }
     }
 
-    public async Task KeyPress(VirtualKeyCode[] keyCodes, TimeSpan? sleepAfter = default)
+    public async Task KeyPressAsync(VirtualKeyCode[] keyCodes, TimeSpan? sleepAfter = default)
     {
         EnsureNotNullOrEmpty(keyCodes);
         await this._keyPressHandler.Execute(new KeyboardKeysCommand(keyCodes)).ConfigureAwait(false);
@@ -292,11 +292,11 @@ public sealed class MarionetteDriver : IDisposable
         var effectiveSleepAfter = sleepAfter.GetValueOrDefault(this._defaultKeyboardSleepAfterDuration);
         if (effectiveSleepAfter > TimeSpan.Zero)
         {
-            await this.Sleep(effectiveSleepAfter).ConfigureAwait(false);
+            await this.SleepAsync(effectiveSleepAfter).ConfigureAwait(false);
         }
     }
 
-    public async Task KeyDown(VirtualKeyCode[] keyCodes, TimeSpan? sleepAfter = default)
+    public async Task KeyDownAsync(VirtualKeyCode[] keyCodes, TimeSpan? sleepAfter = default)
     {
         EnsureNotNullOrEmpty(keyCodes);
         await this._keyDownHandler.Execute(new KeyboardKeysCommand(keyCodes)).ConfigureAwait(false);
@@ -304,11 +304,11 @@ public sealed class MarionetteDriver : IDisposable
         var effectiveSleepAfter = sleepAfter.GetValueOrDefault(this._defaultKeyboardSleepAfterDuration);
         if (effectiveSleepAfter > TimeSpan.Zero)
         {
-            await this.Sleep(effectiveSleepAfter).ConfigureAwait(false);
+            await this.SleepAsync(effectiveSleepAfter).ConfigureAwait(false);
         }
     }
 
-    public async Task KeyUp(VirtualKeyCode[] keyCodes, TimeSpan? sleepAfter = default)
+    public async Task KeyUpAsync(VirtualKeyCode[] keyCodes, TimeSpan? sleepAfter = default)
     {
         EnsureNotNullOrEmpty(keyCodes);
         await this._keyUpHandler.Execute(new KeyboardKeysCommand(keyCodes)).ConfigureAwait(false);
@@ -316,7 +316,7 @@ public sealed class MarionetteDriver : IDisposable
         var effectiveSleepAfter = sleepAfter.GetValueOrDefault(this._defaultKeyboardSleepAfterDuration);
         if (effectiveSleepAfter > TimeSpan.Zero)
         {
-            await this.Sleep(effectiveSleepAfter).ConfigureAwait(false);
+            await this.SleepAsync(effectiveSleepAfter).ConfigureAwait(false);
         }
     }
 
@@ -378,10 +378,10 @@ public sealed class MarionetteDriver : IDisposable
     }
 
     [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "It looks more coherent to only use instance methods here.")]
-    public Task Sleep(int millisecondsDelay) => Task.Delay(millisecondsDelay);
+    public Task SleepAsync(int millisecondsDelay) => Task.Delay(millisecondsDelay);
 
     [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "It looks more coherent to only use instance methods here.")]
-    public Task Sleep(TimeSpan delay) => Task.Delay(delay);
+    public Task SleepAsync(TimeSpan delay) => Task.Delay(delay);
 
     public void Dispose()
     {

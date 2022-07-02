@@ -11,177 +11,177 @@ public static class MarionetteDriverExtensions
 {
     #region Mouse interaction with the first available element of a collection
 
-    public static async Task MoveToAny(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task MoveToAnyAsync(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitForAny(elements, waitFor, searchRect).ConfigureAwait(false);
-        await MoveTo(driver, result).ConfigureAwait(false);
+        var result = await driver.WaitForAnyAsync(elements, waitFor, searchRect).ConfigureAwait(false);
+        await MoveToAsync(driver, result).ConfigureAwait(false);
     }
 
-    public static async Task SingleClickAny(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task SingleClickAnyAsync(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitForAny(elements, waitFor, searchRect).ConfigureAwait(false);
-        await SingleClick(driver, result).ConfigureAwait(false);
+        var result = await driver.WaitForAnyAsync(elements, waitFor, searchRect).ConfigureAwait(false);
+        await SingleClickAsync(driver, result).ConfigureAwait(false);
     }
 
-    public static async Task DoubleClickAny(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task DoubleClickAnyAsync(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitForAny(elements, waitFor, searchRect).ConfigureAwait(false);
-        await DoubleClick(driver, result).ConfigureAwait(false);
+        var result = await driver.WaitForAnyAsync(elements, waitFor, searchRect).ConfigureAwait(false);
+        await DoubleClickAsync(driver, result).ConfigureAwait(false);
     }
 
-    public static async Task TripleClickAny(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task TripleClickAnyAsync(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitForAny(elements, waitFor, searchRect).ConfigureAwait(false);
-        await TripleClick(driver, result).ConfigureAwait(false);
+        var result = await driver.WaitForAnyAsync(elements, waitFor, searchRect).ConfigureAwait(false);
+        await TripleClickAsync(driver, result).ConfigureAwait(false);
     }
 
-    public static async Task RightClickAny(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task RightClickAnyAsync(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitForAny(elements, waitFor, searchRect).ConfigureAwait(false);
-        await RightClick(driver, result).ConfigureAwait(false);
+        var result = await driver.WaitForAnyAsync(elements, waitFor, searchRect).ConfigureAwait(false);
+        await RightClickAsync(driver, result).ConfigureAwait(false);
     }
 
-    public static async Task DragFromAny(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task DragFromAnyAsync(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitForAny(elements, waitFor, searchRect).ConfigureAwait(false);
-        await DragFrom(driver, result).ConfigureAwait(false);
+        var result = await driver.WaitForAnyAsync(elements, waitFor, searchRect).ConfigureAwait(false);
+        await DragFromAsync(driver, result).ConfigureAwait(false);
     }
 
-    public static async Task DropToAny(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task DropToAnyAsync(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitForAny(elements, waitFor, searchRect).ConfigureAwait(false);
-        await DropTo(driver, result).ConfigureAwait(false);
+        var result = await driver.WaitForAnyAsync(elements, waitFor, searchRect).ConfigureAwait(false);
+        await DropToAsync(driver, result).ConfigureAwait(false);
     }
 
     #endregion
 
     #region Mouse interaction with points
 
-    public static async Task MoveTo(this MarionetteDriver driver, Point coordinates)
+    public static async Task MoveToAsync(this MarionetteDriver driver, Point coordinates)
     {
         var (x, y) = coordinates;
-        await driver.MoveTo(x, y).ConfigureAwait(false);
+        await driver.MoveToAsync(x, y).ConfigureAwait(false);
     }
 
-    public static async Task SingleClick(this MarionetteDriver driver, Point coordinates)
+    public static async Task SingleClickAsync(this MarionetteDriver driver, Point coordinates)
     {
         var (x, y) = coordinates;
-        await driver.SingleClick(x, y).ConfigureAwait(false);
+        await driver.SingleClickAsync(x, y).ConfigureAwait(false);
     }
 
-    public static async Task DoubleClick(this MarionetteDriver driver, Point coordinates)
+    public static async Task DoubleClickAsync(this MarionetteDriver driver, Point coordinates)
     {
         var (x, y) = coordinates;
-        await driver.DoubleClick(x, y).ConfigureAwait(false);
+        await driver.DoubleClickAsync(x, y).ConfigureAwait(false);
     }
 
-    public static async Task TripleClick(this MarionetteDriver driver, Point coordinates)
+    public static async Task TripleClickAsync(this MarionetteDriver driver, Point coordinates)
     {
         var (x, y) = coordinates;
-        await driver.TripleClick(x, y).ConfigureAwait(false);
+        await driver.TripleClickAsync(x, y).ConfigureAwait(false);
     }
 
-    public static async Task RightClick(this MarionetteDriver driver, Point coordinates)
+    public static async Task RightClickAsync(this MarionetteDriver driver, Point coordinates)
     {
         var (x, y) = coordinates;
-        await driver.RightClick(x, y).ConfigureAwait(false);
+        await driver.RightClickAsync(x, y).ConfigureAwait(false);
     }
 
-    public static async Task DragFrom(this MarionetteDriver driver, Point coordinates)
+    public static async Task DragFromAsync(this MarionetteDriver driver, Point coordinates)
     {
         var (x, y) = coordinates;
-        await driver.DragFrom(x, y).ConfigureAwait(false);
+        await driver.DragFromAsync(x, y).ConfigureAwait(false);
     }
 
-    public static async Task DropTo(this MarionetteDriver driver, Point coordinates)
+    public static async Task DropToAsync(this MarionetteDriver driver, Point coordinates)
     {
         var (x, y) = coordinates;
-        await driver.DropTo(x, y).ConfigureAwait(false);
+        await driver.DropToAsync(x, y).ConfigureAwait(false);
     }
 
     #endregion
 
     #region Mouse interaction with search result
 
-    public static async Task MoveTo(this MarionetteDriver driver, SearchResult searchResult) => await MoveTo(driver, searchResult.Location.Center).ConfigureAwait(false);
+    public static async Task MoveToAsync(this MarionetteDriver driver, SearchResult searchResult) => await MoveToAsync(driver, searchResult.Location.Center).ConfigureAwait(false);
 
-    public static async Task SingleClick(this MarionetteDriver driver, SearchResult searchResult) => await SingleClick(driver, searchResult.Location.Center).ConfigureAwait(false);
+    public static async Task SingleClickAsync(this MarionetteDriver driver, SearchResult searchResult) => await SingleClickAsync(driver, searchResult.Location.Center).ConfigureAwait(false);
 
-    public static async Task DoubleClick(this MarionetteDriver driver, SearchResult searchResult) => await DoubleClick(driver, searchResult.Location.Center).ConfigureAwait(false);
+    public static async Task DoubleClickAsync(this MarionetteDriver driver, SearchResult searchResult) => await DoubleClickAsync(driver, searchResult.Location.Center).ConfigureAwait(false);
 
-    public static async Task TripleClick(this MarionetteDriver driver, SearchResult searchResult) => await TripleClick(driver, searchResult.Location.Center).ConfigureAwait(false);
+    public static async Task TripleClickAsync(this MarionetteDriver driver, SearchResult searchResult) => await TripleClickAsync(driver, searchResult.Location.Center).ConfigureAwait(false);
 
-    public static async Task RightClick(this MarionetteDriver driver, SearchResult searchResult) => await RightClick(driver, searchResult.Location.Center).ConfigureAwait(false);
+    public static async Task RightClickAsync(this MarionetteDriver driver, SearchResult searchResult) => await RightClickAsync(driver, searchResult.Location.Center).ConfigureAwait(false);
 
-    public static async Task DragFrom(this MarionetteDriver driver, SearchResult searchResult) => await DragFrom(driver, searchResult.Location.Center).ConfigureAwait(false);
+    public static async Task DragFromAsync(this MarionetteDriver driver, SearchResult searchResult) => await DragFromAsync(driver, searchResult.Location.Center).ConfigureAwait(false);
 
-    public static async Task DropTo(this MarionetteDriver driver, SearchResult searchResult) => await DropTo(driver, searchResult.Location.Center).ConfigureAwait(false);
+    public static async Task DropToAsync(this MarionetteDriver driver, SearchResult searchResult) => await DropToAsync(driver, searchResult.Location.Center).ConfigureAwait(false);
 
     #endregion
 
     #region Mouse interaction with an element
 
-    public static async Task MoveTo(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task MoveToAsync(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitFor(element, waitFor, searchRect).ConfigureAwait(false);
-        await MoveTo(driver, result).ConfigureAwait(false);
+        var result = await driver.WaitForAsync(element, waitFor, searchRect).ConfigureAwait(false);
+        await MoveToAsync(driver, result).ConfigureAwait(false);
     }
 
-    public static async Task SingleClick(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task SingleClickAsync(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitFor(element, waitFor, searchRect).ConfigureAwait(false);
-        await SingleClick(driver, result).ConfigureAwait(false);
+        var result = await driver.WaitForAsync(element, waitFor, searchRect).ConfigureAwait(false);
+        await SingleClickAsync(driver, result).ConfigureAwait(false);
     }
 
-    public static async Task DoubleClick(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task DoubleClickAsync(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitFor(element, waitFor, searchRect).ConfigureAwait(false);
-        await DoubleClick(driver, result).ConfigureAwait(false);
+        var result = await driver.WaitForAsync(element, waitFor, searchRect).ConfigureAwait(false);
+        await DoubleClickAsync(driver, result).ConfigureAwait(false);
     }
 
-    public static async Task TripleClick(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task TripleClickAsync(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitFor(element, waitFor, searchRect).ConfigureAwait(false);
-        await TripleClick(driver, result).ConfigureAwait(false);
+        var result = await driver.WaitForAsync(element, waitFor, searchRect).ConfigureAwait(false);
+        await TripleClickAsync(driver, result).ConfigureAwait(false);
     }
 
-    public static async Task RightClick(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task RightClickAsync(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitFor(element, waitFor, searchRect).ConfigureAwait(false);
-        await RightClick(driver, result).ConfigureAwait(false);
+        var result = await driver.WaitForAsync(element, waitFor, searchRect).ConfigureAwait(false);
+        await RightClickAsync(driver, result).ConfigureAwait(false);
     }
 
-    public static async Task DragFrom(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task DragFromAsync(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitFor(element, waitFor, searchRect).ConfigureAwait(false);
-        await DragFrom(driver, result).ConfigureAwait(false);
+        var result = await driver.WaitForAsync(element, waitFor, searchRect).ConfigureAwait(false);
+        await DragFromAsync(driver, result).ConfigureAwait(false);
     }
 
-    public static async Task DropTo(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task DropToAsync(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitFor(element, waitFor, searchRect).ConfigureAwait(false);
-        await DropTo(driver, result).ConfigureAwait(false);
+        var result = await driver.WaitForAsync(element, waitFor, searchRect).ConfigureAwait(false);
+        await DropToAsync(driver, result).ConfigureAwait(false);
     }
 
     #endregion
 
     #region Element visibility
 
-    public static async Task<bool> IsVisible(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task<bool> IsVisibleAsync(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitFor(element, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
+        var result = await driver.WaitForAsync(element, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
         return result.Success;
     }
 
-    public static async Task<bool> IsAnyVisible(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task<bool> IsAnyVisibleAsync(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitForAny(elements, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
+        var result = await driver.WaitForAnyAsync(elements, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
         return result.Success;
     }
 
-    public static async Task<bool> AreAllVisible(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task<bool> AreAllVisibleAsync(this MarionetteDriver driver, IEnumerable<IElement> elements, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitForAll(elements, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
+        var result = await driver.WaitForAllAsync(elements, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
         return result.All(x => x.Success);
     }
 
@@ -189,137 +189,137 @@ public static class MarionetteDriverExtensions
 
     #region Key press with single key code
 
-    public static async Task KeyPress(this MarionetteDriver driver, VirtualKeyCode keyCode, TimeSpan? sleepAfter = default)
+    public static async Task KeyPressAsync(this MarionetteDriver driver, VirtualKeyCode keyCode, TimeSpan? sleepAfter = default)
     {
-        await driver.KeyPress(new[] { keyCode }, sleepAfter).ConfigureAwait(false);
+        await driver.KeyPressAsync(new[] { keyCode }, sleepAfter).ConfigureAwait(false);
     }
 
-    public static async Task KeyDown(this MarionetteDriver driver, VirtualKeyCode keyCode, TimeSpan? sleepAfter = default)
+    public static async Task KeyDownAsync(this MarionetteDriver driver, VirtualKeyCode keyCode, TimeSpan? sleepAfter = default)
     {
-        await driver.KeyDown(new[] { keyCode }, sleepAfter).ConfigureAwait(false);
+        await driver.KeyDownAsync(new[] { keyCode }, sleepAfter).ConfigureAwait(false);
     }
 
-    public static async Task KeyUp(this MarionetteDriver driver, VirtualKeyCode keyCode, TimeSpan? sleepAfter = default)
+    public static async Task KeyUpAsync(this MarionetteDriver driver, VirtualKeyCode keyCode, TimeSpan? sleepAfter = default)
     {
-        await driver.KeyUp(new[] { keyCode }, sleepAfter).ConfigureAwait(false);
+        await driver.KeyUpAsync(new[] { keyCode }, sleepAfter).ConfigureAwait(false);
     }
 
     #endregion
 
     #region Text-based actions
 
-    public static async Task<SearchResult> WaitFor(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
+    public static async Task<SearchResult> WaitForAsync(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
     {
-        return await driver.WaitFor(new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        return await driver.WaitForAsync(new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task MoveTo(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
+    public static async Task MoveToAsync(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
     {
-        await MoveTo(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        await MoveToAsync(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task SingleClick(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
+    public static async Task SingleClickAsync(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
     {
-        await SingleClick(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        await SingleClickAsync(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task DoubleClick(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
+    public static async Task DoubleClickAsync(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
     {
-        await DoubleClick(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        await DoubleClickAsync(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task TripleClick(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
+    public static async Task TripleClickAsync(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
     {
-        await TripleClick(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        await TripleClickAsync(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task RightClick(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
+    public static async Task RightClickAsync(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
     {
-        await RightClick(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        await RightClickAsync(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task DragFrom(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
+    public static async Task DragFromAsync(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
     {
-        await DragFrom(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        await DragFromAsync(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task DropTo(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
+    public static async Task DropToAsync(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
     {
-        await DropTo(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        await DropToAsync(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task<bool> IsVisible(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
+    public static async Task<bool> IsVisibleAsync(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
     {
-        return await IsVisible(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        return await IsVisibleAsync(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
     }
 
     #endregion
 
     #region System.Drawing.Image-based actions
 
-    public static async Task<SearchResult> WaitFor(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+    public static async Task<SearchResult> WaitForAsync(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
     {
-        return await driver.WaitFor(new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        return await driver.WaitForAsync(new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task MoveTo(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+    public static async Task MoveToAsync(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
     {
-        await MoveTo(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        await MoveToAsync(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task SingleClick(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+    public static async Task SingleClickAsync(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
     {
-        await SingleClick(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        await SingleClickAsync(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task DoubleClick(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+    public static async Task DoubleClickAsync(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
     {
-        await DoubleClick(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        await DoubleClickAsync(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task TripleClick(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+    public static async Task TripleClickAsync(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
     {
-        await TripleClick(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        await TripleClickAsync(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task RightClick(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+    public static async Task RightClickAsync(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
     {
-        await RightClick(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        await RightClickAsync(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task DragFrom(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+    public static async Task DragFromAsync(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
     {
-        await DragFrom(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        await DragFromAsync(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task DropTo(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+    public static async Task DropToAsync(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
     {
-        await DropTo(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        await DropToAsync(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task<bool> IsVisible(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+    public static async Task<bool> IsVisibleAsync(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
     {
-        return await IsVisible(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        return await IsVisibleAsync(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
     }
 
     #endregion
 
     #region Finding elements locations without throwing exceptions
 
-    public static async Task<Rectangle[]> FindLocations(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
+    public static async Task<Rectangle[]> FindLocationsAsync(this MarionetteDriver driver, IElement element, TimeSpan? waitFor = default, Rectangle? searchRect = default)
     {
-        var result = await driver.WaitFor(element, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
+        var result = await driver.WaitForAsync(element, waitFor, searchRect, NoSingleResultBehavior.Ignore).ConfigureAwait(false);
         return result.Locations.ToArray();
     }
 
-    public static async Task<Rectangle[]> FindLocations(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
+    public static async Task<Rectangle[]> FindLocationsAsync(this MarionetteDriver driver, string text, TimeSpan? waitFor = default, Rectangle? searchRect = default, TextOptions textOptions = TextOptions.BlackAndWhite)
     {
-        return await FindLocations(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
+        return await FindLocationsAsync(driver, new TextElement(text, textOptions), waitFor, searchRect).ConfigureAwait(false);
     }
 
-    public static async Task<Rectangle[]> FindLocations(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
+    public static async Task<Rectangle[]> FindLocationsAsync(this MarionetteDriver driver, Image image, TimeSpan? waitFor = default, Rectangle? searchRect = default, decimal threshold = ImageElement.DefaultThreshold, bool grayscale = false)
     {
-        return await FindLocations(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
+        return await FindLocationsAsync(driver, new ImageElement("image", image.GetBytes(ImageFormat.Png), threshold, grayscale), waitFor, searchRect).ConfigureAwait(false);
     }
 
     #endregion

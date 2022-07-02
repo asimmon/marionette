@@ -66,4 +66,9 @@
       </TfmSpecificPackageFile>
     </ItemGroup>
   </Target>
+
+  <ItemGroup>
+    <Content Include="Askaiser.Marionette.targets" Pack="true" PackagePath="build/net45/" Visible="false" />
+    <Content Include="Askaiser.Marionette.targets" Pack="true" PackagePath="buildTransitive/net45/" Visible="false" />
+  </ItemGroup>
 </Project>

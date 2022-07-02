@@ -28,7 +28,7 @@ public class MarionetteDriverTests_Click : BaseMarionetteDriverTests
         driver.SetCurrentMonitor(0);
         driver.SetMouseSpeed(MouseSpeed.Fast);
         var expectedMonitor = FakeMonitorService.Monitors[0];
-        var actualMonitor = await driver.GetCurrentMonitor();
+        var actualMonitor = await driver.GetCurrentMonitorAsync();
         Assert.Equal(expectedMonitor, actualMonitor);
 
         var needle = new FakeElement("needle");
@@ -37,12 +37,12 @@ public class MarionetteDriverTests_Click : BaseMarionetteDriverTests
 
         Func<Task> action = actionName switch
         {
-            SingleClick => () => driver.SingleClick(needle, searchRect: searchRect),
-            DoubleClick => () => driver.DoubleClick(needle, searchRect: searchRect),
-            TripleClick => () => driver.TripleClick(needle, searchRect: searchRect),
-            RightClick => () => driver.RightClick(needle, searchRect: searchRect),
-            DragFrom => () => driver.DragFrom(needle, searchRect: searchRect),
-            DropTo => () => driver.DropTo(needle, searchRect: searchRect),
+            SingleClick => () => driver.SingleClickAsync(needle, searchRect: searchRect),
+            DoubleClick => () => driver.DoubleClickAsync(needle, searchRect: searchRect),
+            TripleClick => () => driver.TripleClickAsync(needle, searchRect: searchRect),
+            RightClick => () => driver.RightClickAsync(needle, searchRect: searchRect),
+            DragFrom => () => driver.DragFromAsync(needle, searchRect: searchRect),
+            DropTo => () => driver.DropToAsync(needle, searchRect: searchRect),
             _ => throw new ArgumentOutOfRangeException(nameof(actionName), actionName),
         };
 
@@ -68,14 +68,14 @@ public class MarionetteDriverTests_Click : BaseMarionetteDriverTests
         driver.SetMouseSpeed(MouseSpeed.Slow);
 
         var expectedMonitor = FakeMonitorService.Monitors[monitorIndex];
-        var actualMonitor = await driver.GetCurrentMonitor();
+        var actualMonitor = await driver.GetCurrentMonitorAsync();
         Assert.Equal(expectedMonitor, actualMonitor);
 
         var needle = new FakeElement("needle");
         var searchRect = actualMonitor.FromCenter(100, 100);
         this.ElementRecognizer.AddExpectedResult(needle, new SearchResult(needle, new[] { new Rectangle(10, 10, 90, 90) }));
 
-        await driver.SingleClick(needle, searchRect: searchRect);
+        await driver.SingleClickAsync(needle, searchRect: searchRect);
 
         var (expectedX, expectedY) = actualMonitor.Center;
         var expectedResult = $"SingleClick({expectedX}, {expectedY}, Slow)";

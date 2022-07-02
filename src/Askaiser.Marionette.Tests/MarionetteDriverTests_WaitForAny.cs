@@ -23,7 +23,7 @@ public class MarionetteDriverTests_WaitForAny : BaseMarionetteDriverTests
         this.ElementRecognizer.AddExpectedResult(needle1, SearchResult.NotFound(needle1));
         this.ElementRecognizer.AddExpectedResult(needle2, expectedResult);
 
-        var actualResult = await driver.WaitForAny(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(2));
+        var actualResult = await driver.WaitForAnyAsync(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(2));
         await Task.Delay(TimeSpan.FromSeconds(1));
 
         AssertSearchResult(expectedResult, actualResult);
@@ -58,7 +58,7 @@ public class MarionetteDriverTests_WaitForAny : BaseMarionetteDriverTests
             return expectedResult;
         });
 
-        var ex = await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitForAny(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(0.5)));
+        var ex = await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitForAnyAsync(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(0.5)));
         await Task.Delay(TimeSpan.FromSeconds(1));
 
         Assert.Equal(needle1, ex.Element);
@@ -110,7 +110,7 @@ public class MarionetteDriverTests_WaitForAny : BaseMarionetteDriverTests
             return SearchResult.NotFound(needle2);
         });
 
-        var actualResult = await driver.WaitForAny(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(3));
+        var actualResult = await driver.WaitForAnyAsync(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(3));
         await Task.Delay(TimeSpan.FromSeconds(1));
 
         AssertSearchResult(expectedResult, actualResult);
@@ -151,7 +151,7 @@ public class MarionetteDriverTests_WaitForAny : BaseMarionetteDriverTests
             return SearchResult.NotFound(needle3);
         });
 
-        await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitForAny(new[] { needle1, needle2, needle3 }, waitFor: TimeSpan.FromSeconds(2)));
+        await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitForAnyAsync(new[] { needle1, needle2, needle3 }, waitFor: TimeSpan.FromSeconds(2)));
         await Task.Delay(TimeSpan.FromSeconds(1));
 
         Assert.True(recognizeCallCount >= 1);
@@ -192,7 +192,7 @@ public class MarionetteDriverTests_WaitForAny : BaseMarionetteDriverTests
             return SearchResult.NotFound(needle2);
         });
 
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => driver.WaitForAny(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(10)));
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => driver.WaitForAnyAsync(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(10)));
         await Task.Delay(TimeSpan.FromSeconds(1));
 
         Assert.Equal("Yolo", ex.Message);
