@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- If targeting the classic .NET Framework (net45 to net48) using the new or old csproj format, force load this nuget targets file -->
+  <!-- otherwise OpenCvSharpExtern.dll and opencv_videoio_ffmpeg452.dll will be missing from the output directory of the project that consumes Askaiser.Marionette -->
+  <!-- https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild-conditions?view=vs-2022 -->
+  <ItemGroup Condition=" '$(TargetFramework.TrimEnd(`0123456789`))' == 'net' Or '$(TargetFrameworkVersion)' != '' ">
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.5.2.20210404" />
+  </ItemGroup>
+</Project>
