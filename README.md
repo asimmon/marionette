@@ -23,7 +23,7 @@ Askaiser.Marionette is a **test automation framework based on image and text rec
 * `00:00` : Capture screenshots of the app you're testing,
 * `00:08` : Rename and organize your screenshots in a meaningful way,
 * `00:22` : Drop your screenshots in your project,
-* `00:30` : Use `ImageLibrary` to **automatically** generate properties from your screenshots,
+* `00:30` : Use `ImageLibraryAttribute` to **automatically** generate properties from your screenshots,
 * `01:06` : Use `MarionetteDriver` to interact with the generated properties (or even text recognized by the OCR)!
 
 https://user-images.githubusercontent.com/14242083/126416123-aebd0fce-825f-4ece-90e9-762503dc4cab.mp4
@@ -38,6 +38,13 @@ dotnet add package Askaiser.Marionette
 It supports **.NET Standard 2.0**, **.NET Standard 2.1** an **.NET 6**, but only on Windows for now.
 
 ```csharp
+[ImageLibrary("<relativeOrAbsolutePathToMyImagesDirectory>")]
+public partial class MyLibrary
+{
+}
+
+var library = new MyLibrary();
+
 using (var driver = MarionetteDriver.Create(/* optional DriverOptions */))
 {
     // in this exemple, we enter a username and password in a login page
@@ -114,9 +121,9 @@ SleepAsync(TimeSpan delay)
 ### Basic methods
 
 ```csharp
-WaitForAsync(IElement element, TimeSpan? waitFor, Rectangle searchRect)
-WaitForAllAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
-WaitForAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
+WaitForAsync(IElement element, TimeSpan? waitFor, Rectangle? searchRect)
+WaitForAllAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect)
+WaitForAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect)
 SingleClickAsync(int x, int y)
 DoubleClickAsync(int x, int y)
 TripleClickAsync(int x, int y)
@@ -130,54 +137,54 @@ KeyDownAsync(VirtualKeyCode[] keyCodes)
 KeyUpAsync(VirtualKeyCode[] keyCodes)
 ScrollDownAsync(int scrollTicks)
 ScrollUpAsync(int scrollTicks)
-ScrollDownUntilVisibleAsync(IElement element, TimeSpan totalDuration, int scrollTicks, Rectangle searchRect)
-ScrollUpUntilVisibleAsync(IElement element, TimeSpan totalDuration, int scrollTicks, Rectangle searchRect)
+ScrollDownUntilVisibleAsync(IElement element, TimeSpan totalDuration, int scrollTicks, Rectangle? searchRect)
+ScrollUpUntilVisibleAsync(IElement element, TimeSpan totalDuration, int scrollTicks, Rectangle? searchRect)
 ```
 
 ### Mouse interaction with an element
 
 ```csharp
-MoveToAsync(IElement element, TimeSpan? waitFor, Rectangle searchRect)
-SingleClickAsync(IElement element, TimeSpan? waitFor, Rectangle searchRect)
-DoubleClickAsync(IElement element, TimeSpan? waitFor, Rectangle searchRect)
-TripleClickAsync(IElement element, TimeSpan? waitFor, Rectangle searchRect)
-RightClickAsync(IElement element, TimeSpan? waitFor, Rectangle searchRect)
-DragFromAsync(IElement element, TimeSpan? waitFor, Rectangle searchRect)
-DropToAsync(IElement element, TimeSpan? waitFor, Rectangle searchRect)
+MoveToAsync(IElement element, TimeSpan? waitFor, Rectangle? searchRect)
+SingleClickAsync(IElement element, TimeSpan? waitFor, Rectangle? searchRect)
+DoubleClickAsync(IElement element, TimeSpan? waitFor, Rectangle? searchRect)
+TripleClickAsync(IElement element, TimeSpan? waitFor, Rectangle? searchRect)
+RightClickAsync(IElement element, TimeSpan? waitFor, Rectangle? searchRect)
+DragFromAsync(IElement element, TimeSpan? waitFor, Rectangle? searchRect)
+DropToAsync(IElement element, TimeSpan? waitFor, Rectangle? searchRect)
 ```
 
 ### Check for element visibility
 
 ```csharp
-IsVisibleAsync(IElement element, TimeSpan? waitFor, Rectangle searchRect)
-IsAnyVisibleAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
-AreAllVisibleAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
+IsVisibleAsync(IElement element, TimeSpan? waitFor, Rectangle? searchRect)
+IsAnyVisibleAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect)
+AreAllVisibleAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect)
 ```
 
 ### Mouse interaction with the first available element of a collection
 
 ```csharp
-MoveToAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
-SingleClickAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
-DoubleClickAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
-TripleClickAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
-RightClickAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
-DragFromAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
-DropToAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle searchRect)
+MoveToAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect)
+SingleClickAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect)
+DoubleClickAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect)
+TripleClickAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect)
+RightClickAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect)
+DragFromAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect)
+DropToAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect)
 ```
 
 ### Text-based actions
 
 ```csharp
-WaitForAsync(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
-MoveToAsync(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
-SingleClickAsync(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
-DoubleClickAsync(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
-TripleClickAsync(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
-RightClickAsync(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
-DragFromAsync(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
-DropToAsync(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
-IsVisibleAsync(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
+WaitForAsync(string text, TimeSpan? waitFor, Rectangle? searchRect, TextOptions? textOptions)
+MoveToAsync(string text, TimeSpan? waitFor, Rectangle? searchRect, TextOptions? textOptions)
+SingleClickAsync(string text, TimeSpan? waitFor, Rectangle? searchRect, TextOptions? textOptions)
+DoubleClickAsync(string text, TimeSpan? waitFor, Rectangle? searchRect, TextOptions? textOptions)
+TripleClickAsync(string text, TimeSpan? waitFor, Rectangle? searchRect, TextOptions? textOptions)
+RightClickAsync(string text, TimeSpan? waitFor, Rectangle? searchRect, TextOptions? textOptions)
+DragFromAsync(string text, TimeSpan? waitFor, Rectangle? searchRect, TextOptions? textOptions)
+DropToAsync(string text, TimeSpan? waitFor, Rectangle? searchRect, TextOptions? textOptions)
+IsVisibleAsync(string text, TimeSpan? waitFor, Rectangle? searchRect, TextOptions? textOptions)
 ```
 
 ### Mouse interaction with points
@@ -215,21 +222,21 @@ KeyUpAsync(VirtualKeyCode keyCode, TimeSpan? sleepAfter)
 ### `System.Drawing.Image`-based actions
 
 ```csharp
-WaitForAsync(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-MoveToAsync(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-SingleClickAsync(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-DoubleClickAsync(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-TripleClickAsync(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-RightClickAsync(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-DragFromAsync(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-DropToAsync(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
-IsVisibleAsync(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
+WaitForAsync(Image image, TimeSpan? waitFor, Rectangle? searchRect, decimal? threshold, bool? grayscale)
+MoveToAsync(Image image, TimeSpan? waitFor, Rectangle? searchRect, decimal? threshold, bool? grayscale)
+SingleClickAsync(Image image, TimeSpan? waitFor, Rectangle? searchRect, decimal? threshold, bool? grayscale)
+DoubleClickAsync(Image image, TimeSpan? waitFor, Rectangle? searchRect, decimal? threshold, bool? grayscale)
+TripleClickAsync(Image image, TimeSpan? waitFor, Rectangle? searchRect, decimal? threshold, bool? grayscale)
+RightClickAsync(Image image, TimeSpan? waitFor, Rectangle? searchRect, decimal? threshold, bool? grayscale)
+DragFromAsync(Image image, TimeSpan? waitFor, Rectangle? searchRect, decimal? threshold, bool? grayscale)
+DropToAsync(Image image, TimeSpan? waitFor, Rectangle? searchRect, decimal? threshold, bool? grayscale)
+IsVisibleAsync(Image image, TimeSpan? waitFor, Rectangle? searchRect, decimal? threshold, bool? grayscale)
 ```
 
 ### Finding elements locations without throwing not found exceptions or multiple element found exceptions
 
 ```csharp
-FindLocationsAsync(IElement element, TimeSpan? waitFor, Rectangle searchRect)
-FindLocationsAsync(string text, TimeSpan? waitFor, Rectangle searchRect, TextOptions textOptions)
-FindLocationsAsync(Image image, TimeSpan? waitFor, Rectangle searchRect, decimal threshold, bool grayscale)
+FindLocationsAsync(IElement element, TimeSpan? waitFor, Rectangle? searchRect)
+FindLocationsAsync(string text, TimeSpan? waitFor, Rectangle? searchRect, TextOptions? textOptions)
+FindLocationsAsync(Image image, TimeSpan? waitFor, Rectangle? searchRect, decimal? threshold, bool? grayscale)
 ```
