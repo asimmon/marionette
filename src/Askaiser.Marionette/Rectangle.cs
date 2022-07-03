@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Askaiser.Marionette;
 
-[SuppressMessage("StyleCop.Analyzers.ReadabilityRules", "SA1101:PrefixLocalCallsWithThis", Justification = "StyleCop.Analyzers is not aware of records 'with' syntax.")]
 [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "I don't want to")]
 public record Rectangle
 {
