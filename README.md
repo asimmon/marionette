@@ -61,7 +61,7 @@ using (var driver = MarionetteDriver.Create(/* optional DriverOptions */))
 }
 ```
 
-The [sample project](https://github.com/asimmon/askaiser-marionette/tree/master/samples/Askaiser.Marionette.ConsoleApp) will shows the basics of using this library.
+The [sample project](https://github.com/asimmon/askaiser-marionette/tree/master/samples/Askaiser.Marionette.ConsoleApp) shows the basics of using this library.
 
 
 ## Change the source generator behavior
