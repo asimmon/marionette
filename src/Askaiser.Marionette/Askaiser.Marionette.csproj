@@ -3,8 +3,8 @@
     <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0-windows</TargetFrameworks>
     <AssemblyTitle>Askaiser.Marionette</AssemblyTitle>
     <PackageId>Askaiser.Marionette</PackageId>
-    <IsPackable>True</IsPackable>
-    <IncludeSymbols>True</IncludeSymbols>
+    <IsPackable>true</IsPackable>
+    <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
@@ -25,8 +25,8 @@
     <None Include="tessdata\eng.traineddata">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <PackagePath>content\tessdata;contentFiles\any\any\tessdata</PackagePath>
-      <PackageCopyToOutput>True</PackageCopyToOutput>
-      <Pack>True</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <Pack>true</Pack>
     </None>
   </ItemGroup>
 
@@ -39,14 +39,18 @@
 
   <ItemGroup>
     <Compile Update="Messages.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
+      <DesignTime>true</DesignTime>
+      <AutoGen>true</AutoGen>
       <DependentUpon>Messages.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <None Include="..\..\README.md" Link="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Askaiser.Marionette.targets" Pack="true" PackagePath="build\net45\;buildTransitive\net45\" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -56,19 +60,13 @@
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
     <ItemGroup>
-      <_ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')-&gt;WithMetadataValue('PrivateAssets', 'All'))" />
+      <MarionettePrivateAssetsFiles Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')-&gt;WithMetadataValue('PrivateAssets', 'All'))" />
+      <MarionetteSourceGeneratorDlls Include="@(MarionettePrivateAssetsFiles)" Condition=" '%(Filename)' == 'Askaiser.Marionette.SourceGenerator' And '%(Extension)' == '.dll' " />
     </ItemGroup>
 
     <!-- Prevent copying the source generator files multiple times (for each targeted framework) -->
     <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-      <TfmSpecificPackageFile Include="@(_ReferenceCopyLocalPaths)">
-        <PackagePath>analyzers/dotnet/cs</PackagePath>
-      </TfmSpecificPackageFile>
+      <TfmSpecificPackageFile Include="@(MarionetteSourceGeneratorDlls)" PackagePath="analyzers\dotnet\cs" />
     </ItemGroup>
   </Target>
-
-  <ItemGroup>
-    <Content Include="Askaiser.Marionette.targets" Pack="true" PackagePath="build/net45/" Visible="false" />
-    <Content Include="Askaiser.Marionette.targets" Pack="true" PackagePath="buildTransitive/net45/" Visible="false" />
-  </ItemGroup>
 </Project>
