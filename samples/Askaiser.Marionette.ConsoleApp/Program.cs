@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Askaiser.Marionette.ConsoleApp;
 
 [ImageLibrary("images")]
-[SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleType", Justification = "It shows how to build an image library in the main Program class.")]
 public partial class MyLibrary
 {
 }
@@ -29,8 +28,10 @@ public static class Program
             var monitor = await driver.GetCurrentMonitorAsync();
             var ideLogoRect = monitor.FromTopLeft(200, 200);
 
-            // RiderLogo and VsLogo properties will be generated from the *.png files
-            await driver.MoveToAnyAsync(new[] { library.RiderLogo, library.VsLogo }, waitFor: TimeSpan.FromSeconds(2), searchRect: ideLogoRect);
+            // RiderLogo and VsLogo properties will be generated from the *.png files in the images directory specified in the MyLibrary class definition
+            // VsLogo is an array because there are multiple images suffixed with "_n" (vs-logo_0.png, vs-logo_1.png)
+            var ideLogos = new[] { library.RiderLogo }.Concat(library.VsLogo);
+            await driver.MoveToAnyAsync(ideLogos, waitFor: TimeSpan.FromSeconds(2), searchRect: ideLogoRect);
 
             // Also, in the same area, we expect to find the toolbar item "Edit". Negative preprocessing should be used if the IDE use a dark theme.
             await driver.MoveToAsync("Edit", searchRect: ideLogoRect, textOptions: TextOptions.BlackAndWhite | TextOptions.Negative);

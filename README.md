@@ -61,36 +61,8 @@ using (var driver = MarionetteDriver.Create(/* optional DriverOptions */))
 }
 ```
 
-The [sample project](https://github.com/asimmon/askaiser-marionette/tree/master/samples/Askaiser.Marionette.ConsoleApp) will show you the basics of using this library.
+The [sample project](https://github.com/asimmon/askaiser-marionette/tree/master/samples/Askaiser.Marionette.ConsoleApp) shows the basics of using this library.
 
-
-## Creating image and text elements manually
-
-#### Image search
-
-```csharp
-// Instead of relying on the source generator that works with image files, you can create an ImageElement manually
-var bytes = await File.ReadAllBytesAsync("path/to/your/image.png");
-var image = new ImageElement(name: "sidebar-close-button", content: bytes, threshold: 0.95m, grayscale: false);
-```
-
-* `ImageElement.Threshold` is a floating number between 0 and 1. It defines the accuracy of the image search process. `0.95` is the default value.
-* `ImageElement.Grayscale` defines whether or not the engine will apply grayscaling preprocessing. Image search is faster with grayscaling.
-
-**Image recognition works best with PNG images.**
-
-#### Text search
-
-```csharp
-Although many methods accept a simple string as an element, you can manually create a TextElement
-var text = new TextElement("Save changes", options: TextOptions.BlackAndWhite | TextOptions.Negative);
-```
-
-**Text options** are flags that define the preprocessing behavior of your monitor's screenshots before executing the OCR.
-* `TextOptions.None` : do not use preprocessing,
-* `TextOptions.Grayscale` : Use grayscaling,
-* `TextOptions.BlackAndWhite` : Use grayscaling and binarization (this is the default value),
-* `TextOptions.Negative` : Use negative preprocessing, very helpful with white text on dark background.
 
 ## Change the source generator behavior
 
@@ -127,7 +99,36 @@ You can mix these modifiers. Here we will create an single array property `libra
 * `header_gs_0.9_1.png` (second item of the array, grayscaled with a 0.9 threshold),
 * `header_2.png` (second and last item of the array, keep original colors with and use default threshold).
 
-## Show me the `MarionetteDriver` APIs
+## Creating image and text elements manually
+
+#### Image search
+
+```csharp
+// Instead of relying on the source generator that works with image files, you can create an ImageElement manually
+var bytes = await File.ReadAllBytesAsync("path/to/your/image.png");
+var image = new ImageElement(name: "sidebar-close-button", content: bytes, threshold: 0.95m, grayscale: false);
+```
+
+* `ImageElement.Threshold` is a floating number between 0 and 1. It defines the accuracy of the image search process. `0.95` is the default value.
+* `ImageElement.Grayscale` defines whether or not the engine will apply grayscaling preprocessing. Image search is faster with grayscaling.
+
+**Image recognition works best with PNG images.**
+
+#### Text search
+
+```csharp
+Although many methods accept a simple string as an element, you can manually create a TextElement
+var text = new TextElement("Save changes", options: TextOptions.BlackAndWhite | TextOptions.Negative);
+```
+
+**Text options** are flags that define the preprocessing behavior of your monitor's screenshots before executing the OCR.
+* `TextOptions.None` : do not use preprocessing,
+* `TextOptions.Grayscale` : Use grayscaling,
+* `TextOptions.BlackAndWhite` : Use grayscaling and binarization (this is the default value),
+* `TextOptions.Negative` : Use negative preprocessing, very helpful with white text on dark background.
+
+
+## MarionetteDriver methods
 
 Many parameters are optional. Most methods that look for an element (image or text) expect to find **only one occurrence** of this element. `ElementNotFoundException` and `MultipleElementFoundException` can be thrown.
 
