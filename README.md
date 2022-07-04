@@ -117,7 +117,7 @@ var image = new ImageElement(name: "sidebar-close-button", content: bytes, thres
 #### Text search
 
 ```csharp
-Although many methods accept a simple string as an element, you can manually create a TextElement
+// Although many methods accept a simple string as an element, you can manually create a TextElement
 var text = new TextElement("Save changes", options: TextOptions.BlackAndWhite | TextOptions.Negative);
 ```
 
