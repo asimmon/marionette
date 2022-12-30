@@ -147,6 +147,24 @@ public class LibraryCodeGenerator
             WriteGeneratedCodeAttribute(cw);
             cw.AppendLine("private readonly global::Askaiser.Marionette.ElementCollection _elements;");
             cw.AppendLine();
+
+            if (library.IsRoot && this._target.IsSingleton)
+            {
+                WriteGeneratedCodeAttribute(cw);
+                cw.Append("private static readonly global::System.Lazy<").Append(className).Append("> _lazy = new global::System.Lazy<").Append(className).Append(">(() => new ").Append(className).AppendLine("());");
+                cw.AppendLine();
+
+                WriteGeneratedCodeAttribute(cw);
+                cw.Append("public static ").Append(className).AppendLine(" Instance");
+
+                using (cw.BeginBlock())
+                {
+                    cw.AppendLine("get { return _lazy.Value; }");
+                }
+
+                cw.AppendLine();
+            }
+
             this.GenerateLibraryConstructorCode(library, cw);
             GenerateLibraryPropertiesCode(library, cw);
             GenerateLibraryElementCreationCode(library, cw);

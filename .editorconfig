@@ -561,7 +561,7 @@ dotnet_diagnostic.SA1644.severity = none
 dotnet_diagnostic.SA1652.severity = none
 
 ## Test configs
-[**Tests*/**.cs]
+[{**Tests*/**.cs,**ConsoleApp/**.cs}]
 dotnet_diagnostic.CA1002.severity = none
 dotnet_diagnostic.CA1005.severity = warning
 dotnet_diagnostic.CA1021.severity = warning

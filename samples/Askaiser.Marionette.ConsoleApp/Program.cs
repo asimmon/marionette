@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Askaiser.Marionette.ConsoleApp;
 
-[ImageLibrary("images")]
+[ImageLibrary("images", singleton: true)]
 public partial class MyLibrary
 {
 }
@@ -20,8 +20,6 @@ public static class Program
 
     private static async Task AutomaticallyGeneratedLibrary()
     {
-        var library = new MyLibrary();
-
         using (var driver = MarionetteDriver.Create())
         {
             // We expect the IDE logo to be in a 200x200 square at the top left of the current monitor.
@@ -30,7 +28,7 @@ public static class Program
 
             // RiderLogo and VsLogo properties will be generated from the *.png files in the images directory specified in the MyLibrary class definition
             // VsLogo is an array because there are multiple images suffixed with "_n" (vs-logo_0.png, vs-logo_1.png)
-            var ideLogos = new[] { library.RiderLogo }.Concat(library.VsLogo);
+            var ideLogos = new[] { MyLibrary.Instance.RiderLogo }.Concat(MyLibrary.Instance.VsLogo);
             await driver.MoveToAnyAsync(ideLogos, waitFor: TimeSpan.FromSeconds(2), searchRect: ideLogoRect);
 
             // Also, in the same area, we expect to find the toolbar item "Edit". Negative preprocessing should be used if the IDE use a dark theme.

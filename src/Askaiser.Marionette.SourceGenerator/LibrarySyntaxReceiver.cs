@@ -75,7 +75,8 @@ public class LibrarySyntaxReceiver : ISyntaxContextReceiver
 
             var modifierNames = string.Join(" ", classSyntax.Modifiers.Select(x => x.ValueText));
 
-            this._targetedClasses.Add(new TargetedClassInfo(classModel.Name, classModel.GetNamespace(), modifierNames, validImageDirPath, context.Node));
+            var isSingleton = attribute.ConstructorArguments[1].Value as bool?;
+            this._targetedClasses.Add(new TargetedClassInfo(classModel.Name, classModel.GetNamespace(), modifierNames, validImageDirPath, isSingleton.GetValueOrDefault(), context.Node));
         }
         else
         {
@@ -105,7 +106,8 @@ public class LibrarySyntaxReceiver : ISyntaxContextReceiver
             return false;
         }
 
-        return Constants.ExpectedAttributeNamespaceName.Equals(attribute.AttributeClass.GetNamespace(), StringComparison.Ordinal);
+        return Constants.ExpectedAttributeNamespaceName.Equals(attribute.AttributeClass.GetNamespace(), StringComparison.Ordinal)
+            && attribute.ConstructorArguments.Length == 2;
     }
 
     private static bool TryValidatePath(string rawPath, out string validPath)
