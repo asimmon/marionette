@@ -51,8 +51,10 @@ It supports **.NET Standard 2.0**, **.NET Standard 2.1** an **.NET 6**, but only
 [ImageLibrary("path/to/your/images")]
 public partial class MyLibrary
 {
-    // In the "path/to/your/images" directory, we assume here that there are multiple small screenshots of UI elements with these relative paths: "pages/login/title.png", "pages/login/email.png", "pages/login/password.png" and "pages/login/submit.png".
-    // These file names actually control the behavior of the C# source generator. This behavior is explained in the next section.
+    // In the "path/to/your/images" directory, we assume here that there are multiple small screenshots of UI elements
+    // with these relative paths: "pages/login/title.png", "pages/login/email.png", "pages/login/password.png" and "pages/login/submit.png".
+    // These file names actually control the behavior of the C# source generator.
+    // This behavior is explained in the next section.
 }
 
 using (var driver = MarionetteDriver.Create(/* optional DriverOptions */))
@@ -107,7 +109,7 @@ It is very convenient when you have screenshots of an element in multiple states
 You can mix these modifiers. Here we will create an single array property `library.Header` with these images:
 * `header_gs_0.85_0.png` (first item of the array, grayscaled with a 0.85 threshold),
 * `header_gs_0.9_1.png` (second item of the array, grayscaled with a 0.9 threshold),
-* `header_2.png` (second and last item of the array, keep original colors with and use default threshold).
+* `header_2.png` (third and last item of the array, keep original colors with and use default threshold).
 
 
 ## ✍ Manually creating image and text elements
