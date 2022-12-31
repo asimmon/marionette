@@ -71,27 +71,19 @@ public sealed class MarionetteDriver : IDisposable
         this._defaultKeyboardSleepAfterDuration = options.DefaultKeyboardSleepAfterDuration;
     }
 
-    public static MarionetteDriver Create()
+    public static MarionetteDriver Create(DriverOptions? options = null)
     {
-        return Create(new DriverOptions());
-    }
+        var optionsCopy = options == null ? new DriverOptions() : new DriverOptions(options);
 
-    public static MarionetteDriver Create(DriverOptions options)
-    {
-        if (options == null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
-
-        var monitorService = new MonitorService(options.ScreenshotCacheDuration);
+        var monitorService = new MonitorService(optionsCopy.ScreenshotCacheDuration);
         var imageRecognizer = new ImageElementRecognizer();
-        var textRecognizer = new TextElementRecognizer(options);
+        var textRecognizer = new TextElementRecognizer(optionsCopy);
         var elementRecognizer = new AggregateElementRecognizer(imageRecognizer, textRecognizer);
         var mouseController = new MouseController();
         var keyboardController = new KeyboardController();
         var fileWriter = new RealFileWriter();
 
-        return new MarionetteDriver(options, fileWriter, monitorService, elementRecognizer, mouseController, keyboardController, textRecognizer);
+        return new MarionetteDriver(optionsCopy, fileWriter, monitorService, elementRecognizer, mouseController, keyboardController, textRecognizer);
     }
 
     public async Task<MonitorDescription[]> GetMonitorsAsync()

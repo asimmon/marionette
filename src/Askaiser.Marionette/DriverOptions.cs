@@ -14,6 +14,7 @@ public sealed class DriverOptions
     private readonly TimeSpan _waitForThrottlingInterval;
     private readonly TimeSpan _defaultWaitForDuration;
     private readonly TimeSpan _defaultKeyboardSleepAfterDuration;
+    private readonly MouseSpeed _mouseSpeed;
 
     public DriverOptions()
     {
@@ -24,7 +25,19 @@ public sealed class DriverOptions
         this._waitForThrottlingInterval = TimeSpan.FromMilliseconds(50);
         this._defaultWaitForDuration = TimeSpan.Zero;
         this._defaultKeyboardSleepAfterDuration = TimeSpan.Zero;
-        this.MouseSpeed = MouseSpeed.Fast;
+        this._mouseSpeed = MouseSpeed.Fast;
+    }
+
+    internal DriverOptions(DriverOptions options)
+    {
+        this._tesseractDataPath = options._tesseractDataPath;
+        this._tesseractLanguage = options._tesseractLanguage;
+        this._failureScreenshotPath = options._failureScreenshotPath;
+        this._screenshotCacheDuration = options._screenshotCacheDuration;
+        this._waitForThrottlingInterval = options._waitForThrottlingInterval;
+        this._defaultWaitForDuration = options._defaultWaitForDuration;
+        this._defaultKeyboardSleepAfterDuration = options._defaultKeyboardSleepAfterDuration;
+        this._mouseSpeed = options._mouseSpeed;
     }
 
     /// <summary>
@@ -98,7 +111,11 @@ public sealed class DriverOptions
     /// <summary>
     /// Gets or sets the initial mouse speed of the driver
     /// </summary>
-    public MouseSpeed MouseSpeed { get; init; }
+    public MouseSpeed MouseSpeed
+    {
+        get => this._mouseSpeed;
+        init => this._mouseSpeed = value is MouseSpeed.Immediate or MouseSpeed.Slow or MouseSpeed.Fast ? value : throw new ArgumentOutOfRangeException(nameof(this.MouseSpeed));
+    }
 
     private static string GetCurrentAssemblyDirectoryPath()
     {
