@@ -1,13 +1,8 @@
-name: CI build
+name: CI
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - master
   pull_request:
-    branches:
-      - master
+    branches: ["master"]
 
 jobs:
   build:
@@ -18,21 +13,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-dotnet@v2
+      - uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: |
-            3.1.x
-            6.0.x
+          dotnet-version: "6.0.x"
 
-      - run: ./build.ps1 --target=push --nuget-api-key=${{ secrets.myget_api_key }} --nuget-source=${{ secrets.myget_source }}
-        if: github.ref != 'refs/heads/master'
+      - run: ./Build.ps1
         shell: pwsh
-
-      - run: ./build.ps1 --target=push --nuget-api-key=${{ secrets.myget_api_key }} --nuget-source=${{ secrets.myget_source }} --codecov-token=${{ secrets.codecov_token }}
-        if: github.ref == 'refs/heads/master'
-        shell: pwsh
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: packages
-          path: ./.output/**/*
+        env:
+          NUGET_SOURCE: ${{ secrets.MYGET_SOURCE }}
+          NUGET_API_KEY: ${{ secrets.MYGET_API_KEY }}

@@ -17,7 +17,7 @@ indent_size = 2
 indent_size = 2
 
 # JSON Files
-[*.{json,json5,webmanifest}]
+[*.{json,yml,yaml,json5,webmanifest}]
 indent_size = 2
 
 # Markdown Files
