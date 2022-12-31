@@ -71,19 +71,27 @@ public sealed class MarionetteDriver : IDisposable
         this._defaultKeyboardSleepAfterDuration = options.DefaultKeyboardSleepAfterDuration;
     }
 
-    public static MarionetteDriver Create(DriverOptions? options = null)
+    public static MarionetteDriver Create()
     {
-        var optionsCopy = options == null ? new DriverOptions() : new DriverOptions(options);
+        return Create(new DriverOptions());
+    }
 
-        var monitorService = new MonitorService(optionsCopy.ScreenshotCacheDuration);
+    public static MarionetteDriver Create(DriverOptions options)
+    {
+        if (options == null)
+        {
+            throw new ArgumentNullException(nameof(options));
+        }
+
+        var monitorService = new MonitorService(options.ScreenshotCacheDuration);
         var imageRecognizer = new ImageElementRecognizer();
-        var textRecognizer = new TextElementRecognizer(optionsCopy);
+        var textRecognizer = new TextElementRecognizer(options);
         var elementRecognizer = new AggregateElementRecognizer(imageRecognizer, textRecognizer);
         var mouseController = new MouseController();
         var keyboardController = new KeyboardController();
         var fileWriter = new RealFileWriter();
 
-        return new MarionetteDriver(optionsCopy, fileWriter, monitorService, elementRecognizer, mouseController, keyboardController, textRecognizer);
+        return new MarionetteDriver(options, fileWriter, monitorService, elementRecognizer, mouseController, keyboardController, textRecognizer);
     }
 
     public async Task<MonitorDescription[]> GetMonitorsAsync()
@@ -341,6 +349,11 @@ public sealed class MarionetteDriver : IDisposable
 
     public MarionetteDriver SetMouseSpeed(MouseSpeed speed)
     {
+        if (!DriverOptions.ValidMouseSpeeds.Contains(speed))
+        {
+            throw new ArgumentOutOfRangeException(nameof(speed));
+        }
+
         this._mouseSpeed = speed;
         return this;
     }

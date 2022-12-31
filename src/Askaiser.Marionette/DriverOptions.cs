@@ -8,7 +8,7 @@ public sealed class DriverOptions
 {
     private static readonly Lazy<string> LazyCurrentAssemblyDirectoryPath = new Lazy<string>(GetCurrentAssemblyDirectoryPath);
 
-    private static readonly HashSet<MouseSpeed> ValidMouseSpeeds = new HashSet<MouseSpeed>(new[]
+    internal static readonly HashSet<MouseSpeed> ValidMouseSpeeds = new HashSet<MouseSpeed>(new[]
     {
         MouseSpeed.Immediate,
         MouseSpeed.Fast,
@@ -34,18 +34,6 @@ public sealed class DriverOptions
         this._defaultWaitForDuration = TimeSpan.Zero;
         this._defaultKeyboardSleepAfterDuration = TimeSpan.Zero;
         this._mouseSpeed = MouseSpeed.Fast;
-    }
-
-    internal DriverOptions(DriverOptions options)
-    {
-        this._tesseractDataPath = options._tesseractDataPath;
-        this._tesseractLanguage = options._tesseractLanguage;
-        this._failureScreenshotPath = options._failureScreenshotPath;
-        this._screenshotCacheDuration = options._screenshotCacheDuration;
-        this._waitForThrottlingInterval = options._waitForThrottlingInterval;
-        this._defaultWaitForDuration = options._defaultWaitForDuration;
-        this._defaultKeyboardSleepAfterDuration = options._defaultKeyboardSleepAfterDuration;
-        this._mouseSpeed = options._mouseSpeed;
     }
 
     /// <summary>
