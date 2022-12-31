@@ -112,15 +112,13 @@ public sealed class MarionetteDriver : IDisposable
 
     public async Task SaveScreenshotAsync(Stream destinationStream)
     {
-        var monitor = await this.GetCurrentMonitorAsync().ConfigureAwait(false);
-        using var screenshot = await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
+        using var screenshot = await this.GetScreenshotAsync().ConfigureAwait(false);
         screenshot.Save(destinationStream, ImageFormat.Png);
     }
 
     public async Task SaveScreenshotAsync(string destinationPath)
     {
-        var monitor = await this.GetCurrentMonitorAsync().ConfigureAwait(false);
-        using var screenshot = await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
+        using var screenshot = await this.GetScreenshotAsync().ConfigureAwait(false);
         screenshot.Save(destinationPath, ImageFormat.Png);
     }
 
