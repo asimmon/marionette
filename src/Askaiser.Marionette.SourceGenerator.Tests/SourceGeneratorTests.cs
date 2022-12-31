@@ -124,12 +124,12 @@ namespace MyCode
         private readonly global::Askaiser.Marionette.ElementCollection _elements;
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
-        private static readonly global::System.Lazy<MyLibrary> _lazy = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
+        private static readonly global::System.Lazy<MyLibrary> _instance = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
         public static MyLibrary Instance
         {
-            get { return _lazy.Value; }
+            get { return _instance.Value; }
         }
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
@@ -195,12 +195,12 @@ namespace MyCode
         private readonly global::Askaiser.Marionette.ElementCollection _elements;
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
-        private static readonly global::System.Lazy<MyLibrary> _lazy = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
+        private static readonly global::System.Lazy<MyLibrary> _instance = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
         public static MyLibrary Instance
         {
-            get { return _lazy.Value; }
+            get { return _instance.Value; }
         }
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
@@ -254,12 +254,12 @@ namespace MyCode
         private readonly global::Askaiser.Marionette.ElementCollection _elements;
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
-        private static readonly global::System.Lazy<MyLibrary> _lazy = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
+        private static readonly global::System.Lazy<MyLibrary> _instance = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
         public static MyLibrary Instance
         {
-            get { return _lazy.Value; }
+            get { return _instance.Value; }
         }
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
@@ -322,12 +322,12 @@ namespace MyCode
         private readonly global::Askaiser.Marionette.ElementCollection _elements;
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
-        private static readonly global::System.Lazy<MyLibrary> _lazy = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
+        private static readonly global::System.Lazy<MyLibrary> _instance = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
         public static MyLibrary Instance
         {
-            get { return _lazy.Value; }
+            get { return _instance.Value; }
         }
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
@@ -380,12 +380,12 @@ public partial class MyLibrary
     private readonly global::Askaiser.Marionette.ElementCollection _elements;
 
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
-    private static readonly global::System.Lazy<MyLibrary> _lazy = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
+    private static readonly global::System.Lazy<MyLibrary> _instance = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
 
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
     public static MyLibrary Instance
     {
-        get { return _lazy.Value; }
+        get { return _instance.Value; }
     }
 
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
@@ -451,12 +451,12 @@ namespace A.B.C.D.E.F
         private readonly global::Askaiser.Marionette.ElementCollection _elements;
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
-        private static readonly global::System.Lazy<MyLibrary> _lazy = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
+        private static readonly global::System.Lazy<MyLibrary> _instance = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
         public static MyLibrary Instance
         {
-            get { return _lazy.Value; }
+            get { return _instance.Value; }
         }
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
@@ -515,12 +515,12 @@ namespace MyCode
         private readonly global::Askaiser.Marionette.ElementCollection _elements;
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
-        private static readonly global::System.Lazy<MyLibrary> _lazy = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
+        private static readonly global::System.Lazy<MyLibrary> _instance = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
         public static MyLibrary Instance
         {
-            get { return _lazy.Value; }
+            get { return _instance.Value; }
         }
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
@@ -583,12 +583,12 @@ namespace MyCode
         private readonly global::Askaiser.Marionette.ElementCollection _elements;
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
-        private static readonly global::System.Lazy<MyLibrary> _lazy = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
+        private static readonly global::System.Lazy<MyLibrary> _instance = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
         public static MyLibrary Instance
         {
-            get { return _lazy.Value; }
+            get { return _instance.Value; }
         }
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
@@ -684,12 +684,12 @@ namespace MyCode
         private readonly global::Askaiser.Marionette.ElementCollection _elements;
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
-        private static readonly global::System.Lazy<MyLibrary> _lazy = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
+        private static readonly global::System.Lazy<MyLibrary> _instance = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
         public static MyLibrary Instance
         {
-            get { return _lazy.Value; }
+            get { return _instance.Value; }
         }
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
@@ -755,12 +755,12 @@ namespace MyCode
         private readonly global::Askaiser.Marionette.ElementCollection _elements;
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
-        private static readonly global::System.Lazy<MyLibrary> _lazy = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
+        private static readonly global::System.Lazy<MyLibrary> _instance = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
         public static MyLibrary Instance
         {
-            get { return _lazy.Value; }
+            get { return _instance.Value; }
         }
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
@@ -836,12 +836,12 @@ namespace MyCode
         private readonly global::Askaiser.Marionette.ElementCollection _elements;
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
-        private static readonly global::System.Lazy<MyLibrary> _lazy = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
+        private static readonly global::System.Lazy<MyLibrary> _instance = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
         public static MyLibrary Instance
         {
-            get { return _lazy.Value; }
+            get { return _instance.Value; }
         }
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
@@ -972,12 +972,12 @@ namespace MyCode
         private readonly global::Askaiser.Marionette.ElementCollection _elements;
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
-        private static readonly global::System.Lazy<MyLibrary> _lazy = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
+        private static readonly global::System.Lazy<MyLibrary> _instance = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
         public static MyLibrary Instance
         {
-            get { return _lazy.Value; }
+            get { return _instance.Value; }
         }
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
@@ -1033,12 +1033,12 @@ public partial class MyLibrary
     private readonly global::Askaiser.Marionette.ElementCollection _elements;
 
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
-    private static readonly global::System.Lazy<MyLibrary> _lazy = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
+    private static readonly global::System.Lazy<MyLibrary> _instance = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
 
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
     public static MyLibrary Instance
     {
-        get { return _lazy.Value; }
+        get { return _instance.Value; }
     }
 
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
@@ -1099,12 +1099,12 @@ namespace MyCode
         private readonly global::Askaiser.Marionette.ElementCollection _elements;
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
-        private static readonly global::System.Lazy<{1}Library> _lazy = new global::System.Lazy<{1}Library>(() => new {1}Library());
+        private static readonly global::System.Lazy<{1}Library> _instance = new global::System.Lazy<{1}Library>(() => new {1}Library());
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
         public static {1}Library Instance
         {{
-            get {{ return _lazy.Value; }}
+            get {{ return _instance.Value; }}
         }}
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
@@ -1201,12 +1201,12 @@ namespace MyCode
         private readonly global::Askaiser.Marionette.ElementCollection _elements;
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
-        private static readonly global::System.Lazy<MyLibrary> _lazy = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
+        private static readonly global::System.Lazy<MyLibrary> _instance = new global::System.Lazy<MyLibrary>(() => new MyLibrary());
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]
         public static MyLibrary Instance
         {{
-            get {{ return _lazy.Value; }}
+            get {{ return _instance.Value; }}
         }}
 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Askaiser.Marionette.SourceGenerator"", """ + AssemblyVersion + @""")]

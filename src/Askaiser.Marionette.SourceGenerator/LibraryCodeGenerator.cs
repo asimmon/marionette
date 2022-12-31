@@ -148,7 +148,7 @@ public class LibraryCodeGenerator
             if (library.IsRoot)
             {
                 cw.AppendGeneratedCodeAttributeLine();
-                cw.Append("private static readonly global::System.Lazy<").Append(className).Append("> _lazy = new global::System.Lazy<").Append(className).Append(">(() => new ").Append(className).AppendLine("());");
+                cw.Append("private static readonly global::System.Lazy<").Append(className).Append("> _instance = new global::System.Lazy<").Append(className).Append(">(() => new ").Append(className).AppendLine("());");
                 cw.AppendLine();
 
                 cw.AppendGeneratedCodeAttributeLine();
@@ -156,7 +156,7 @@ public class LibraryCodeGenerator
 
                 using (cw.BeginBlock())
                 {
-                    cw.AppendLine("get { return _lazy.Value; }");
+                    cw.AppendLine("get { return _instance.Value; }");
                 }
 
                 cw.AppendLine();
