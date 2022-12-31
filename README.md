@@ -4,7 +4,6 @@ Askaiser.Marionette is a **test automation framework based on image and text rec
 
 [![nuget](https://img.shields.io/nuget/v/Askaiser.Marionette.svg?logo=nuget)](https://www.nuget.org/packages/Askaiser.Marionette/)
 [![build](https://img.shields.io/github/actions/workflow/status/asimmon/askaiser-marionette/ci.yml?branch=master&logo=github)](https://github.com/asimmon/askaiser-marionette/actions/workflows/ci.yml)
-[![coverage](https://img.shields.io/codecov/c/github/asimmon/askaiser-marionette?logo=codecov&token=VAV5V5EAR7)](https://codecov.io/gh/asimmon/askaiser-marionette)
 
 
 ## Why use Askaiser.Marionette
