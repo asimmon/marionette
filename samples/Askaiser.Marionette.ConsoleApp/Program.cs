@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Askaiser.Marionette.ConsoleApp;
 
-[ImageLibrary("images", singleton: true)]
+[ImageLibrary("images")]
 public partial class MyLibrary
 {
 }
