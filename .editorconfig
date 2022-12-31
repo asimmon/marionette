@@ -17,7 +17,7 @@ indent_size = 2
 indent_size = 2
 
 # JSON Files
-[*.{json,json5,webmanifest}]
+[*.{json,yml,yaml,json5,webmanifest}]
 indent_size = 2
 
 # Markdown Files
@@ -561,7 +561,7 @@ dotnet_diagnostic.SA1644.severity = none
 dotnet_diagnostic.SA1652.severity = none
 
 ## Test configs
-[{**Tests*/**.cs,**ConsoleApp/**.cs}]
+[**Tests*/**.cs]
 dotnet_diagnostic.CA1002.severity = none
 dotnet_diagnostic.CA1005.severity = warning
 dotnet_diagnostic.CA1021.severity = warning
@@ -583,3 +583,7 @@ dotnet_diagnostic.CA2007.severity = none
 dotnet_diagnostic.CA2229.severity = warning
 dotnet_diagnostic.CA2235.severity = warning
 dotnet_diagnostic.xUnit1004.severity = none
+
+## Console sample app
+[**ConsoleApp/**.cs]
+dotnet_diagnostic.CA2007.severity = none
