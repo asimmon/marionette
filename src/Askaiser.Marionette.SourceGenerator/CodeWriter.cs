@@ -5,6 +5,9 @@ namespace Askaiser.Marionette.SourceGenerator;
 
 internal sealed class CodeWriter
 {
+    private static readonly string AssemblyName = typeof(LibraryCodeGenerator).Assembly.GetName().Name;
+    private static readonly string AssemblyVersion = typeof(LibraryCodeGenerator).Assembly.GetName().Version.ToString();
+
     private readonly StringBuilder _sb;
     private string _indentation;
     private bool _isAtBeginningOfNewLine;
@@ -81,6 +84,12 @@ internal sealed class CodeWriter
 
         this.Append("namespace ").AppendLine(name);
         return new CodeBlock(this);
+    }
+
+    public CodeWriter AppendGeneratedCodeAttributeLine()
+    {
+        this.AppendLine("[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"" + AssemblyName + "\", \"" + AssemblyVersion + "\")]");
+        return this;
     }
 
     public override string ToString()

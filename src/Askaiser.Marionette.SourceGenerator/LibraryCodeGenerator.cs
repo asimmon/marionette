@@ -144,17 +144,17 @@ public class LibraryCodeGenerator
 
         using (cw.BeginClass(this._target.ModifierNames, className))
         {
-            WriteGeneratedCodeAttribute(cw);
+            cw.AppendGeneratedCodeAttributeLine();
             cw.AppendLine("private readonly global::Askaiser.Marionette.ElementCollection _elements;");
             cw.AppendLine();
 
             if (library.IsRoot)
             {
-                WriteGeneratedCodeAttribute(cw);
+                cw.AppendGeneratedCodeAttributeLine();
                 cw.Append("private static readonly global::System.Lazy<").Append(className).Append("> _lazy = new global::System.Lazy<").Append(className).Append(">(() => new ").Append(className).AppendLine("());");
                 cw.AppendLine();
 
-                WriteGeneratedCodeAttribute(cw);
+                cw.AppendGeneratedCodeAttributeLine();
                 cw.Append("public static ").Append(className).AppendLine(" Instance");
 
                 using (cw.BeginBlock())
@@ -178,7 +178,7 @@ public class LibraryCodeGenerator
 
     private void GenerateLibraryConstructorCode(GeneratedLibrary library, CodeWriter cw)
     {
-        WriteGeneratedCodeAttribute(cw);
+        cw.AppendGeneratedCodeAttributeLine();
 
         if (library.IsRoot)
         {
@@ -215,7 +215,7 @@ public class LibraryCodeGenerator
         foreach (var childLibrary in library.Libraries.Values.Where(x => !x.IsEmpty).OrderBy(x => x.UniqueName, StringComparer.OrdinalIgnoreCase))
         {
             cw.AppendLine();
-            WriteGeneratedCodeAttribute(cw);
+            cw.AppendGeneratedCodeAttributeLine();
             cw.Append("public ").Append(childLibrary.UniqueName).Append("Library ").Append(childLibrary.Name).AppendLine(" { get; }");
         }
 
@@ -223,7 +223,7 @@ public class LibraryCodeGenerator
         {
             cw.AppendLine();
 
-            WriteGeneratedCodeAttribute(cw);
+            cw.AppendGeneratedCodeAttributeLine();
 
             if (imageGroup.Count == 1)
             {
@@ -252,7 +252,7 @@ public class LibraryCodeGenerator
         }
 
         cw.AppendLine();
-        WriteGeneratedCodeAttribute(cw);
+        cw.AppendGeneratedCodeAttributeLine();
         cw.AppendLine("private void CreateElements()");
         using (cw.BeginBlock())
         {
@@ -268,10 +268,5 @@ public class LibraryCodeGenerator
                     .AppendLine("));");
             }
         }
-    }
-
-    private static void WriteGeneratedCodeAttribute(CodeWriter cw)
-    {
-        cw.AppendLine("[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"" + AssemblyName + "\", \"" + AssemblyVersion + "\")]");
     }
 }
