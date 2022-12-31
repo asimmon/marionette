@@ -48,9 +48,11 @@ dotnet add package Askaiser.Marionette
 It supports **.NET Standard 2.0**, **.NET Standard 2.1** an **.NET 6**, but only on Windows for now.
 
 ```csharp
-[ImageLibrary("path/to/your/images/directory")]
+[ImageLibrary("path/to/your/images")]
 public partial class MyLibrary
 {
+    // In the "path/to/your/images" directory, we assume here that there are multiple small screenshots of UI elements with these relative paths: "pages/login/title.png", "pages/login/email.png", "pages/login/password.png" and "pages/login/submit.png".
+    // These file names actually control the behavior of the C# source generator. This behavior is explained in the next section.
 }
 
 using (var driver = MarionetteDriver.Create(/* optional DriverOptions */))
