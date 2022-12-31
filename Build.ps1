@@ -12,7 +12,7 @@ Process {
         }
     }
 
-    $workingDir = Join-Path $PSScriptRoot "src"
+    $workingDir = $PSScriptRoot
     $outputDir = Join-Path $PSScriptRoot ".output"
     $nupkgsPath = Join-Path $outputDir "*.nupkg"
 
@@ -22,8 +22,8 @@ Process {
 
         Exec { & dotnet clean -c Release }
         Exec { & dotnet build -c Release }
-        Exec { & dotnet test  -c Release --no-build -r "$outputDir" --no-restore -l "trx" -l "console;verbosity=detailed" }
-        Exec { & dotnet pack  -c Release --no-build -o "$outputDir" }
+        Exec { & dotnet test  -c Release -r "$outputDir" --no-restore --no-build -l "trx" -l "console;verbosity=detailed" }
+        Exec { & dotnet pack  -c Release -o "$outputDir" --no-restore }
 
         if (($null -ne $env:NUGET_SOURCE ) -and ($null -ne $env:NUGET_API_KEY)) {
             Exec { & dotnet nuget push "$nupkgsPath" -s $env:NUGET_SOURCE -k $env:NUGET_API_KEY }

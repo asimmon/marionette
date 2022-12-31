@@ -583,3 +583,7 @@ dotnet_diagnostic.CA2007.severity = none
 dotnet_diagnostic.CA2229.severity = warning
 dotnet_diagnostic.CA2235.severity = warning
 dotnet_diagnostic.xUnit1004.severity = none
+
+## Console sample app
+[**ConsoleApp/**.cs]
+dotnet_diagnostic.CA2007.severity = none
