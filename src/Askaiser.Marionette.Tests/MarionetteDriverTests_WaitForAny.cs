@@ -110,7 +110,7 @@ public class MarionetteDriverTests_WaitForAny : BaseMarionetteDriverTests
             return SearchResult.NotFound(needle2);
         });
 
-        var actualResult = await driver.WaitForAnyAsync(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(3));
+        var actualResult = await driver.WaitForAnyAsync(new[] { needle1, needle2 }, waitFor: TimeSpan.FromSeconds(5));
         await Task.Delay(TimeSpan.FromSeconds(1));
 
         AssertSearchResult(expectedResult, actualResult);
