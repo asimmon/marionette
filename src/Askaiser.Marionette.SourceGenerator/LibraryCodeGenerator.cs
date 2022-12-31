@@ -9,9 +9,6 @@ namespace Askaiser.Marionette.SourceGenerator;
 
 public class LibraryCodeGenerator
 {
-    private static readonly string AssemblyName = typeof(LibraryCodeGenerator).Assembly.GetName().Name;
-    private static readonly string AssemblyVersion = typeof(LibraryCodeGenerator).Assembly.GetName().Version.ToString();
-
     private static readonly HashSet<string> SupportedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ".PNG", ".JPEG", ".JPG", ".BMP",
