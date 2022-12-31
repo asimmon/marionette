@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Askaiser.Marionette;
@@ -6,6 +7,13 @@ namespace Askaiser.Marionette;
 public sealed class DriverOptions
 {
     private static readonly Lazy<string> LazyCurrentAssemblyDirectoryPath = new Lazy<string>(GetCurrentAssemblyDirectoryPath);
+
+    private static readonly HashSet<MouseSpeed> ValidMouseSpeeds = new HashSet<MouseSpeed>(new[]
+    {
+        MouseSpeed.Immediate,
+        MouseSpeed.Fast,
+        MouseSpeed.Slow,
+    });
 
     private readonly string _tesseractDataPath;
     private readonly string _tesseractLanguage;
@@ -114,7 +122,7 @@ public sealed class DriverOptions
     public MouseSpeed MouseSpeed
     {
         get => this._mouseSpeed;
-        init => this._mouseSpeed = value is MouseSpeed.Immediate or MouseSpeed.Slow or MouseSpeed.Fast ? value : throw new ArgumentOutOfRangeException(nameof(this.MouseSpeed));
+        init => this._mouseSpeed = ValidMouseSpeeds.Contains(value) ? value : throw new ArgumentOutOfRangeException(nameof(this.MouseSpeed));
     }
 
     private static string GetCurrentAssemblyDirectoryPath()
