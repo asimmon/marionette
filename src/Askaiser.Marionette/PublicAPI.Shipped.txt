@@ -1,0 +1,415 @@
+#nullable enable
+Askaiser.Marionette.DriverOptions
+Askaiser.Marionette.DriverOptions.DefaultKeyboardSleepAfterDuration.get -> System.TimeSpan
+Askaiser.Marionette.DriverOptions.DefaultKeyboardSleepAfterDuration.init -> void
+Askaiser.Marionette.DriverOptions.DefaultWaitForDuration.get -> System.TimeSpan
+Askaiser.Marionette.DriverOptions.DefaultWaitForDuration.init -> void
+Askaiser.Marionette.DriverOptions.DriverOptions() -> void
+Askaiser.Marionette.DriverOptions.FailureScreenshotPath.get -> string?
+Askaiser.Marionette.DriverOptions.FailureScreenshotPath.init -> void
+Askaiser.Marionette.DriverOptions.MouseSpeed.get -> Askaiser.Marionette.MouseSpeed
+Askaiser.Marionette.DriverOptions.MouseSpeed.init -> void
+Askaiser.Marionette.DriverOptions.ScreenshotCacheDuration.get -> System.TimeSpan
+Askaiser.Marionette.DriverOptions.ScreenshotCacheDuration.init -> void
+Askaiser.Marionette.DriverOptions.TesseractDataPath.get -> string!
+Askaiser.Marionette.DriverOptions.TesseractDataPath.init -> void
+Askaiser.Marionette.DriverOptions.TesseractLanguage.get -> string!
+Askaiser.Marionette.DriverOptions.TesseractLanguage.init -> void
+Askaiser.Marionette.DriverOptions.WaitForThrottlingInterval.get -> System.TimeSpan
+Askaiser.Marionette.DriverOptions.WaitForThrottlingInterval.init -> void
+Askaiser.Marionette.ElementCollection
+Askaiser.Marionette.ElementCollection.Add(Askaiser.Marionette.IElement! element) -> void
+Askaiser.Marionette.ElementCollection.Clear() -> void
+Askaiser.Marionette.ElementCollection.Contains(Askaiser.Marionette.IElement! element) -> bool
+Askaiser.Marionette.ElementCollection.Contains(string! name) -> bool
+Askaiser.Marionette.ElementCollection.Count.get -> int
+Askaiser.Marionette.ElementCollection.ElementCollection() -> void
+Askaiser.Marionette.ElementCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<Askaiser.Marionette.IElement!>!
+Askaiser.Marionette.ElementCollection.Remove(Askaiser.Marionette.IElement! element) -> void
+Askaiser.Marionette.ElementCollection.Remove(string! name) -> void
+Askaiser.Marionette.ElementCollection.this[string! name].get -> Askaiser.Marionette.IElement!
+Askaiser.Marionette.ElementCollection.TryGetValue(string! name, out Askaiser.Marionette.IElement? value) -> bool
+Askaiser.Marionette.ElementCollectionExtensions
+Askaiser.Marionette.ElementNotFoundException
+Askaiser.Marionette.ElementNotFoundException.Element.get -> Askaiser.Marionette.IElement!
+Askaiser.Marionette.ElementNotFoundException.ElementNotFoundException(Askaiser.Marionette.IElement! element, System.TimeSpan duration) -> void
+Askaiser.Marionette.IElement
+Askaiser.Marionette.IElement.Name.get -> string!
+Askaiser.Marionette.ImageElement
+Askaiser.Marionette.ImageElement.Content.get -> byte[]!
+Askaiser.Marionette.ImageElement.Content.init -> void
+Askaiser.Marionette.ImageElement.Grayscale.get -> bool
+Askaiser.Marionette.ImageElement.Grayscale.init -> void
+Askaiser.Marionette.ImageElement.ImageElement(string! name, byte[]! content, decimal threshold, bool grayscale) -> void
+Askaiser.Marionette.ImageElement.ImageElement(string! name, string! base64Content, decimal threshold, bool grayscale) -> void
+Askaiser.Marionette.ImageElement.Name.get -> string!
+Askaiser.Marionette.ImageElement.Name.init -> void
+Askaiser.Marionette.ImageElement.Threshold.get -> decimal
+Askaiser.Marionette.ImageElement.Threshold.init -> void
+Askaiser.Marionette.ImageLibraryAttribute
+Askaiser.Marionette.ImageLibraryAttribute.ImageLibraryAttribute(string! imageLibraryDirectoryPath) -> void
+Askaiser.Marionette.ImageLibraryAttribute.ImageLibraryDirectoryPath.get -> string!
+Askaiser.Marionette.MarionetteDriver
+Askaiser.Marionette.MarionetteDriver.Dispose() -> void
+Askaiser.Marionette.MarionetteDriver.DoubleClickAsync(int x, int y) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.DragFromAsync(int x, int y) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.DropToAsync(int x, int y) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.GetCurrentMonitorAsync() -> System.Threading.Tasks.Task<Askaiser.Marionette.MonitorDescription!>!
+Askaiser.Marionette.MarionetteDriver.GetMonitorsAsync() -> System.Threading.Tasks.Task<Askaiser.Marionette.MonitorDescription![]!>!
+Askaiser.Marionette.MarionetteDriver.GetMousePositionAsync() -> Askaiser.Marionette.Point!
+Askaiser.Marionette.MarionetteDriver.GetScreenshotAsync() -> System.Threading.Tasks.Task<System.Drawing.Bitmap!>!
+Askaiser.Marionette.MarionetteDriver.KeyDownAsync(Askaiser.Marionette.VirtualKeyCode[]! keyCodes, System.TimeSpan? sleepAfter = null) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.KeyPressAsync(Askaiser.Marionette.VirtualKeyCode[]! keyCodes, System.TimeSpan? sleepAfter = null) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.KeyUpAsync(Askaiser.Marionette.VirtualKeyCode[]! keyCodes, System.TimeSpan? sleepAfter = null) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.MoveToAsync(int x, int y) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.RightClickAsync(int x, int y) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.SaveScreenshotAsync(string! destinationPath) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.SaveScreenshotAsync(System.IO.Stream! destinationStream) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.ScrollDownAsync(int scrollTicks = 1) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.ScrollDownUntilVisibleAsync(Askaiser.Marionette.IElement! element, System.TimeSpan waitFor, int scrollTicks = 1, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.ScrollUpAsync(int scrollTicks = 1) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.ScrollUpUntilVisibleAsync(Askaiser.Marionette.IElement! element, System.TimeSpan waitFor, int scrollTicks = 1, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.SetCurrentMonitor(Askaiser.Marionette.MonitorDescription! monitor) -> Askaiser.Marionette.MarionetteDriver!
+Askaiser.Marionette.MarionetteDriver.SetCurrentMonitor(int monitorIndex) -> Askaiser.Marionette.MarionetteDriver!
+Askaiser.Marionette.MarionetteDriver.SetDefaultKeyboardSleepAfterDuration(System.TimeSpan defaultKeyboardSleepAfter) -> Askaiser.Marionette.MarionetteDriver!
+Askaiser.Marionette.MarionetteDriver.SetDefaultWaitForDuration(System.TimeSpan defaultWaitFor) -> Askaiser.Marionette.MarionetteDriver!
+Askaiser.Marionette.MarionetteDriver.SetMouseSpeed(Askaiser.Marionette.MouseSpeed speed) -> Askaiser.Marionette.MarionetteDriver!
+Askaiser.Marionette.MarionetteDriver.SingleClickAsync(int x, int y) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.SleepAsync(int millisecondsDelay) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.SleepAsync(System.TimeSpan delay) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.TripleClickAsync(int x, int y) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.TypeTextAsync(string! text, System.TimeSpan? sleepAfter = null) -> System.Threading.Tasks.Task!
+Askaiser.Marionette.MarionetteDriver.WaitForAllAsync(System.Collections.Generic.IEnumerable<Askaiser.Marionette.IElement!>! elements, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task<Askaiser.Marionette.SearchResultCollection!>!
+Askaiser.Marionette.MarionetteDriver.WaitForAnyAsync(System.Collections.Generic.IEnumerable<Askaiser.Marionette.IElement!>! elements, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task<Askaiser.Marionette.SearchResult!>!
+Askaiser.Marionette.MarionetteDriver.WaitForAsync(Askaiser.Marionette.IElement! element, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task<Askaiser.Marionette.SearchResult!>!
+Askaiser.Marionette.MarionetteDriverExtensions
+Askaiser.Marionette.MarionetteException
+Askaiser.Marionette.MarionetteException.MarionetteException(string! message) -> void
+Askaiser.Marionette.MonitorDescription
+Askaiser.Marionette.MonitorDescription.Index.get -> int
+Askaiser.Marionette.MonitorDescription.Index.init -> void
+Askaiser.Marionette.MonitorDescription.IsPrimary.get -> bool
+Askaiser.Marionette.MonitorDescription.MonitorDescription(int Index, int Left, int Top, int Right, int Bottom) -> void
+Askaiser.Marionette.MouseSpeed
+Askaiser.Marionette.MouseSpeed.Fast = 1 -> Askaiser.Marionette.MouseSpeed
+Askaiser.Marionette.MouseSpeed.Immediate = 0 -> Askaiser.Marionette.MouseSpeed
+Askaiser.Marionette.MouseSpeed.Slow = 2 -> Askaiser.Marionette.MouseSpeed
+Askaiser.Marionette.MultipleElementFoundException
+Askaiser.Marionette.MultipleElementFoundException.MultipleElementFoundException(Askaiser.Marionette.SearchResult! result) -> void
+Askaiser.Marionette.MultipleElementFoundException.Result.get -> Askaiser.Marionette.SearchResult!
+Askaiser.Marionette.Point
+Askaiser.Marionette.Point.Deconstruct(out int x, out int y) -> void
+Askaiser.Marionette.Point.Point(int X, int Y) -> void
+Askaiser.Marionette.Point.X.get -> int
+Askaiser.Marionette.Point.X.init -> void
+Askaiser.Marionette.Point.Y.get -> int
+Askaiser.Marionette.Point.Y.init -> void
+Askaiser.Marionette.Rectangle
+Askaiser.Marionette.Rectangle.Bottom.get -> int
+Askaiser.Marionette.Rectangle.BottomLeft.get -> Askaiser.Marionette.Point!
+Askaiser.Marionette.Rectangle.BottomRight.get -> Askaiser.Marionette.Point!
+Askaiser.Marionette.Rectangle.Center.get -> Askaiser.Marionette.Point!
+Askaiser.Marionette.Rectangle.CenterBottom.get -> Askaiser.Marionette.Point!
+Askaiser.Marionette.Rectangle.CenterLeft.get -> Askaiser.Marionette.Point!
+Askaiser.Marionette.Rectangle.CenterRight.get -> Askaiser.Marionette.Point!
+Askaiser.Marionette.Rectangle.CenterTop.get -> Askaiser.Marionette.Point!
+Askaiser.Marionette.Rectangle.Deconstruct(out int left, out int top, out int right, out int bottom) -> void
+Askaiser.Marionette.Rectangle.FromBottom(int height) -> Askaiser.Marionette.Rectangle!
+Askaiser.Marionette.Rectangle.FromBottomLeft(int width, int height) -> Askaiser.Marionette.Rectangle!
+Askaiser.Marionette.Rectangle.FromBottomRight(int width, int height) -> Askaiser.Marionette.Rectangle!
+Askaiser.Marionette.Rectangle.FromCenter(int width, int height) -> Askaiser.Marionette.Rectangle!
+Askaiser.Marionette.Rectangle.FromLeft(int width) -> Askaiser.Marionette.Rectangle!
+Askaiser.Marionette.Rectangle.FromRight(int width) -> Askaiser.Marionette.Rectangle!
+Askaiser.Marionette.Rectangle.FromTop(int height) -> Askaiser.Marionette.Rectangle!
+Askaiser.Marionette.Rectangle.FromTopLeft(int width, int height) -> Askaiser.Marionette.Rectangle!
+Askaiser.Marionette.Rectangle.FromTopRight(int width, int height) -> Askaiser.Marionette.Rectangle!
+Askaiser.Marionette.Rectangle.Height.get -> int
+Askaiser.Marionette.Rectangle.Left.get -> int
+Askaiser.Marionette.Rectangle.Rectangle(Askaiser.Marionette.Point! topLeft, Askaiser.Marionette.Point! bottomRight) -> void
+Askaiser.Marionette.Rectangle.Rectangle(int left, int top, int right, int bottom) -> void
+Askaiser.Marionette.Rectangle.Right.get -> int
+Askaiser.Marionette.Rectangle.Top.get -> int
+Askaiser.Marionette.Rectangle.TopLeft.get -> Askaiser.Marionette.Point!
+Askaiser.Marionette.Rectangle.TopRight.get -> Askaiser.Marionette.Point!
+Askaiser.Marionette.Rectangle.Width.get -> int
+Askaiser.Marionette.SearchResult
+Askaiser.Marionette.SearchResult.Element.get -> Askaiser.Marionette.IElement!
+Askaiser.Marionette.SearchResult.EnsureSingleLocation(System.TimeSpan waitFor) -> void
+Askaiser.Marionette.SearchResult.GetEnumerator() -> System.Collections.Generic.IEnumerator<Askaiser.Marionette.Rectangle!>!
+Askaiser.Marionette.SearchResult.Location.get -> Askaiser.Marionette.Rectangle!
+Askaiser.Marionette.SearchResult.Locations.get -> System.Collections.Generic.IReadOnlyList<Askaiser.Marionette.Rectangle!>!
+Askaiser.Marionette.SearchResult.Success.get -> bool
+Askaiser.Marionette.SearchResultCollection
+Askaiser.Marionette.SearchResultCollection.Count.get -> int
+Askaiser.Marionette.SearchResultCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<Askaiser.Marionette.SearchResult!>!
+Askaiser.Marionette.SearchResultCollection.this[Askaiser.Marionette.IElement! element].get -> Askaiser.Marionette.SearchResult!
+Askaiser.Marionette.SearchResultCollection.this[string! name].get -> Askaiser.Marionette.SearchResult!
+Askaiser.Marionette.TextElement
+Askaiser.Marionette.TextElement.Content.get -> string!
+Askaiser.Marionette.TextElement.Content.init -> void
+Askaiser.Marionette.TextElement.IgnoreCase.get -> bool
+Askaiser.Marionette.TextElement.IgnoreCase.init -> void
+Askaiser.Marionette.TextElement.Name.get -> string!
+Askaiser.Marionette.TextElement.Name.init -> void
+Askaiser.Marionette.TextElement.Options.get -> Askaiser.Marionette.TextOptions
+Askaiser.Marionette.TextElement.Options.init -> void
+Askaiser.Marionette.TextElement.TextElement(string! content, Askaiser.Marionette.TextOptions options = Askaiser.Marionette.TextOptions.BlackAndWhite) -> void
+Askaiser.Marionette.TextElement.TextElement(string! name, string! content, Askaiser.Marionette.TextOptions options) -> void
+Askaiser.Marionette.TextOptions
+Askaiser.Marionette.TextOptions.BlackAndWhite = 3 -> Askaiser.Marionette.TextOptions
+Askaiser.Marionette.TextOptions.Grayscale = 1 -> Askaiser.Marionette.TextOptions
+Askaiser.Marionette.TextOptions.Negative = 4 -> Askaiser.Marionette.TextOptions
+Askaiser.Marionette.TextOptions.None = 0 -> Askaiser.Marionette.TextOptions
+Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.ACCEPT = 30 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.ADD = 107 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.ALT = 18 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.APPS = 93 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.ATTN = 246 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.BACK = 8 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.BROWSER_BACK = 166 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.BROWSER_FAVORITES = 171 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.BROWSER_FORWARD = 167 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.BROWSER_HOME = 172 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.BROWSER_REFRESH = 168 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.BROWSER_SEARCH = 170 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.BROWSER_STOP = 169 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.CANCEL = 3 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.CAPITAL = 20 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.CLEAR = 12 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.CONTROL = 17 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.CONVERT = 28 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.CRSEL = 247 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.DECIMAL = 110 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.DELETE = 46 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.DIVIDE = 111 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.DOWN = 40 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.END = 35 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.EREOF = 249 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.ESCAPE = 27 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.EXECUTE = 43 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.EXSEL = 248 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F1 = 112 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F10 = 121 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F11 = 122 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F12 = 123 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F13 = 124 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F14 = 125 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F15 = 126 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F16 = 127 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F17 = 128 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F18 = 129 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F19 = 130 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F2 = 113 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F20 = 131 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F21 = 132 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F22 = 133 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F23 = 134 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F24 = 135 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F3 = 114 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F4 = 115 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F5 = 116 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F6 = 117 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F7 = 118 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F8 = 119 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.F9 = 120 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.FINAL = 24 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.HANGEUL = 21 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.HANGUL = 21 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.HANJA = 25 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.HELP = 47 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.HOME = 36 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.INSERT = 45 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.JUNJA = 23 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.KANA = 21 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.KANJI = 25 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.LALT = 164 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.LAUNCH_APP1 = 182 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.LAUNCH_APP2 = 183 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.LAUNCH_MAIL = 180 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.LAUNCH_MEDIA_SELECT = 181 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.LBUTTON = 1 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.LCONTROL = 162 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.LEFT = 37 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.LSHIFT = 160 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.LWIN = 91 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.MBUTTON = 4 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.MEDIA_NEXT_TRACK = 176 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.MEDIA_PLAY_PAUSE = 179 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.MEDIA_PREV_TRACK = 177 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.MEDIA_STOP = 178 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.MODECHANGE = 31 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.MULTIPLY = 106 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.NEXT = 34 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.NONAME = 252 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.NONCONVERT = 29 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.NUMLOCK = 144 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.NUMPAD0 = 96 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.NUMPAD1 = 97 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.NUMPAD2 = 98 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.NUMPAD3 = 99 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.NUMPAD4 = 100 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.NUMPAD5 = 101 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.NUMPAD6 = 102 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.NUMPAD7 = 103 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.NUMPAD8 = 104 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.NUMPAD9 = 105 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.OEM_1 = 186 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.OEM_102 = 226 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.OEM_2 = 191 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.OEM_3 = 192 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.OEM_4 = 219 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.OEM_5 = 220 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.OEM_6 = 221 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.OEM_7 = 222 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.OEM_8 = 223 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.OEM_CLEAR = 254 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.OEM_COMMA = 188 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.OEM_MINUS = 189 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.OEM_PERIOD = 190 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.OEM_PLUS = 187 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.PA1 = 253 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.PACKET = 231 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.PAUSE = 19 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.PLAY = 250 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.PRINT = 42 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.PRIOR = 33 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.PROCESSKEY = 229 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.RALT = 165 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.RBUTTON = 2 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.RCONTROL = 163 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.RETURN = 13 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.RIGHT = 39 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.RSHIFT = 161 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.RWIN = 92 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.SCROLL = 145 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.SELECT = 41 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.SEPARATOR = 108 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.SHIFT = 16 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.SLEEP = 95 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.SNAPSHOT = 44 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.SPACE = 32 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.SUBTRACT = 109 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.TAB = 9 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.UP = 38 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_0 = 48 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_1 = 49 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_2 = 50 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_3 = 51 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_4 = 52 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_5 = 53 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_6 = 54 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_7 = 55 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_8 = 56 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_9 = 57 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_A = 65 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_B = 66 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_C = 67 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_D = 68 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_E = 69 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_F = 70 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_G = 71 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_H = 72 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_I = 73 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_J = 74 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_K = 75 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_L = 76 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_M = 77 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_N = 78 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_O = 79 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_P = 80 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_Q = 81 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_R = 82 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_S = 83 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_T = 84 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_U = 85 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_V = 86 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_W = 87 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_X = 88 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_Y = 89 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VK_Z = 90 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VOLUME_DOWN = 174 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VOLUME_MUTE = 173 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.VOLUME_UP = 175 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.XBUTTON1 = 5 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.XBUTTON2 = 6 -> Askaiser.Marionette.VirtualKeyCode
+Askaiser.Marionette.VirtualKeyCode.ZOOM = 251 -> Askaiser.Marionette.VirtualKeyCode
+override Askaiser.Marionette.ImageElement.ToString() -> string!
+override Askaiser.Marionette.MonitorDescription.ToString() -> string!
+override Askaiser.Marionette.Point.ToString() -> string!
+override Askaiser.Marionette.Rectangle.ToString() -> string!
+override Askaiser.Marionette.SearchResult.ToString() -> string!
+override Askaiser.Marionette.TextElement.ToString() -> string!
+static Askaiser.Marionette.ElementCollectionExtensions.LoadAsync(this Askaiser.Marionette.ElementCollection! elements, string! filePath) -> System.Threading.Tasks.Task<Askaiser.Marionette.ElementCollection!>!
+static Askaiser.Marionette.ElementCollectionExtensions.LoadAsync(this Askaiser.Marionette.ElementCollection! elements, System.IO.Stream! stream) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.ElementCollectionExtensions.SaveAsync(this Askaiser.Marionette.ElementCollection! elements, string! filePath) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.ElementCollectionExtensions.SaveAsync(this Askaiser.Marionette.ElementCollection! elements, System.IO.Stream! destinationStream) -> System.Threading.Tasks.Task<Askaiser.Marionette.ElementCollection!>!
+static Askaiser.Marionette.MarionetteDriver.Create() -> Askaiser.Marionette.MarionetteDriver!
+static Askaiser.Marionette.MarionetteDriver.Create(Askaiser.Marionette.DriverOptions! options) -> Askaiser.Marionette.MarionetteDriver!
+static Askaiser.Marionette.MarionetteDriverExtensions.AreAllVisibleAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Collections.Generic.IEnumerable<Askaiser.Marionette.IElement!>! elements, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task<bool>!
+static Askaiser.Marionette.MarionetteDriverExtensions.DoubleClickAnyAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Collections.Generic.IEnumerable<Askaiser.Marionette.IElement!>! elements, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DoubleClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.IElement! element, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DoubleClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.Point! coordinates) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DoubleClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.SearchResult! searchResult) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DoubleClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, string! text, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, Askaiser.Marionette.TextOptions textOptions = Askaiser.Marionette.TextOptions.BlackAndWhite) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DoubleClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Drawing.Image! image, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, decimal threshold = 0.95, bool grayscale = false) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DragFromAnyAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Collections.Generic.IEnumerable<Askaiser.Marionette.IElement!>! elements, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DragFromAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.IElement! element, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DragFromAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.Point! coordinates) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DragFromAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.SearchResult! searchResult) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DragFromAsync(this Askaiser.Marionette.MarionetteDriver! driver, string! text, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, Askaiser.Marionette.TextOptions textOptions = Askaiser.Marionette.TextOptions.BlackAndWhite) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DragFromAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Drawing.Image! image, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, decimal threshold = 0.95, bool grayscale = false) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DropToAnyAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Collections.Generic.IEnumerable<Askaiser.Marionette.IElement!>! elements, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DropToAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.IElement! element, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DropToAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.Point! coordinates) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DropToAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.SearchResult! searchResult) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DropToAsync(this Askaiser.Marionette.MarionetteDriver! driver, string! text, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, Askaiser.Marionette.TextOptions textOptions = Askaiser.Marionette.TextOptions.BlackAndWhite) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.DropToAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Drawing.Image! image, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, decimal threshold = 0.95, bool grayscale = false) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.FindLocationsAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.IElement! element, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task<Askaiser.Marionette.Rectangle![]!>!
+static Askaiser.Marionette.MarionetteDriverExtensions.FindLocationsAsync(this Askaiser.Marionette.MarionetteDriver! driver, string! text, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, Askaiser.Marionette.TextOptions textOptions = Askaiser.Marionette.TextOptions.BlackAndWhite) -> System.Threading.Tasks.Task<Askaiser.Marionette.Rectangle![]!>!
+static Askaiser.Marionette.MarionetteDriverExtensions.FindLocationsAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Drawing.Image! image, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, decimal threshold = 0.95, bool grayscale = false) -> System.Threading.Tasks.Task<Askaiser.Marionette.Rectangle![]!>!
+static Askaiser.Marionette.MarionetteDriverExtensions.IsAnyVisibleAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Collections.Generic.IEnumerable<Askaiser.Marionette.IElement!>! elements, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task<bool>!
+static Askaiser.Marionette.MarionetteDriverExtensions.IsVisibleAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.IElement! element, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task<bool>!
+static Askaiser.Marionette.MarionetteDriverExtensions.IsVisibleAsync(this Askaiser.Marionette.MarionetteDriver! driver, string! text, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, Askaiser.Marionette.TextOptions textOptions = Askaiser.Marionette.TextOptions.BlackAndWhite) -> System.Threading.Tasks.Task<bool>!
+static Askaiser.Marionette.MarionetteDriverExtensions.IsVisibleAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Drawing.Image! image, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, decimal threshold = 0.95, bool grayscale = false) -> System.Threading.Tasks.Task<bool>!
+static Askaiser.Marionette.MarionetteDriverExtensions.KeyDownAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.VirtualKeyCode keyCode, System.TimeSpan? sleepAfter = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.KeyPressAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.VirtualKeyCode keyCode, System.TimeSpan? sleepAfter = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.KeyUpAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.VirtualKeyCode keyCode, System.TimeSpan? sleepAfter = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.MoveToAnyAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Collections.Generic.IEnumerable<Askaiser.Marionette.IElement!>! elements, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.MoveToAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.IElement! element, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.MoveToAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.Point! coordinates) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.MoveToAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.SearchResult! searchResult) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.MoveToAsync(this Askaiser.Marionette.MarionetteDriver! driver, string! text, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, Askaiser.Marionette.TextOptions textOptions = Askaiser.Marionette.TextOptions.BlackAndWhite) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.MoveToAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Drawing.Image! image, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, decimal threshold = 0.95, bool grayscale = false) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.RightClickAnyAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Collections.Generic.IEnumerable<Askaiser.Marionette.IElement!>! elements, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.RightClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.IElement! element, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.RightClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.Point! coordinates) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.RightClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.SearchResult! searchResult) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.RightClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, string! text, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, Askaiser.Marionette.TextOptions textOptions = Askaiser.Marionette.TextOptions.BlackAndWhite) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.RightClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Drawing.Image! image, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, decimal threshold = 0.95, bool grayscale = false) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.SingleClickAnyAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Collections.Generic.IEnumerable<Askaiser.Marionette.IElement!>! elements, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.SingleClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.IElement! element, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.SingleClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.Point! coordinates) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.SingleClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.SearchResult! searchResult) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.SingleClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, string! text, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, Askaiser.Marionette.TextOptions textOptions = Askaiser.Marionette.TextOptions.BlackAndWhite) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.SingleClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Drawing.Image! image, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, decimal threshold = 0.95, bool grayscale = false) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.TripleClickAnyAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Collections.Generic.IEnumerable<Askaiser.Marionette.IElement!>! elements, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.TripleClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.IElement! element, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.TripleClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.Point! coordinates) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.TripleClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, Askaiser.Marionette.SearchResult! searchResult) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.TripleClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, string! text, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, Askaiser.Marionette.TextOptions textOptions = Askaiser.Marionette.TextOptions.BlackAndWhite) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.TripleClickAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Drawing.Image! image, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, decimal threshold = 0.95, bool grayscale = false) -> System.Threading.Tasks.Task!
+static Askaiser.Marionette.MarionetteDriverExtensions.WaitForAsync(this Askaiser.Marionette.MarionetteDriver! driver, string! text, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, Askaiser.Marionette.TextOptions textOptions = Askaiser.Marionette.TextOptions.BlackAndWhite) -> System.Threading.Tasks.Task<Askaiser.Marionette.SearchResult!>!
+static Askaiser.Marionette.MarionetteDriverExtensions.WaitForAsync(this Askaiser.Marionette.MarionetteDriver! driver, System.Drawing.Image! image, System.TimeSpan? waitFor = null, Askaiser.Marionette.Rectangle? searchRect = null, decimal threshold = 0.95, bool grayscale = false) -> System.Threading.Tasks.Task<Askaiser.Marionette.SearchResult!>!
+static Askaiser.Marionette.Point.operator +(Askaiser.Marionette.Point! p1, Askaiser.Marionette.Point! p2) -> Askaiser.Marionette.Point!
+static Askaiser.Marionette.Point.operator +(Askaiser.Marionette.Point! point, (int, int) xy) -> Askaiser.Marionette.Point!
+static Askaiser.Marionette.Point.operator -(Askaiser.Marionette.Point! p1, Askaiser.Marionette.Point! p2) -> Askaiser.Marionette.Point!
+static Askaiser.Marionette.Point.operator -(Askaiser.Marionette.Point! point, (int, int) xy) -> Askaiser.Marionette.Point!
+static Askaiser.Marionette.Rectangle.operator *(Askaiser.Marionette.Rectangle! rect, (double, double) xy) -> Askaiser.Marionette.Rectangle!
+static Askaiser.Marionette.Rectangle.operator +(Askaiser.Marionette.Rectangle! rect, (int, int) xy) -> Askaiser.Marionette.Rectangle!
+static Askaiser.Marionette.Rectangle.operator +(Askaiser.Marionette.Rectangle! rect, Askaiser.Marionette.Point! xy) -> Askaiser.Marionette.Rectangle!
+static Askaiser.Marionette.Rectangle.operator -(Askaiser.Marionette.Rectangle! rect, (int, int) xy) -> Askaiser.Marionette.Rectangle!
+static Askaiser.Marionette.Rectangle.operator -(Askaiser.Marionette.Rectangle! rect, Askaiser.Marionette.Point! xy) -> Askaiser.Marionette.Rectangle!
+static Askaiser.Marionette.Rectangle.operator /(Askaiser.Marionette.Rectangle! rect, (double, double) xy) -> Askaiser.Marionette.Rectangle!
+static Askaiser.Marionette.SearchResult.NotFound(Askaiser.Marionette.IElement! element) -> Askaiser.Marionette.SearchResult!
+static readonly Askaiser.Marionette.Point.Empty -> Askaiser.Marionette.Point!

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Askaiser.Marionette;
@@ -7,6 +8,13 @@ public sealed class DriverOptions
 {
     private static readonly Lazy<string> LazyCurrentAssemblyDirectoryPath = new Lazy<string>(GetCurrentAssemblyDirectoryPath);
 
+    internal static readonly HashSet<MouseSpeed> ValidMouseSpeeds = new HashSet<MouseSpeed>(new[]
+    {
+        MouseSpeed.Immediate,
+        MouseSpeed.Fast,
+        MouseSpeed.Slow,
+    });
+
     private readonly string _tesseractDataPath;
     private readonly string _tesseractLanguage;
     private readonly string? _failureScreenshotPath;
@@ -14,6 +22,7 @@ public sealed class DriverOptions
     private readonly TimeSpan _waitForThrottlingInterval;
     private readonly TimeSpan _defaultWaitForDuration;
     private readonly TimeSpan _defaultKeyboardSleepAfterDuration;
+    private readonly MouseSpeed _mouseSpeed;
 
     public DriverOptions()
     {
@@ -24,7 +33,7 @@ public sealed class DriverOptions
         this._waitForThrottlingInterval = TimeSpan.FromMilliseconds(50);
         this._defaultWaitForDuration = TimeSpan.Zero;
         this._defaultKeyboardSleepAfterDuration = TimeSpan.Zero;
-        this.MouseSpeed = MouseSpeed.Fast;
+        this._mouseSpeed = MouseSpeed.Fast;
     }
 
     /// <summary>
@@ -98,7 +107,11 @@ public sealed class DriverOptions
     /// <summary>
     /// Gets or sets the initial mouse speed of the driver
     /// </summary>
-    public MouseSpeed MouseSpeed { get; init; }
+    public MouseSpeed MouseSpeed
+    {
+        get => this._mouseSpeed;
+        init => this._mouseSpeed = ValidMouseSpeeds.Contains(value) ? value : throw new ArgumentOutOfRangeException(nameof(this.MouseSpeed));
+    }
 
     private static string GetCurrentAssemblyDirectoryPath()
     {

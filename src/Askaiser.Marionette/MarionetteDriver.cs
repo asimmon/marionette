@@ -349,6 +349,11 @@ public sealed class MarionetteDriver : IDisposable
 
     public MarionetteDriver SetMouseSpeed(MouseSpeed speed)
     {
+        if (!DriverOptions.ValidMouseSpeeds.Contains(speed))
+        {
+            throw new ArgumentOutOfRangeException(nameof(speed));
+        }
+
         this._mouseSpeed = speed;
         return this;
     }
