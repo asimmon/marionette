@@ -140,6 +140,8 @@ static Create()
 static Create(DriverOptions options)
 
 GetScreenshotAsync()
+SaveScreenshotAsync(Stream destinationStream)
+SaveScreenshotAsync(string destinationPath)
 GetCurrentMonitorAsync()
 GetMonitorsAsync()
 SetCurrentMonitor(int monitorIndex)
