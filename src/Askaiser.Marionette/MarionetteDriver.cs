@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Threading.Tasks;
 using Askaiser.Marionette.Commands;
 
@@ -106,6 +108,20 @@ public sealed class MarionetteDriver : IDisposable
     {
         var monitor = await this.GetCurrentMonitorAsync().ConfigureAwait(false);
         return await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
+    }
+
+    public async Task SaveScreenshotAsync(Stream destinationStream)
+    {
+        var monitor = await this.GetCurrentMonitorAsync().ConfigureAwait(false);
+        using var screenshot = await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
+        screenshot.Save(destinationStream, ImageFormat.Png);
+    }
+
+    public async Task SaveScreenshotAsync(string destinationPath)
+    {
+        var monitor = await this.GetCurrentMonitorAsync().ConfigureAwait(false);
+        using var screenshot = await this._monitorService.GetScreenshot(monitor).ConfigureAwait(false);
+        screenshot.Save(destinationPath, ImageFormat.Png);
     }
 
     public Point GetMousePositionAsync()
