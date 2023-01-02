@@ -12,17 +12,17 @@ internal static class KeyboardInterop
 
     private static readonly HashSet<VirtualKeyCode> KnownModifiers = new()
     {
-        VirtualKeyCode.LSHIFT,
-        VirtualKeyCode.LSHIFT,
-        VirtualKeyCode.SHIFT,
-        VirtualKeyCode.LWIN,
-        VirtualKeyCode.RWIN,
-        VirtualKeyCode.CONTROL,
-        VirtualKeyCode.LCONTROL,
-        VirtualKeyCode.RCONTROL,
-        VirtualKeyCode.LALT,
-        VirtualKeyCode.RALT,
-        VirtualKeyCode.ALT,
+        VirtualKeyCode.LeftShift,
+        VirtualKeyCode.RightShift,
+        VirtualKeyCode.Shift,
+        VirtualKeyCode.LeftWindows,
+        VirtualKeyCode.RightWindows,
+        VirtualKeyCode.Control,
+        VirtualKeyCode.LeftControl,
+        VirtualKeyCode.RightControl,
+        VirtualKeyCode.LeftAlt,
+        VirtualKeyCode.RightAlt,
+        VirtualKeyCode.Alt,
     };
 
     public static async Task TypeText(string text)
