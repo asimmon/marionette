@@ -25,7 +25,7 @@ internal class KeyboardController : IKeyboardController
 
             if (i < lines.Length - 1)
             {
-                await KeyboardInterop.KeyPress(VirtualKeyCode.RETURN).ConfigureAwait(false);
+                await KeyboardInterop.KeyPress(VirtualKeyCode.Enter).ConfigureAwait(false);
             }
         }
     }

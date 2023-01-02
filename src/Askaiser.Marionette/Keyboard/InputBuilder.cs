@@ -77,25 +77,25 @@ internal class InputBuilder : IEnumerable<INPUT>
     /// </remarks>
     public static bool IsExtendedKey(VirtualKeyCode keyCode)
     {
-        if (keyCode == VirtualKeyCode.ALT ||
-            keyCode == VirtualKeyCode.LALT ||
-            keyCode == VirtualKeyCode.RALT ||
-            keyCode == VirtualKeyCode.CONTROL ||
-            keyCode == VirtualKeyCode.RCONTROL ||
-            keyCode == VirtualKeyCode.INSERT ||
-            keyCode == VirtualKeyCode.DELETE ||
-            keyCode == VirtualKeyCode.HOME ||
-            keyCode == VirtualKeyCode.END ||
-            keyCode == VirtualKeyCode.PRIOR ||
-            keyCode == VirtualKeyCode.NEXT ||
-            keyCode == VirtualKeyCode.RIGHT ||
-            keyCode == VirtualKeyCode.UP ||
-            keyCode == VirtualKeyCode.LEFT ||
-            keyCode == VirtualKeyCode.DOWN ||
-            keyCode == VirtualKeyCode.NUMLOCK ||
-            keyCode == VirtualKeyCode.CANCEL ||
-            keyCode == VirtualKeyCode.SNAPSHOT ||
-            keyCode == VirtualKeyCode.DIVIDE)
+        if (keyCode == VirtualKeyCode.Alt ||
+            keyCode == VirtualKeyCode.LeftAlt ||
+            keyCode == VirtualKeyCode.RightAlt ||
+            keyCode == VirtualKeyCode.Control ||
+            keyCode == VirtualKeyCode.RightControl ||
+            keyCode == VirtualKeyCode.Insert ||
+            keyCode == VirtualKeyCode.Delete ||
+            keyCode == VirtualKeyCode.Home ||
+            keyCode == VirtualKeyCode.End ||
+            keyCode == VirtualKeyCode.PageUp ||
+            keyCode == VirtualKeyCode.PageDown ||
+            keyCode == VirtualKeyCode.RightArrow ||
+            keyCode == VirtualKeyCode.UpArrow ||
+            keyCode == VirtualKeyCode.LeftArrow ||
+            keyCode == VirtualKeyCode.DownArrow ||
+            keyCode == VirtualKeyCode.NumLock ||
+            keyCode == VirtualKeyCode.Cancel ||
+            keyCode == VirtualKeyCode.PrintScreen ||
+            keyCode == VirtualKeyCode.Divide)
         {
             return true;
         }
