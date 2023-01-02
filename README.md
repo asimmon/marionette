@@ -179,13 +179,11 @@ MoveToAsync(int x, int y)
 DragFromAsync(int x, int y)
 DropToAsync(int x, int y)
 TypeTextAsync(string text, TimeSpan? sleepAfter)
-KeyPressAsync(VirtualKeyCode[] keyCodes)
-KeyDownAsync(VirtualKeyCode[] keyCodes)
-KeyUpAsync(VirtualKeyCode[] keyCodes)
+KeyPressAsync(VirtualKeyCode[] keyCodes, TimeSpan? sleepAfter)
+KeyDownAsync(VirtualKeyCode[] keyCodes, TimeSpan? sleepAfter)
+KeyUpAsync(VirtualKeyCode[] keyCodes, TimeSpan? sleepAfter)
 ScrollDownAsync(int scrollTicks)
 ScrollUpAsync(int scrollTicks)
-ScrollDownUntilVisibleAsync(IElement element, TimeSpan totalDuration, int scrollTicks, Rectangle? searchRect)
-ScrollUpUntilVisibleAsync(IElement element, TimeSpan totalDuration, int scrollTicks, Rectangle? searchRect)
 ```
 
 ### Mouse interaction with an element
@@ -198,6 +196,8 @@ TripleClickAsync(IElement element, TimeSpan? waitFor, Rectangle? searchRect)
 RightClickAsync(IElement element, TimeSpan? waitFor, Rectangle? searchRect)
 DragFromAsync(IElement element, TimeSpan? waitFor, Rectangle? searchRect)
 DropToAsync(IElement element, TimeSpan? waitFor, Rectangle? searchRect)
+ScrollDownUntilVisibleAsync(IElement element, TimeSpan totalDuration, int scrollTicks, Rectangle? searchRect)
+ScrollUpUntilVisibleAsync(IElement element, TimeSpan totalDuration, int scrollTicks, Rectangle? searchRect)
 ```
 
 ### Check for element visibility
@@ -220,7 +220,7 @@ DragFromAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? s
 DropToAnyAsync(IEnumerable<IElement> elements, TimeSpan? waitFor, Rectangle? searchRect)
 ```
 
-### Text-based actions
+### Text-based interaction
 
 ```csharp
 WaitForAsync(string text, TimeSpan? waitFor, Rectangle? searchRect, TextOptions? textOptions)
@@ -266,7 +266,7 @@ KeyDownAsync(VirtualKeyCode keyCode, TimeSpan? sleepAfter)
 KeyUpAsync(VirtualKeyCode keyCode, TimeSpan? sleepAfter)
 ```
 
-### `System.Drawing.Image`-based actions
+### `System.Drawing.Image`-based interaction
 
 ```csharp
 WaitForAsync(Image image, TimeSpan? waitFor, Rectangle? searchRect, decimal? threshold, bool? grayscale)
