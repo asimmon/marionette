@@ -13,7 +13,7 @@ internal static class KeyboardInterop
     private static readonly HashSet<VirtualKeyCode> KnownModifiers = new()
     {
         VirtualKeyCode.LeftShift,
-        VirtualKeyCode.LeftShift,
+        VirtualKeyCode.RightShift,
         VirtualKeyCode.Shift,
         VirtualKeyCode.LeftWindows,
         VirtualKeyCode.RightWindows,
