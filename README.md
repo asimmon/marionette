@@ -1,10 +1,10 @@
 <!-- omit in toc -->
-# Askaiser.Marionette
+# Marionette
 
 [![nuget](https://img.shields.io/nuget/v/Askaiser.Marionette.svg?logo=nuget)](https://www.nuget.org/packages/Askaiser.Marionette/)
 [![build](https://img.shields.io/github/actions/workflow/status/asimmon/askaiser-marionette/ci.yml?branch=master&logo=github)](https://github.com/asimmon/askaiser-marionette/actions/workflows/ci.yml)
 
-Askaiser.Marionette is a **test automation framework based on image and text recognition**. It includes a C# source generator that allows you to quickly interact with C# properties generated from images in your project or elsewhere. The framework is built on top of **OpenCV** and **Tesseract OCR** and only works on Windows for now.
+**Marionette is a test automation framework based on image and text recognition**. It includes a C# source generator that allows you to quickly interact with C# properties generated from images in your project or elsewhere. The framework is built on top of **OpenCV** and **Tesseract OCR** and only supports Windows for now.
 
 **Table of contents**
 
@@ -18,7 +18,7 @@ Askaiser.Marionette is a **test automation framework based on image and text rec
 
 ## 🔥 Motivation and features
 
-* Unlike other test automation frameworks, Askaiser.Marionette **does not rely on hardcoded identifiers, CSS or XPath selectors**. It uses image and text recognition to ensure that you interact with elements that are **actually visible** on the screen.
+* Unlike other test automation frameworks, Marionette **does not rely on hardcoded identifiers, CSS or XPath selectors**. It uses image and text recognition to ensure that you interact with elements that are **actually visible** on the screen.
 * Maintaining identifiers, CSS and XPath selectors over time can be hard. Capturing small screenshots and finding text with an OCR is not.
 * With the built-in C# source generator, you can start **writing the test code right away**.
 * You can interact with the whole operating system, instead of a single application.
@@ -293,7 +293,7 @@ FindLocationsAsync(Image image, TimeSpan? waitFor, Rectangle? searchRect, decima
 
 > 👷‍♂️ Work in progress
 
-This section will soon show how Askaiser.Marionette can be used in an [Azure Pipelines](https://azure.microsoft.com/en-us/products/devops/pipelines/) continuous integration environment:
+This section will soon show how Marionette can be used in an [Azure Pipelines](https://azure.microsoft.com/en-us/products/devops/pipelines/) continuous integration environment:
 
 1. Setup a dedicated Windows agent, or use the [built-in Windows agent](https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=browser#microsoft-hosted-agents),
 2. Use Microsoft's [Screen Resolution Utility task](https://marketplace.visualstudio.com/items?itemName=ms-autotest.screen-resolution-utility-task) to setup a virtual monitor and change its resolution.
