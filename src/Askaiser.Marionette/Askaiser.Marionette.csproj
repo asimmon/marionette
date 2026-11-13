@@ -12,7 +12,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IsAotCompatible>true</IsAotCompatible>
     <!-- CS1591: missing XML comment. Public members are documented where it adds value. -->
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <!-- RS0026, RS0027: overloads with optional parameters are a deliberate part of the public API, which favors concise call sites. -->
+    <NoWarn>$(NoWarn);CS1591;RS0026;RS0027</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

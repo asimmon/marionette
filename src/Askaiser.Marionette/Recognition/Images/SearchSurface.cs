@@ -17,6 +17,7 @@ internal sealed class SearchSurface : IDisposable
     private readonly bool _ownsPixels;
     private readonly ConcurrentDictionary<ColorPlaneKind, Lazy<short[]>> _planes = new();
     private readonly ConcurrentDictionary<(ColorPlaneKind Kind, int BlockSize), Lazy<BlockSums>> _blockSums = new();
+    private readonly ConcurrentDictionary<object, Lazy<object>> _derivedData = new();
     private int _disposed;
 
     public SearchSurface(PixelBuffer pixels, bool ownsPixels)
@@ -56,11 +57,29 @@ internal sealed class SearchSurface : IDisposable
         return this._blockSums.GetOrAdd((kind, blockSize), static (key, self) => new Lazy<BlockSums>(() => BlockSums.Create(self.GetPlane(key.Kind), self.Width, self.Height, key.BlockSize), LazyThreadSafetyMode.ExecutionAndPublication), this).Value;
     }
 
+    /// <summary>
+    /// Gets data derived from the pixels of this surface, computing it the first time it is requested with a given key.
+    /// Disposable data is disposed along with the surface.
+    /// </summary>
+    public T GetOrCreate<T>(object key, Func<SearchSurface, T> factory)
+        where T : class
+    {
+        return (T)this._derivedData.GetOrAdd(key, static (_, state) => new Lazy<object>(() => state.factory(state.self), LazyThreadSafetyMode.ExecutionAndPublication), (self: this, factory)).Value;
+    }
+
     public void Dispose()
     {
         if (Interlocked.Exchange(ref this._disposed, 1) != 0)
         {
             return;
+        }
+
+        foreach (var data in this._derivedData.Values)
+        {
+            if (data.IsValueCreated && data.Value is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
         }
 
         foreach (var plane in this._planes.Values)

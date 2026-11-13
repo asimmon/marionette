@@ -10,6 +10,11 @@ public static class Program
 {
     public static int Main(string[] args)
     {
+        if (args.Contains("--live"))
+        {
+            return RunLiveAsync(args[0]).GetAwaiter().GetResult();
+        }
+
         var screenshotPath = args.Length > 0 ? args[0] : "screen.png";
         var verify = args.Contains("--verify");
         var screen = Image.FromFile(screenshotPath);
@@ -83,6 +88,54 @@ public static class Program
         }
 
         return failures;
+    }
+
+    private static async Task<int> RunLiveAsync(string outputDirectory)
+    {
+        using var driver = MarionetteDriver.Create(new DriverOptions { FailureScreenshotPath = outputDirectory });
+        var sw = Stopwatch.StartNew();
+
+        foreach (var monitor in await driver.GetMonitorsAsync())
+        {
+            Console.WriteLine(monitor);
+        }
+
+        await driver.SaveScreenshotAsync(Path.Combine(outputDirectory, "live-before.png"));
+        Console.WriteLine($"screenshot saved at {sw.ElapsedMilliseconds} ms");
+
+        sw.Restart();
+        var result = await driver.WaitForAsync("Cancel", waitFor: TimeSpan.FromSeconds(5));
+        Console.WriteLine($"found 'Cancel' at {result.Location} in {sw.ElapsedMilliseconds} ms");
+
+        sw.Restart();
+        await driver.SingleClickAsync("Export report");
+        Console.WriteLine($"clicked 'Export report' in {sw.ElapsedMilliseconds} ms, mouse at {driver.GetMousePositionAsync()}");
+
+        sw.Restart();
+        await driver.SingleClickAsync("Cancel");
+        await driver.WaitForAsync("Operation cancelled", waitFor: TimeSpan.FromSeconds(5));
+        Console.WriteLine($"clicked 'Cancel' and saw the confirmation in {sw.ElapsedMilliseconds} ms");
+
+        sw.Restart();
+        await driver.SingleClickAsync("Email address");
+        await driver.TypeTextAsync("Jürgen.Müller+test@example.com\tS3cr€t ✓");
+        await driver.SingleClickAsync("Log in");
+        var welcome = await driver.WaitForAsync("Welcome back, Jürgen.Müller+test@example.com", waitFor: TimeSpan.FromSeconds(5));
+        Console.WriteLine($"typed, logged in and saw '{welcome.Element}' at {welcome.Location} in {sw.ElapsedMilliseconds} ms");
+
+        sw.Restart();
+        var before = await driver.GetScreenshotAsync();
+        var button = new ImageElement("save-button", before.Crop(new Rectangle(18, 96, 130, 122)));
+        await driver.SingleClickAsync(button);
+        await driver.WaitForAsync("Changes saved successfully", waitFor: TimeSpan.FromSeconds(5));
+        Console.WriteLine($"clicked an image and saw the confirmation in {sw.ElapsedMilliseconds} ms");
+
+        sw.Restart();
+        await driver.KeyPressAsync([VirtualKeyCode.ControlOrCommand, VirtualKeyCode.A]);
+        Console.WriteLine($"is 'Not there' visible: {await driver.IsVisibleAsync("Not there")} ({sw.ElapsedMilliseconds} ms)");
+
+        await driver.SaveScreenshotAsync(Path.Combine(outputDirectory, "live-after.png"));
+        return 0;
     }
 
     private static int BenchmarkTextRecognition(Image screen)
