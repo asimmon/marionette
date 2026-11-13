@@ -30,8 +30,8 @@
 
   <ItemGroup>
     <!-- Text recognition models are embedded so that the library works out of the box, including in single-file apps. -->
-    <EmbeddedResource Include="Recognition\Text\Models\*.onnx" LogicalName="Askaiser.Marionette.Models.%(Filename)%(Extension)" />
-    <EmbeddedResource Include="Recognition\Text\Models\*.txt" LogicalName="Askaiser.Marionette.Models.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Recognition\Text\Models\*.onnx" LogicalName="Askaiser.Marionette.Models.%(Filename)%(Extension)" WithCulture="false" />
+    <EmbeddedResource Include="Recognition\Text\Models\*.txt" LogicalName="Askaiser.Marionette.Models.%(Filename)%(Extension)" WithCulture="false" />
   </ItemGroup>
 
   <ItemGroup>

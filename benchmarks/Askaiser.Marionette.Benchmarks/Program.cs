@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Askaiser.Marionette;
 using Askaiser.Marionette.Imaging;
 using Askaiser.Marionette.Recognition.Images;
+using Askaiser.Marionette.Recognition.Text;
 
 namespace Askaiser.Marionette.Benchmarks;
 
@@ -12,6 +13,12 @@ public static class Program
         var screenshotPath = args.Length > 0 ? args[0] : "screen.png";
         var verify = args.Contains("--verify");
         var screen = Image.FromFile(screenshotPath);
+
+        if (args.Contains("--text"))
+        {
+            return BenchmarkTextRecognition(screen);
+        }
+
         Console.WriteLine($"Screen {screen.Width}x{screen.Height}, {Environment.ProcessorCount} logical cores, Vector<float>.Count={System.Numerics.Vector<float>.Count}");
 
         var cases = new (string Name, Rectangle Region, decimal Threshold, bool Grayscale)[]
@@ -76,6 +83,34 @@ public static class Program
         }
 
         return failures;
+    }
+
+    private static int BenchmarkTextRecognition(Image screen)
+    {
+        using var engine = new TextRecognitionEngine(TextRecognitionModel.Default);
+        using var pixels = PixelBuffer.Wrap(screen.Pixels.ToArray(), screen.Width, screen.Height);
+
+        var sw = Stopwatch.StartNew();
+        var rows = engine.Read(pixels, 1f);
+        Console.WriteLine($"First read (loads the models): {sw.ElapsedMilliseconds} ms, {rows.Count} rows");
+
+        // Changing a single pixel far from any text invalidates nothing: lines are recognized from cache.
+        sw.Restart();
+        rows = engine.Read(pixels, 1f);
+        Console.WriteLine($"Second read (same text on screen): {sw.ElapsedMilliseconds} ms");
+
+        foreach (var row in rows)
+        {
+            Console.WriteLine($"  [{row.Left:F0},{row.Top} - {row.Right:F0},{row.Bottom}] {row.Confidence:F2} \"{row.Text}\"");
+        }
+
+        foreach (var text in new[] { "Save changes", "File Edit", "jane.doe@example.com", "lazy dog", "Élodie", "await driver", "Not on screen" })
+        {
+            var found = TextFinder.Find(rows, text, ignoreCase: true);
+            Console.WriteLine($"  search '{text}': {string.Join(", ", found)}");
+        }
+
+        return 0;
     }
 
     private static bool VerifyAgainstExhaustiveSearch(SearchSurface surface, ImageTemplate template, List<TemplateMatch> matches)
