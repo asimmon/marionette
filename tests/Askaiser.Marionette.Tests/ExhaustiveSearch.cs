@@ -24,17 +24,32 @@ internal static class ExhaustiveSearch
         var positionsX = surface.Width - template.Width + 1;
         var positionsY = surface.Height - template.Height + 1;
 
-        Parallel.For(0, Math.Max(0, positionsY), y =>
+        // Dedicated threads, so that this long computation does not starve the thread pool the other tests rely on.
+        var nextRow = -1;
+        var workers = new Thread[Environment.ProcessorCount];
+        for (var i = 0; i < workers.Length; i++)
         {
-            for (var x = 0; x < positionsX; x++)
+            workers[i] = new Thread(() =>
             {
-                var score = TemplateMatcher.Score(surface, template, x, y);
-                if (score >= template.Threshold - 1e-6)
+                for (var y = Interlocked.Increment(ref nextRow); y < positionsY; y = Interlocked.Increment(ref nextRow))
                 {
-                    expected.Add(new TemplateMatch(x, y, score));
+                    for (var x = 0; x < positionsX; x++)
+                    {
+                        var score = TemplateMatcher.Score(surface, template, x, y);
+                        if (score >= template.Threshold - 1e-6)
+                        {
+                            expected.Add(new TemplateMatch(x, y, score));
+                        }
+                    }
                 }
-            }
-        });
+            });
+            workers[i].Start();
+        }
+
+        foreach (var worker in workers)
+        {
+            worker.Join();
+        }
 
         // One result per group of adjacent positions above the threshold: the best position of the group.
         var remaining = expected.ToDictionary(match => (match.X, match.Y));

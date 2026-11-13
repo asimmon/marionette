@@ -1,0 +1,27 @@
+name: Publish
+
+on:
+  push:
+    branches: ["master"]
+    tags: ["*.*.*"]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      # Builds, tests and packs. Packages are pushed when the source and API key are provided.
+      - run: ./Build.ps1
+        shell: pwsh
+        env:
+          NUGET_SOURCE: ${{ secrets.NUGET_SOURCE }}
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}

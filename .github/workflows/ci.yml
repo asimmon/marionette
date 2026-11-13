@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: ["master", "claude/**"]
+  pull_request:
+    branches: ["master"]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Build
+        run: dotnet build Askaiser.Marionette.slnx -c Release
+
+      - name: Unit tests
+        run: dotnet test --solution Askaiser.Marionette.slnx -c Release --no-build
+
+      # Desktop tests drive the real screen, mouse and keyboard of the runner: they are what verifies each platform backend.
+      - name: Desktop tests (Linux, in a virtual X server)
+        if: runner.os == 'Linux'
+        env:
+          MARIONETTE_DESKTOP_TESTS: "1"
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb libx11-6 libxtst6 libxext6 libxrandr2
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" dotnet test --project tests/Askaiser.Marionette.Tests -c Release --no-build --treenode-filter "/*/*/DesktopTests/*"
+
+      - name: Desktop tests (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          MARIONETTE_DESKTOP_TESTS: "1"
+        run: |
+          Set-DisplayResolution -Width 1920 -Height 1080 -Force
+          dotnet test --project tests/Askaiser.Marionette.Tests -c Release --no-build --treenode-filter "/*/*/DesktopTests/*"
+
+      - name: Desktop tests (macOS)
+        if: runner.os == 'macOS'
+        env:
+          MARIONETTE_DESKTOP_TESTS: "1"
+        run: dotnet test --project tests/Askaiser.Marionette.Tests -c Release --no-build --treenode-filter "/*/*/DesktopTests/*"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}
+          if-no-files-found: ignore
+          path: |
+            TestResults/
+            tests/**/bin/Release/**/desktop-failures/

@@ -4,6 +4,8 @@ using Askaiser.Marionette.Tests.Fakes;
 
 namespace Askaiser.Marionette.Tests;
 
+// These tests measure durations and count attempts: running them alone keeps them independent of the load of the machine.
+[NotInParallel]
 public class MarionetteDriverSearchTests
 {
     private static readonly Rectangle Location = new(50, 100, 70, 200);
