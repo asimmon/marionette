@@ -1,7 +1,7 @@
+using TUnit.Assertions.Enums;
 using System.Collections.Concurrent;
 using Askaiser.Marionette.Imaging;
 using Askaiser.Marionette.Recognition.Images;
-using Xunit;
 
 namespace Askaiser.Marionette.Tests;
 
@@ -18,7 +18,7 @@ internal static class ExhaustiveSearch
     /// <summary>
     /// Asserts that a search returned exactly what an exhaustive search finds.
     /// </summary>
-    public static void AssertSameAsExhaustive(SearchSurface surface, ImageTemplate template, IReadOnlyList<TemplateMatch> matches)
+    public static async Task AssertSameAsExhaustiveAsync(SearchSurface surface, ImageTemplate template, IReadOnlyList<TemplateMatch> matches)
     {
         var expected = new ConcurrentBag<TemplateMatch>();
         var positionsX = surface.Width - template.Width + 1;
@@ -80,11 +80,11 @@ internal static class ExhaustiveSearch
 
         var expectedPositions = kept.OrderBy(match => match.Y).ThenBy(match => match.X).Select(match => (match.X, match.Y)).ToList();
         var actualPositions = matches.Select(match => (match.X, match.Y)).ToList();
-        Assert.Equal(expectedPositions, actualPositions);
+        await Assert.That(actualPositions).IsEquivalentTo(expectedPositions, CollectionOrdering.Matching);
 
         foreach (var match in matches)
         {
-            Assert.Equal(kept.Single(other => other.X == match.X && other.Y == match.Y).Score, match.Score, precision: 9);
+            await Assert.That(match.Score).IsEqualTo(kept.Single(other => other.X == match.X && other.Y == match.Y).Score).Within(1e-9);
         }
     }
 

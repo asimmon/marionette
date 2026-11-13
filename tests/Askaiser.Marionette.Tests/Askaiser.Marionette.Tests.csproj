@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="TUnit" />
   </ItemGroup>
 
   <ItemGroup>

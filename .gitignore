@@ -390,3 +390,5 @@ build/tools/**
 # Build output
 /.output
 /.coverage
+# Test reports
+TestResults/

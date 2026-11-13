@@ -24,6 +24,7 @@ internal sealed class ScreenService : IDisposable
     private long _monitorsTimestamp;
     private ScreenFrame? _currentFrame;
     private long _currentFrameTimestamp;
+    private bool _isCurrentFrameStale;
     private bool _disposed;
 
     public ScreenService(IDisplayDevice device, TimeSpan frameLifetime)
@@ -85,6 +86,7 @@ internal sealed class ScreenService : IDisposable
                     // Nothing changed on the screen: keep the previous frame and what was already computed from it.
                     pixels.Dispose();
                     this._currentFrameTimestamp = Stopwatch.GetTimestamp();
+                    this._isCurrentFrameStale = false;
                     return previous;
                 }
 
@@ -93,6 +95,7 @@ internal sealed class ScreenService : IDisposable
 
                 this._currentFrame = frame;
                 this._currentFrameTimestamp = Stopwatch.GetTimestamp();
+                this._isCurrentFrameStale = false;
                 previous?.Release();
                 return frame;
             }
@@ -100,6 +103,18 @@ internal sealed class ScreenService : IDisposable
         finally
         {
             this._captureGate.Release();
+        }
+    }
+
+    /// <summary>
+    /// Makes the next search capture the screen again, whatever the age of the last capture.
+    /// Called after simulated input, which is expected to change what the screen displays.
+    /// </summary>
+    public void Invalidate()
+    {
+        lock (this._stateGate)
+        {
+            this._isCurrentFrameStale = true;
         }
     }
 
@@ -130,7 +145,7 @@ internal sealed class ScreenService : IDisposable
         lock (this._stateGate)
         {
             var frame = this._currentFrame;
-            if (frame != null && frame.Display == display && Stopwatch.GetElapsedTime(this._currentFrameTimestamp) <= this._frameLifetime && frame.TryAddReference())
+            if (frame != null && !this._isCurrentFrameStale && frame.Display == display && Stopwatch.GetElapsedTime(this._currentFrameTimestamp) <= this._frameLifetime && frame.TryAddReference())
             {
                 return frame;
             }

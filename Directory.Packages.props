@@ -14,6 +14,6 @@
     <PackageVersion Include="Workleap.DotNet.CodingStandards" Version="2.0.9" />
 
     <!-- Tests -->
-    <PackageVersion Include="xunit.v3" Version="4.0.3" />
+    <PackageVersion Include="TUnit" Version="1.84.0" />
   </ItemGroup>
 </Project>

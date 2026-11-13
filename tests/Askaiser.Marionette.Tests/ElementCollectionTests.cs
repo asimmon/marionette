@@ -1,5 +1,4 @@
 using System.Text;
-using Xunit;
 
 namespace Askaiser.Marionette.Tests;
 
@@ -13,44 +12,44 @@ public class ElementCollectionTests
     private static readonly ImageElement ImageElement = new ImageElement("logo", Encoding.UTF8.GetBytes("Hello"), 0.9m, false);
     private static readonly TextElement TextElement = new TextElement("lorem", "Lorem ipsum", TextOptions.BlackAndWhite);
 
-    [Fact]
-    public void TryGetValue_WhenExists_ReturnsTrue()
+    [Test]
+    public async Task TryGetValue_WhenExists_ReturnsTrue()
     {
         var collection = new ElementCollection();
         collection.Add(ImageElement);
 
-        Assert.True(collection.TryGetValue(ImageElement.Name, out var imageElement));
-        Assert.Same(ImageElement, imageElement);
+        await Assert.That(collection.TryGetValue(ImageElement.Name, out var imageElement)).IsTrue();
+        await Assert.That(imageElement).IsSameReferenceAs(ImageElement);
     }
 
-    [Fact]
-    public void TryGetValue_WhenDoesNotExists_ReturnsTrue()
+    [Test]
+    public async Task TryGetValue_WhenDoesNotExists_ReturnsTrue()
     {
         var collection = new ElementCollection();
         collection.Add(ImageElement);
 
-        Assert.False(collection.TryGetValue(TextElement.Name, out _));
+        await Assert.That(collection.TryGetValue(TextElement.Name, out _)).IsFalse();
     }
 
-    [Fact]
-    public void GetIndexer_WhenDoesNotExists_Throws()
+    [Test]
+    public async Task GetIndexer_WhenDoesNotExists_Throws()
     {
         var collection = new ElementCollection();
         collection.Add(ImageElement);
 
-        Assert.Same(ImageElement, collection[ImageElement.Name]);
+        await Assert.That(collection[ImageElement.Name]).IsSameReferenceAs(ImageElement);
     }
 
-    [Fact]
-    public void GetIndexer_WhenExists_Returns()
+    [Test]
+    public async Task GetIndexer_WhenExists_Returns()
     {
         var collection = new ElementCollection();
         collection.Add(ImageElement);
 
-        Assert.Throws<ArgumentException>(() => collection[TextElement.Name]);
+        Assert.Throws<ArgumentException>(() => _ = collection[TextElement.Name]);
     }
 
-    [Fact]
+    [Test]
     public async Task SaveAsync_WhenSupportedElements_Works()
     {
         var collection = new ElementCollection();
@@ -61,42 +60,42 @@ public class ElementCollectionTests
         await collection.SaveAsync(stream);
 
         var actualJson = Encoding.UTF8.GetString(stream.ToArray());
-        Assert.Equal(ValidJsonCollection, actualJson);
+        await Assert.That(actualJson).IsEqualTo(ValidJsonCollection);
     }
 
-    [Fact]
+    [Test]
     public async Task LoadAsync_WhenSupportedElements_Works()
     {
         using (var stream = new MemoryStream())
         using (var writer = new StreamWriter(stream))
         {
             await writer.WriteAsync(ValidJsonCollection);
-            await writer.FlushAsync(TestContext.Current.CancellationToken);
+            await writer.FlushAsync(TestContext.Current!.Execution.CancellationToken);
             stream.Seek(0, SeekOrigin.Begin);
 
             var collection = new ElementCollection();
             await collection.LoadAsync(stream);
 
-            Assert.Equal(2, collection.Count);
-            var imageBase = Assert.Single(collection, x => x.Name == ImageElement.Name);
-            var image = Assert.IsType<ImageElement>(imageBase);
-            Assert.NotSame(ImageElement, image);
+            await Assert.That(collection.Count).IsEqualTo(2);
+            var imageBase = collection.Single(x => x.Name == ImageElement.Name);
+            var image = (await Assert.That(imageBase).IsTypeOf<ImageElement>())!;
+            await Assert.That(image).IsNotSameReferenceAs(ImageElement);
 
-            var textBase = Assert.Single(collection, x => x.Name == TextElement.Name);
-            var text = Assert.IsType<TextElement>(textBase);
-            Assert.NotSame(TextElement, text);
+            var textBase = collection.Single(x => x.Name == TextElement.Name);
+            var text = (await Assert.That(textBase).IsTypeOf<TextElement>())!;
+            await Assert.That(text).IsNotSameReferenceAs(TextElement);
 
-            Assert.Equal(ImageElement.Content, image.Content);
-            Assert.Equal(ImageElement.Threshold, image.Threshold);
-            Assert.Equal(ImageElement.Grayscale, image.Grayscale);
+            await Assert.That(image.Content.AsSpan().SequenceEqual(ImageElement.Content)).IsTrue();
+            await Assert.That(image.Threshold).IsEqualTo(ImageElement.Threshold);
+            await Assert.That(image.Grayscale).IsEqualTo(ImageElement.Grayscale);
 
-            Assert.Equal(TextElement.Content, text.Content);
-            Assert.Equal(TextElement.Options, text.Options);
-            Assert.Equal(TextElement.IgnoreCase, text.IgnoreCase);
+            await Assert.That(text.Content).IsEqualTo(TextElement.Content);
+            await Assert.That(text.Options).IsEqualTo(TextElement.Options);
+            await Assert.That(text.IgnoreCase).IsEqualTo(TextElement.IgnoreCase);
         }
     }
 
-    [Fact]
+    [Test]
     public async Task SaveAsync_WhenNotSupportedElements_Throws()
     {
         var collection = new ElementCollection();
@@ -106,14 +105,14 @@ public class ElementCollectionTests
         await Assert.ThrowsAsync<NotSupportedException>(async () => await collection.SaveAsync(stream));
     }
 
-    [Fact]
+    [Test]
     public async Task LoadAsync_WhenNotSupportedElements_Works()
     {
         using (var stream = new MemoryStream())
         using (var writer = new StreamWriter(stream))
         {
             await writer.WriteAsync(InvalidJsonCollection);
-            await writer.FlushAsync(TestContext.Current.CancellationToken);
+            await writer.FlushAsync(TestContext.Current!.Execution.CancellationToken);
             stream.Seek(0, SeekOrigin.Begin);
 
             var collection = new ElementCollection();

@@ -1,83 +1,83 @@
+using TUnit.Assertions.Enums;
 using Askaiser.Marionette.Recognition;
 using Askaiser.Marionette.Recognition.Images;
 using Askaiser.Marionette.Tests.Fakes;
-using Xunit;
 
 namespace Askaiser.Marionette.Tests;
 
 public class TemplateMatcherTests
 {
     // These are the cases of the first versions of the library, which searched images with OpenCV.
-    [Theory]
-    [InlineData(0, 0, 200, 100, "0.95", false, 100, 50)]
-    [InlineData(1000, 300, 1100, 400, "0.95", false, 1050, 350)]
-    [InlineData(20, 620, 162, 660, "0.95", false, 91, 640)]
-    [InlineData(0, 0, 200, 100, "0.8", false, 100, 50)]
-    [InlineData(1000, 300, 1100, 400, "0.8", false, 1050, 350)]
-    [InlineData(20, 620, 162, 660, "0.8", false, 91, 640)]
-    [InlineData(0, 0, 200, 100, "0.95", true, 100, 50)]
-    [InlineData(1000, 300, 1100, 400, "0.95", true, 1050, 350)]
-    [InlineData(20, 620, 162, 660, "0.95", true, 91, 640)]
-    public void Find_WhenSingleOccurrence_ReturnsIt(int left, int top, int right, int bottom, string threshold, bool grayscale, int expectedX, int expectedY)
+    [Test]
+    [Arguments(0, 0, 200, 100, "0.95", false, 100, 50)]
+    [Arguments(1000, 300, 1100, 400, "0.95", false, 1050, 350)]
+    [Arguments(20, 620, 162, 660, "0.95", false, 91, 640)]
+    [Arguments(0, 0, 200, 100, "0.8", false, 100, 50)]
+    [Arguments(1000, 300, 1100, 400, "0.8", false, 1050, 350)]
+    [Arguments(20, 620, 162, 660, "0.8", false, 91, 640)]
+    [Arguments(0, 0, 200, 100, "0.95", true, 100, 50)]
+    [Arguments(1000, 300, 1100, 400, "0.95", true, 1050, 350)]
+    [Arguments(20, 620, 162, 660, "0.95", true, 91, 640)]
+    public async Task Find_WhenSingleOccurrence_ReturnsIt(int left, int top, int right, int bottom, string threshold, bool grayscale, int expectedX, int expectedY)
     {
         var screenshot = TestAssets.GoogleNews;
         var element = new ImageElement("searched", screenshot.Crop(new Rectangle(left, top, right, bottom)), decimal.Parse(threshold, System.Globalization.CultureInfo.InvariantCulture), grayscale);
 
         var locations = Recognize(screenshot, element);
 
-        var location = Assert.Single(locations);
-        Assert.Equal(new Point(expectedX, expectedY), location.Center);
+        var location = await Assert.That(locations).HasSingleItem();
+        await Assert.That(location.Center).IsEqualTo(new Point(expectedX, expectedY));
     }
 
-    [Fact]
-    public void Find_WhenTwoOccurrences_ReturnsBoth()
+    [Test]
+    public async Task Find_WhenTwoOccurrences_ReturnsBoth()
     {
         var screenshot = TestAssets.GoogleNews;
         var element = new ImageElement("searched", screenshot.Crop(new Rectangle(1376, 390, 1420, 436)));
 
         var locations = Recognize(screenshot, element);
 
-        Assert.Equal([new Point(1398, 413), new Point(1464, 413)], locations.Select(location => location.Center));
+        await Assert.That(locations.Select(location => location.Center)).IsEquivalentTo([new Point(1398, 413), new Point(1464, 413)], CollectionOrdering.Matching);
     }
 
-    [Fact]
-    public void Find_WhenImageIsEncoded_DecodesIt()
+    [Test]
+    public async Task Find_WhenImageIsEncoded_DecodesIt()
     {
         var screenshot = TestAssets.TestBench;
         var png = screenshot.Crop(new Rectangle(8, 85, 120, 111)).ToPng();
         var element = new ImageElement("save-button", png, 0.95m, grayscale: false);
 
-        var location = Assert.Single(Recognize(screenshot, element));
-        Assert.Equal(new Rectangle(8, 85, 120, 111), location);
+        var location = await Assert.That(Recognize(screenshot, element)).HasSingleItem();
+        await Assert.That(location).IsEqualTo(new Rectangle(8, 85, 120, 111));
     }
 
-    [Fact]
-    public void Find_WhenImageIsLargerThanScreen_ReturnsNothing()
+    [Test]
+    public async Task Find_WhenImageIsLargerThanScreen_ReturnsNothing()
     {
         var element = new ImageElement("large", TestAssets.TestBench.Crop(new Rectangle(0, 0, 400, 300)));
-        Assert.Empty(Recognize(TestAssets.TestBench.Crop(new Rectangle(0, 0, 399, 300)), element));
+        await Assert.That(Recognize(TestAssets.TestBench.Crop(new Rectangle(0, 0, 399, 300)), element)).IsEmpty();
     }
 
-    [Fact]
-    public void Find_WhenImageIsNotOnScreen_ReturnsNothing()
+    [Test]
+    public async Task Find_WhenImageIsNotOnScreen_ReturnsNothing()
     {
         var element = new ImageElement("other", TestAssets.GoogleNews.Crop(new Rectangle(20, 620, 162, 660)));
-        Assert.Empty(Recognize(TestAssets.TestBench, element));
+        await Assert.That(Recognize(TestAssets.TestBench, element)).IsEmpty();
     }
 
-    [Fact]
-    public void Find_WhenImageIsSolidColor_Throws()
+    [Test]
+    public async Task Find_WhenImageIsSolidColor_Throws()
     {
         var pixels = new byte[16 * 16 * 4];
         Array.Fill(pixels, (byte)200);
         var element = new ImageElement("solid", Image.FromBgra32(16, 16, pixels));
 
         var exception = Assert.Throws<ArgumentException>(() => Recognize(TestAssets.TestBench, element));
-        Assert.Contains("solid", exception.Message, StringComparison.Ordinal);
+        await Assert.That(exception!.Message).Contains("solid");
     }
 
-    [Fact]
-    public void Find_WhenContrastIsOnlyInColor_FindsIt()
+    [Test]
+    public async Task Find_WhenContrastIsOnlyInColor_FindsIt()
     {
         // A red shape on a blue background of the same brightness: invisible once converted to shades of gray.
         var screen = CreateImage(120, 80, (x, y) => IsInside(x, y, 70, 30, 12, 9) ? (60, 20, 220) : (220, 20, 60));
@@ -85,42 +85,42 @@ public class TemplateMatcherTests
         var element = new ImageElement("shape", template);
 
         using var surface = ExhaustiveSearch.CreateSurface(screen);
-        var matches = TemplateMatcher.Find(surface, element.GetTemplate()!, cancellationToken: TestContext.Current.CancellationToken);
+        var matches = TemplateMatcher.Find(surface, element.GetTemplate()!, cancellationToken: TestContext.Current!.Execution.CancellationToken);
 
-        Assert.Contains(matches, match => match.X == 62 && match.Y == 24);
-        Assert.NotEqual(ColorPlaneKind.Sum, element.GetTemplate()!.PlaneKind);
-        ExhaustiveSearch.AssertSameAsExhaustive(surface, element.GetTemplate()!, matches);
+        await Assert.That(matches).Contains(match => match.X == 62 && match.Y == 24);
+        await Assert.That(element.GetTemplate()!.PlaneKind).IsNotEqualTo(ColorPlaneKind.Sum);
+        await ExhaustiveSearch.AssertSameAsExhaustiveAsync(surface, element.GetTemplate()!, matches);
     }
 
-    [Theory]
-    [InlineData(1, "0.95", false)]
-    [InlineData(2, "0.95", true)]
-    [InlineData(3, "0.8", false)]
-    [InlineData(4, "0.8", true)]
-    [InlineData(5, "0.6", false)]
-    [InlineData(6, "1.0", false)]
-    [InlineData(7, "0.3", true)]
-    public void Find_OnSyntheticScreens_ReturnsTheSameAsAnExhaustiveSearch(int seed, string threshold, bool grayscale)
+    [Test]
+    [Arguments(1, "0.95", false)]
+    [Arguments(2, "0.95", true)]
+    [Arguments(3, "0.8", false)]
+    [Arguments(4, "0.8", true)]
+    [Arguments(5, "0.6", false)]
+    [Arguments(6, "1.0", false)]
+    [Arguments(7, "0.3", true)]
+    public async Task Find_OnSyntheticScreens_ReturnsTheSameAsAnExhaustiveSearch(int seed, string threshold, bool grayscale)
     {
         var random = new Random(seed);
         var screen = CreateSyntheticScreen(random, 220, 150, out var template);
         var element = new ImageElement("planted", template, decimal.Parse(threshold, System.Globalization.CultureInfo.InvariantCulture), grayscale);
 
         using var surface = ExhaustiveSearch.CreateSurface(screen);
-        var matches = TemplateMatcher.Find(surface, element.GetTemplate()!, cancellationToken: TestContext.Current.CancellationToken);
+        var matches = TemplateMatcher.Find(surface, element.GetTemplate()!, cancellationToken: TestContext.Current!.Execution.CancellationToken);
 
-        Assert.NotEmpty(matches);
-        ExhaustiveSearch.AssertSameAsExhaustive(surface, element.GetTemplate()!, matches);
+        await Assert.That(matches).IsNotEmpty();
+        await ExhaustiveSearch.AssertSameAsExhaustiveAsync(surface, element.GetTemplate()!, matches);
     }
 
-    [Theory]
-    [InlineData(8, 85, 120, 111, "0.95", false)]
-    [InlineData(8, 85, 120, 111, "0.9", true)]
-    [InlineData(441, 87, 465, 111, "0.95", false)]
-    [InlineData(284, 189, 528, 303, "0.95", false)]
-    [InlineData(18, 167, 83, 183, "0.7", false)]
-    [InlineData(296, 452, 303, 471, "0.9", true)]
-    public void Find_OnRealScreenshot_ReturnsTheSameAsAnExhaustiveSearch(int left, int top, int right, int bottom, string threshold, bool grayscale)
+    [Test]
+    [Arguments(8, 85, 120, 111, "0.95", false)]
+    [Arguments(8, 85, 120, 111, "0.9", true)]
+    [Arguments(441, 87, 465, 111, "0.95", false)]
+    [Arguments(284, 189, 528, 303, "0.95", false)]
+    [Arguments(18, 167, 83, 183, "0.7", false)]
+    [Arguments(296, 452, 303, 471, "0.9", true)]
+    public async Task Find_OnRealScreenshot_ReturnsTheSameAsAnExhaustiveSearch(int left, int top, int right, int bottom, string threshold, bool grayscale)
     {
         // A part of the screenshot keeps the exhaustive search fast, while still containing the image and plenty of look-alikes.
         var screen = TestAssets.TestBench.Crop(new Rectangle(0, 60, 700, 520));
@@ -129,31 +129,31 @@ public class TemplateMatcherTests
 
         using var surface = ExhaustiveSearch.CreateSurface(screen);
         var statistics = new TemplateSearchStatistics();
-        var matches = TemplateMatcher.Find(surface, element.GetTemplate()!, statistics, TestContext.Current.CancellationToken);
+        var matches = TemplateMatcher.Find(surface, element.GetTemplate()!, statistics, TestContext.Current!.Execution.CancellationToken);
 
-        Assert.Contains(matches, match => match.X == left && match.Y == top - 60);
-        ExhaustiveSearch.AssertSameAsExhaustive(surface, element.GetTemplate()!, matches);
+        await Assert.That(matches).Contains(match => match.X == left && match.Y == top - 60);
+        await ExhaustiveSearch.AssertSameAsExhaustiveAsync(surface, element.GetTemplate()!, matches);
 
         // The whole point of the coarse levels: almost no position should need an exact score.
-        Assert.True(statistics.Passed[^2] < statistics.Positions / 20, $"{statistics.Passed[^2]} of {statistics.Positions} positions were scored exactly");
+        await Assert.That(statistics.Passed[^2] < statistics.Positions / 20).IsTrue().Because($"{statistics.Passed[^2]} of {statistics.Positions} positions were scored exactly");
     }
 
-    [Fact]
-    public void Find_WhenSearchedSeveralTimes_ReturnsTheSameResult()
+    [Test]
+    public async Task Find_WhenSearchedSeveralTimes_ReturnsTheSameResult()
     {
         var element = new ImageElement("searched", TestAssets.GoogleNews.Crop(new Rectangle(1376, 390, 1420, 436)));
         using var surface = ExhaustiveSearch.CreateSurface(TestAssets.GoogleNews);
 
-        var first = TemplateMatcher.Find(surface, element.GetTemplate()!, cancellationToken: TestContext.Current.CancellationToken);
-        var second = TemplateMatcher.Find(surface, element.GetTemplate()!, cancellationToken: TestContext.Current.CancellationToken);
+        var first = TemplateMatcher.Find(surface, element.GetTemplate()!, cancellationToken: TestContext.Current!.Execution.CancellationToken);
+        var second = TemplateMatcher.Find(surface, element.GetTemplate()!, cancellationToken: TestContext.Current!.Execution.CancellationToken);
 
-        Assert.Equal(first, second);
+        await Assert.That(second).IsEquivalentTo(first, CollectionOrdering.Matching);
     }
 
     private static IReadOnlyList<Rectangle> Recognize(Image screen, ImageElement element)
     {
         using var surface = ExhaustiveSearch.CreateSurface(screen);
-        return new ImageElementRecognizer().Recognize(surface, FakeDisplayDevice.Displays[1], element, TestContext.Current.CancellationToken);
+        return new ImageElementRecognizer().Recognize(surface, FakeDisplayDevice.Displays[1], element, TestContext.Current!.Execution.CancellationToken);
     }
 
     private static bool IsInside(int x, int y, int centerX, int centerY, int halfWidth, int halfHeight)

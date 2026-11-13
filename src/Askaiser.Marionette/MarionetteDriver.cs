@@ -173,27 +173,27 @@ public sealed class MarionetteDriver : IDisposable
 
     public Task MoveToAsync(int x, int y)
     {
-        return this._mouse.MoveAsync(x, y, this._mouseSpeed);
+        return this.ActAsync(this._mouse.MoveAsync(x, y, this._mouseSpeed));
     }
 
     public Task SingleClickAsync(int x, int y)
     {
-        return this._mouse.SingleClickAsync(x, y, this._mouseSpeed);
+        return this.ActAsync(this._mouse.SingleClickAsync(x, y, this._mouseSpeed));
     }
 
     public Task DoubleClickAsync(int x, int y)
     {
-        return this._mouse.DoubleClickAsync(x, y, this._mouseSpeed);
+        return this.ActAsync(this._mouse.DoubleClickAsync(x, y, this._mouseSpeed));
     }
 
     public Task TripleClickAsync(int x, int y)
     {
-        return this._mouse.TripleClickAsync(x, y, this._mouseSpeed);
+        return this.ActAsync(this._mouse.TripleClickAsync(x, y, this._mouseSpeed));
     }
 
     public Task RightClickAsync(int x, int y)
     {
-        return this._mouse.RightClickAsync(x, y, this._mouseSpeed);
+        return this.ActAsync(this._mouse.RightClickAsync(x, y, this._mouseSpeed));
     }
 
     /// <summary>
@@ -201,7 +201,7 @@ public sealed class MarionetteDriver : IDisposable
     /// </summary>
     public Task DragFromAsync(int x, int y)
     {
-        return this._mouse.DragFromAsync(x, y, this._mouseSpeed);
+        return this.ActAsync(this._mouse.DragFromAsync(x, y, this._mouseSpeed));
     }
 
     /// <summary>
@@ -209,7 +209,7 @@ public sealed class MarionetteDriver : IDisposable
     /// </summary>
     public Task DropToAsync(int x, int y)
     {
-        return this._mouse.DropToAsync(x, y, this._mouseSpeed);
+        return this.ActAsync(this._mouse.DropToAsync(x, y, this._mouseSpeed));
     }
 
     public Task ScrollUpAsync(int scrollTicks = 1)
@@ -249,7 +249,7 @@ public sealed class MarionetteDriver : IDisposable
 
         if (text.Length > 0)
         {
-            await this._keyboard.TypeTextAsync(text).ConfigureAwait(false);
+            await this.ActAsync(this._keyboard.TypeTextAsync(text)).ConfigureAwait(false);
             await this.SleepAfterKeyboardAsync(sleepAfter).ConfigureAwait(false);
         }
     }
@@ -261,7 +261,7 @@ public sealed class MarionetteDriver : IDisposable
     public async Task KeyPressAsync(VirtualKeyCode[] keyCodes, TimeSpan? sleepAfter = default)
     {
         EnsureNotNullOrEmpty(keyCodes);
-        await this._keyboard.KeyPressAsync(keyCodes).ConfigureAwait(false);
+        await this.ActAsync(this._keyboard.KeyPressAsync(keyCodes)).ConfigureAwait(false);
         await this.SleepAfterKeyboardAsync(sleepAfter).ConfigureAwait(false);
     }
 
@@ -271,7 +271,7 @@ public sealed class MarionetteDriver : IDisposable
     public async Task KeyDownAsync(VirtualKeyCode[] keyCodes, TimeSpan? sleepAfter = default)
     {
         EnsureNotNullOrEmpty(keyCodes);
-        await this._keyboard.KeyDownAsync(keyCodes).ConfigureAwait(false);
+        await this.ActAsync(this._keyboard.KeyDownAsync(keyCodes)).ConfigureAwait(false);
         await this.SleepAfterKeyboardAsync(sleepAfter).ConfigureAwait(false);
     }
 
@@ -281,7 +281,7 @@ public sealed class MarionetteDriver : IDisposable
     public async Task KeyUpAsync(VirtualKeyCode[] keyCodes, TimeSpan? sleepAfter = default)
     {
         EnsureNotNullOrEmpty(keyCodes);
-        await this._keyboard.KeyUpAsync(keyCodes).ConfigureAwait(false);
+        await this.ActAsync(this._keyboard.KeyUpAsync(keyCodes)).ConfigureAwait(false);
         await this.SleepAfterKeyboardAsync(sleepAfter).ConfigureAwait(false);
     }
 
@@ -399,6 +399,21 @@ public sealed class MarionetteDriver : IDisposable
         }
     }
 
+    /// <summary>
+    /// Runs a mouse or keyboard action. The screen most likely changes as a result, so the last screenshot is not reused afterwards.
+    /// </summary>
+    private async Task ActAsync(Task action)
+    {
+        try
+        {
+            await action.ConfigureAwait(false);
+        }
+        finally
+        {
+            this._screen.Invalidate();
+        }
+    }
+
     private async Task ScrollAsync(bool up, int scrollTicks)
     {
         if (scrollTicks <= 0)
@@ -408,7 +423,7 @@ public sealed class MarionetteDriver : IDisposable
 
         for (var i = 0; i < scrollTicks; i++)
         {
-            await this._mouse.ScrollAsync(up).ConfigureAwait(false);
+            await this.ActAsync(this._mouse.ScrollAsync(up)).ConfigureAwait(false);
         }
     }
 

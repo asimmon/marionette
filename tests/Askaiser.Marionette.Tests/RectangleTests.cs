@@ -1,165 +1,163 @@
-using Xunit;
-
 namespace Askaiser.Marionette.Tests;
 
 public class RectangleTests
 {
-    [Theory]
-    [InlineData(1, 0, 0, 0)]
-    [InlineData(0, 1, 0, 0)]
-    [InlineData(0, 0, -1, 0)]
-    [InlineData(0, 0, 0, -1)]
-    public void WhenArgumentOutOfRangeException_Throws(int left, int top, int right, int bottom)
+    [Test]
+    [Arguments(1, 0, 0, 0)]
+    [Arguments(0, 1, 0, 0)]
+    [Arguments(0, 0, -1, 0)]
+    [Arguments(0, 0, 0, -1)]
+    public async Task WhenArgumentOutOfRangeException_Throws(int left, int top, int right, int bottom)
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => new Rectangle(left, top, right, bottom));
+        Assert.Throws<ArgumentOutOfRangeException>(() => _ = new Rectangle(left, top, right, bottom));
     }
 
-    [Fact]
-    public void WidthAndHeight_Work()
+    [Test]
+    public async Task WidthAndHeight_Work()
     {
         var rect = new Rectangle(50, 20, 70, 90);
-        Assert.Equal(20, rect.Width);
-        Assert.Equal(70, rect.Height);
+        await Assert.That(rect.Width).IsEqualTo(20);
+        await Assert.That(rect.Height).IsEqualTo(70);
     }
 
-    [Fact]
-    public void Deconstruct_Work()
+    [Test]
+    public async Task Deconstruct_Work()
     {
         var (left, top, right, bottom) = new Rectangle(50, 20, 70, 90);
 
-        Assert.Equal(50, left);
-        Assert.Equal(20, top);
-        Assert.Equal(70, right);
-        Assert.Equal(90, bottom);
+        await Assert.That(left).IsEqualTo(50);
+        await Assert.That(top).IsEqualTo(20);
+        await Assert.That(right).IsEqualTo(70);
+        await Assert.That(bottom).IsEqualTo(90);
     }
 
-    [Theory]
-    [InlineData(10, 10, 10, 10, 10, 10)]
-    [InlineData(10, 10, 20, 20, 15, 15)]
-    [InlineData(10, 10, 15, 16, 12, 13)]
-    public void Center_Works(int left, int top, int right, int bottom, int expectedCenterX, int expectedCenterY)
+    [Test]
+    [Arguments(10, 10, 10, 10, 10, 10)]
+    [Arguments(10, 10, 20, 20, 15, 15)]
+    [Arguments(10, 10, 15, 16, 12, 13)]
+    public async Task Center_Works(int left, int top, int right, int bottom, int expectedCenterX, int expectedCenterY)
     {
         var rect = new Rectangle(left, top, right, bottom);
         var (centerX, centerY) = rect.Center;
 
-        Assert.Equal(expectedCenterX, centerX);
-        Assert.Equal(expectedCenterY, centerY);
+        await Assert.That(centerX).IsEqualTo(expectedCenterX);
+        await Assert.That(centerY).IsEqualTo(expectedCenterY);
     }
 
-    [Fact]
-    public void Corners()
+    [Test]
+    public async Task Corners()
     {
         var rect = new Rectangle(75, 63, 478, 362);
-        Assert.Equal(new Point(75, 63), rect.TopLeft);
-        Assert.Equal(new Point(478, 63), rect.TopRight);
-        Assert.Equal(new Point(75, 362), rect.BottomLeft);
-        Assert.Equal(new Point(478, 362), rect.BottomRight);
+        await Assert.That(rect.TopLeft).IsEqualTo(new Point(75, 63));
+        await Assert.That(rect.TopRight).IsEqualTo(new Point(478, 63));
+        await Assert.That(rect.BottomLeft).IsEqualTo(new Point(75, 362));
+        await Assert.That(rect.BottomRight).IsEqualTo(new Point(478, 362));
     }
 
-    [Fact]
-    public void ConstructorWithPoints()
+    [Test]
+    public async Task ConstructorWithPoints()
     {
         var r1 = new Rectangle(75, 63, 478, 362);
         var r2 = new Rectangle(r1.TopLeft, r1.BottomRight);
-        Assert.Equal(r1, r2);
+        await Assert.That(r2).IsEqualTo(r1);
     }
 
-    [Fact]
-    public void FromLeft()
+    [Test]
+    public async Task FromLeft()
     {
         var rect = new Rectangle(100, 200, 300, 400);
-        Assert.Equal(new Rectangle(100, 200, 150, 400), rect.FromLeft(50));
+        await Assert.That(rect.FromLeft(50)).IsEqualTo(new Rectangle(100, 200, 150, 400));
     }
 
-    [Fact]
-    public void FromRight()
+    [Test]
+    public async Task FromRight()
     {
         var rect = new Rectangle(100, 200, 300, 400);
-        Assert.Equal(new Rectangle(250, 200, 300, 400), rect.FromRight(50));
+        await Assert.That(rect.FromRight(50)).IsEqualTo(new Rectangle(250, 200, 300, 400));
     }
 
-    [Fact]
-    public void FromTop()
+    [Test]
+    public async Task FromTop()
     {
         var rect = new Rectangle(100, 200, 300, 400);
-        Assert.Equal(new Rectangle(100, 200, 300, 250), rect.FromTop(50));
+        await Assert.That(rect.FromTop(50)).IsEqualTo(new Rectangle(100, 200, 300, 250));
     }
 
-    [Fact]
-    public void FromBottom()
+    [Test]
+    public async Task FromBottom()
     {
         var rect = new Rectangle(100, 200, 300, 400);
-        Assert.Equal(new Rectangle(100, 350, 300, 400), rect.FromBottom(50));
+        await Assert.That(rect.FromBottom(50)).IsEqualTo(new Rectangle(100, 350, 300, 400));
     }
 
-    [Fact]
-    public void FromTopLeft()
+    [Test]
+    public async Task FromTopLeft()
     {
         var rect = new Rectangle(1, 1, 100, 100);
-        Assert.Equal(new Rectangle(1, 1, 50, 30), rect.FromTopLeft(49, 29));
+        await Assert.That(rect.FromTopLeft(49, 29)).IsEqualTo(new Rectangle(1, 1, 50, 30));
     }
 
-    [Fact]
-    public void FromTopRight()
+    [Test]
+    public async Task FromTopRight()
     {
         var rect = new Rectangle(1, 1, 100, 100);
-        Assert.Equal(new Rectangle(50, 1, 100, 30), rect.FromTopRight(50, 29));
+        await Assert.That(rect.FromTopRight(50, 29)).IsEqualTo(new Rectangle(50, 1, 100, 30));
     }
 
-    [Fact]
-    public void FromBottomLeft()
+    [Test]
+    public async Task FromBottomLeft()
     {
         var rect = new Rectangle(1, 1, 100, 100);
-        Assert.Equal(new Rectangle(1, 70, 50, 100), rect.FromBottomLeft(49, 30));
+        await Assert.That(rect.FromBottomLeft(49, 30)).IsEqualTo(new Rectangle(1, 70, 50, 100));
     }
 
-    [Fact]
-    public void FromBottomRight()
+    [Test]
+    public async Task FromBottomRight()
     {
         var rect = new Rectangle(1, 1, 100, 100);
-        Assert.Equal(new Rectangle(50, 70, 100, 100), rect.FromBottomRight(50, 30));
+        await Assert.That(rect.FromBottomRight(50, 30)).IsEqualTo(new Rectangle(50, 70, 100, 100));
     }
 
-    [Fact]
-    public void FromCenter()
+    [Test]
+    public async Task FromCenter()
     {
         var rect = new Rectangle(0, 0, 100, 100);
-        Assert.Equal(new Rectangle(20, 30, 80, 70), rect.FromCenter(60, 40));
+        await Assert.That(rect.FromCenter(60, 40)).IsEqualTo(new Rectangle(20, 30, 80, 70));
     }
 
-    [Fact]
-    public void Multiply()
+    [Test]
+    public async Task Multiply()
     {
         var rect = new Rectangle(5, 5, 20, 20);
-        Assert.Equal(new Rectangle(10, 15, 40, 60), rect * (2, 3));
+        await Assert.That(rect * (2, 3)).IsEqualTo(new Rectangle(10, 15, 40, 60));
     }
 
-    [Fact]
-    public void Divide()
+    [Test]
+    public async Task Divide()
     {
         var rect = new Rectangle(10, 15, 40, 60);
-        Assert.Equal(new Rectangle(5, 5, 20, 20), rect / (2, 3));
+        await Assert.That(rect / (2, 3)).IsEqualTo(new Rectangle(5, 5, 20, 20));
     }
 
-    [Fact]
-    public void BoundingCenters()
+    [Test]
+    public async Task BoundingCenters()
     {
         var rect = new Rectangle(10, 20, 100, 200);
-        Assert.Equal(new Point(10, 110), rect.CenterLeft);
-        Assert.Equal(new Point(100, 110), rect.CenterRight);
-        Assert.Equal(new Point(55, 20), rect.CenterTop);
-        Assert.Equal(new Point(55, 200), rect.CenterBottom);
+        await Assert.That(rect.CenterLeft).IsEqualTo(new Point(10, 110));
+        await Assert.That(rect.CenterRight).IsEqualTo(new Point(100, 110));
+        await Assert.That(rect.CenterTop).IsEqualTo(new Point(55, 20));
+        await Assert.That(rect.CenterBottom).IsEqualTo(new Point(55, 200));
     }
 
-    [Fact]
-    public void Operators()
+    [Test]
+    public async Task Operators()
     {
         var rect = new Rectangle(1, 2, 3, 4);
 
-        Assert.Equal(new Rectangle(2, 4, 4, 6), rect + (1, 2));
-        Assert.Equal(new Rectangle(2, 4, 4, 6), rect + new Point(1, 2));
+        await Assert.That(rect + (1, 2)).IsEqualTo(new Rectangle(2, 4, 4, 6));
+        await Assert.That(rect + new Point(1, 2)).IsEqualTo(new Rectangle(2, 4, 4, 6));
 
-        Assert.Equal(new Rectangle(0, 0, 2, 2), rect - (1, 2));
-        Assert.Equal(new Rectangle(0, 0, 2, 2), rect - new Point(1, 2));
+        await Assert.That(rect - (1, 2)).IsEqualTo(new Rectangle(0, 0, 2, 2));
+        await Assert.That(rect - new Point(1, 2)).IsEqualTo(new Rectangle(0, 0, 2, 2));
     }
 }
