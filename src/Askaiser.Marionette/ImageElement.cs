@@ -1,4 +1,6 @@
 using System;
+using System.Buffers;
+using System.Buffers.Text;
 using System.Diagnostics;
 using System.Threading;
 using Askaiser.Marionette.Recognition.Images;
@@ -59,6 +61,26 @@ public sealed class ImageElement : IElement
         this._image = image;
         this.Threshold = threshold;
         this.Grayscale = grayscale;
+    }
+
+    /// <summary>
+    /// Creates an image element from a PNG, JPEG or BMP image encoded as base64 text, itself encoded as UTF-8.
+    /// This is what generated image libraries use: such text can be stored as static data of an assembly, without allocating a string.
+    /// </summary>
+    public static ImageElement FromBase64(string name, ReadOnlySpan<byte> utf8Base64Content, decimal threshold, bool grayscale)
+    {
+        var content = new byte[Base64.GetMaxDecodedFromUtf8Length(utf8Base64Content.Length)];
+        if (Base64.DecodeFromUtf8(utf8Base64Content, content, out _, out var written) != OperationStatus.Done)
+        {
+            throw new FormatException(Messages.ImageElement_Throw_InvalidBase64);
+        }
+
+        if (written != content.Length)
+        {
+            Array.Resize(ref content, written);
+        }
+
+        return new ImageElement(name, content, threshold, grayscale);
     }
 
     /// <summary>

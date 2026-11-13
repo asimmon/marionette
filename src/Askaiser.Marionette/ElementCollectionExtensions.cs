@@ -83,7 +83,7 @@ public static class ElementCollectionExtensions
 
         await using (destinationStream.ConfigureAwait(false))
         {
-            var writer = new Utf8JsonWriter(destinationStream, new JsonWriterOptions { Indented = true });
+            var writer = new Utf8JsonWriter(destinationStream, new JsonWriterOptions { Indented = true, NewLine = "\n" });
             await using (writer.ConfigureAwait(false))
             {
                 writer.WriteStartArray();

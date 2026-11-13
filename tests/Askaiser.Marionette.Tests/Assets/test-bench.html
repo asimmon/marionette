@@ -1,0 +1,39 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Marionette test bench</title>
+<style>
+body{margin:0;font-family:"DejaVu Sans",Inter,Arial,sans-serif;font-size:13px;background:#f3f3f3;color:#1b1b1b}
+.menubar{background:#fff;border-bottom:1px solid #d0d0d0;padding:4px 8px;font-size:12px}
+.menubar span{margin-right:16px}
+.toolbar{background:#e9e9ef;padding:6px 8px;border-bottom:1px solid #c8c8c8}
+button{font-size:13px;padding:5px 14px;margin-right:6px;border:1px solid #8a8a8a;border-radius:4px;background:#fdfdfd}
+button.primary{background:#0067c0;color:#fff;border-color:#005aa8}
+button.danger{background:#c42b1c;color:#fff;border-color:#a32015}
+.layout{display:flex;height:900px}
+.sidebar{width:240px;background:#202020;color:#e6e6e6;padding:10px;font-size:12px}
+.sidebar .item{padding:6px 8px;border-radius:4px}
+.sidebar .item.active{background:#3a3a3a;color:#fff}
+.sidebar h4{color:#9cdcfe;font-size:11px;text-transform:uppercase;margin:14px 0 6px}
+.content{flex:1;padding:16px 24px}
+h1{font-size:22px;margin:0 0 8px} h2{font-size:16px;margin:18px 0 6px}
+.small{font-size:11px;color:#555} .tiny{font-size:10px;color:#666}
+table{border-collapse:collapse;font-size:12px;margin-top:8px}
+td,th{border:1px solid #ccc;padding:4px 10px} th{background:#e4e4e4;text-align:left}
+.card{display:inline-block;width:220px;height:90px;margin:8px 12px 8px 0;border-radius:8px;padding:12px;color:#fff;vertical-align:top}
+.c1{background:linear-gradient(135deg,#1e88e5,#7e57c2)} .c2{background:#2e7d32} .c3{background:#ef6c00} .c4{background:#263238}
+input{font-size:13px;padding:5px 8px;border:1px solid #999;border-radius:3px;width:260px}
+.status{position:absolute;left:0;right:0;top:1040px;background:#007acc;color:#fff;font-size:11px;padding:3px 10px}
+code{font-family:"DejaVu Sans Mono",monospace;font-size:12px;background:#272822;color:#f8f8f2;padding:8px 12px;display:block;margin-top:8px;width:560px;border-radius:4px;white-space:pre}
+.icon{display:inline-block;width:24px;height:24px;border-radius:5px;margin-right:6px;vertical-align:middle}
+</style></head><body>
+<div class="menubar"><span>File</span><span>Edit</span><span>View</span><span>Navigate</span><span>Tools</span><span>Window</span><span>Help</span></div>
+<div class="toolbar"><button id="save" class="primary" onclick="document.getElementById('out').textContent='Changes saved successfully'">Save changes</button><button onclick="document.getElementById('out').textContent='Operation cancelled'">Cancel</button><button class="danger">Delete account</button><button>Export report</button>
+<span class="icon" style="background:#e53935"></span><span class="icon" style="background:conic-gradient(#fbc02d,#43a047,#1e88e5,#fbc02d)"></span><span class="icon" style="background:radial-gradient(#fff 30%,#6a1b9a 32%)"></span></div>
+<div class="layout"><div class="sidebar"><h4>Explorer</h4><div class="item active">Dashboard</div><div class="item">Customers</div><div class="item">Invoices and payments</div><div class="item">Settings</div><h4>Recent projects</h4><div class="item">marionette-core</div><div class="item">website_redesign_2026</div><div class="item">Quarterly forecast (Q3)</div></div>
+<div class="content"><h1>Account overview</h1><div class="small">Last synchronized 3 minutes ago · 1,284 records · user: jane.doe@example.com</div>
+<div><div class="card c1"><b>Revenue</b><br>$48,210.75<br><span style="font-size:11px">+12.4% vs last month</span></div><div class="card c2"><b>Active users</b><br>9,301</div><div class="card c3"><b>Open tickets</b><br>27 pending</div><div class="card c4"><b>Uptime</b><br>99.98 %</div></div>
+<h2>Sign in</h2><input id="email" placeholder="Email address"> <input id="pwd" placeholder="Password"> <button onclick="document.getElementById('out').textContent='Welcome back, '+document.getElementById('email').value">Log in</button>
+<div id="out" style="margin-top:8px;font-weight:bold;color:#0b6a0b">Waiting for input</div>
+<h2>Recent orders</h2><table><tr><th>Order</th><th>Customer</th><th>Status</th><th>Total</th></tr><tr><td>#10482</td><td>Élodie Lefèvre</td><td>Shipped</td><td>€129.00</td></tr><tr><td>#10483</td><td>Jürgen Müller</td><td>Processing</td><td>€58.40</td></tr><tr><td>#10484</td><td>María Peña</td><td>Refunded</td><td>€12.99</td></tr></table>
+<code>var driver = MarionetteDriver.Create();
+await driver.SingleClickAsync("Save changes");</code>
+<p class="tiny">Tiny footnote text rendered at ten pixels: the quick brown fox jumps over the lazy dog 0123456789.</p>
+</div></div><div class="status">Ready · Ln 42, Col 7 · UTF-8 · main branch</div></body></html>

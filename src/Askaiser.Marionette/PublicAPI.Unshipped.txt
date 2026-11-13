@@ -428,3 +428,4 @@ virtual Askaiser.Marionette.Rectangle.<Clone>$() -> Askaiser.Marionette.Rectangl
 virtual Askaiser.Marionette.Rectangle.EqualityContract.get -> System.Type!
 virtual Askaiser.Marionette.Rectangle.Equals(Askaiser.Marionette.Rectangle? other) -> bool
 virtual Askaiser.Marionette.Rectangle.PrintMembers(System.Text.StringBuilder! builder) -> bool
+static Askaiser.Marionette.ImageElement.FromBase64(string! name, System.ReadOnlySpan<byte> utf8Base64Content, decimal threshold, bool grayscale) -> Askaiser.Marionette.ImageElement!

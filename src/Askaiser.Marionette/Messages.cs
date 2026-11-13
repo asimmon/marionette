@@ -31,6 +31,7 @@ internal static class Messages
     public const string Element_Throw_InvalidName = "Name cannot be null or empty.";
     public const string ImageElement_Throw_EmptyContent = "Content must be a non-empty array of bytes.";
     public const string ImageElement_Throw_ThresholdOutOfRange = "Threshold must be a floating number between 0 and 1.";
+    public const string ImageElement_Throw_InvalidBase64 = "Content is not valid base64 text.";
     public const string ImageElement_Throw_NoFeatures = "Image element '{0}' is a single solid color. Image recognition needs an image with visible features.";
     public const string TextElement_Throw_EmptyContent = "Content cannot be null or empty.";
     public const string SearchResultCollection_Throw_ResultsEmpty = "Results cannot be empty.";

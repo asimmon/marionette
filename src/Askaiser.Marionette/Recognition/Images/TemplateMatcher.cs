@@ -91,9 +91,13 @@ internal static class TemplateMatcher
     }
 
     /// <summary>
-    /// Keeps the best match of every group of overlapping matches. Two matches belong to the same group when
-    /// their rectangles overlap by more than half in both directions, which is what happens around the exact location of an occurrence.
+    /// Reduces all the positions above the threshold to one match per occurrence of the image.
     /// </summary>
+    /// <remarks>
+    /// Around an occurrence, neighboring positions also score above the threshold: together they form a group of adjacent
+    /// positions, sometimes a long one when the image is made of lines, of which only the best one is kept. Then, of two
+    /// matches whose rectangles overlap by more than half in both directions, only the best one is kept as well.
+    /// </remarks>
     private static List<TemplateMatch> SuppressOverlaps(List<TemplateMatch> matches, int width, int height)
     {
         if (matches.Count <= 1)
@@ -101,24 +105,60 @@ internal static class TemplateMatcher
             return matches;
         }
 
-        // Position is a tie-breaker so that results do not depend on how the search was split across threads.
-        matches.Sort(static (a, b) =>
+        // Group adjacent positions with a disjoint-set forest.
+        var indices = new Dictionary<(int X, int Y), int>(matches.Count);
+        for (var i = 0; i < matches.Count; i++)
         {
-            var byScore = b.Score.CompareTo(a.Score);
-            if (byScore != 0)
+            indices[(matches[i].X, matches[i].Y)] = i;
+        }
+
+        var parents = new int[matches.Count];
+        for (var i = 0; i < parents.Length; i++)
+        {
+            parents[i] = i;
+        }
+
+        int Find(int index)
+        {
+            while (parents[index] != index)
             {
-                return byScore;
+                parents[index] = parents[parents[index]];
+                index = parents[index];
             }
 
-            var byY = a.Y.CompareTo(b.Y);
-            return byY != 0 ? byY : a.X.CompareTo(b.X);
-        });
+            return index;
+        }
+
+        Span<(int X, int Y)> neighbors = [(-1, 0), (-1, -1), (0, -1), (1, -1)];
+        for (var i = 0; i < matches.Count; i++)
+        {
+            foreach (var (dx, dy) in neighbors)
+            {
+                if (indices.TryGetValue((matches[i].X + dx, matches[i].Y + dy), out var neighbor))
+                {
+                    parents[Find(i)] = Find(neighbor);
+                }
+            }
+        }
+
+        var bestOfGroups = new Dictionary<int, TemplateMatch>();
+        for (var i = 0; i < matches.Count; i++)
+        {
+            var group = Find(i);
+            if (!bestOfGroups.TryGetValue(group, out var best) || IsBetter(matches[i], best))
+            {
+                bestOfGroups[group] = matches[i];
+            }
+        }
+
+        var candidates = new List<TemplateMatch>(bestOfGroups.Values);
+        candidates.Sort(static (a, b) => IsBetter(a, b) ? -1 : IsBetter(b, a) ? 1 : 0);
 
         var kept = new List<TemplateMatch>();
         var halfWidth = Math.Max(1, (width + 1) / 2);
         var halfHeight = Math.Max(1, (height + 1) / 2);
 
-        foreach (var candidate in matches)
+        foreach (var candidate in candidates)
         {
             var overlaps = false;
             foreach (var other in kept)
@@ -138,6 +178,19 @@ internal static class TemplateMatcher
 
         kept.Sort(static (a, b) => a.Y != b.Y ? a.Y.CompareTo(b.Y) : a.X.CompareTo(b.X));
         return kept;
+    }
+
+    /// <summary>
+    /// Orders matches by score. Position breaks ties so that results do not depend on how the search was split across threads.
+    /// </summary>
+    private static bool IsBetter(TemplateMatch a, TemplateMatch b)
+    {
+        if (a.Score != b.Score)
+        {
+            return a.Score > b.Score;
+        }
+
+        return a.Y != b.Y ? a.Y < b.Y : a.X < b.X;
     }
 
     private static unsafe void SearchRows(SearchSurface surface, ImageTemplate template, short[] plane, short[]? lumaPlane, BlockSums[] blockSums, int fromY, int toY, List<TemplateMatch> matches, TemplateSearchStatistics? statistics, CancellationToken cancellationToken)
