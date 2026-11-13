@@ -3,13 +3,21 @@
     <Copyright>Copyright © Anthony Simmon $([System.DateTime]::UtcNow.ToString(yyyy))</Copyright>
     <Authors>Anthony Simmon</Authors>
     <Owners>Anthony Simmon</Owners>
-    <PackageProjectUrl>https://github.com/asimmon/askaiser-marionette</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/asimmon/marionette</PackageProjectUrl>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
-    <LangVersion>10</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <Description>Askaiser.Marionette is a test automation framework based on image and text recognition.</Description>
+    <Description>Askaiser.Marionette is a cross-platform test automation framework based on image and text recognition.</Description>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <NuGetAuditMode>direct</NuGetAuditMode>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Versions are computed from git tags by MinVer. Until the first 2.x tag exists, builds are 2.0.0 previews. -->
+    <MinVerMinimumMajorMinor>2.0</MinVerMinimumMajorMinor>
+    <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -19,11 +27,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.435">
+    <PackageReference Include="StyleCop.Analyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="GitVersion.MsBuild" Version="5.11.1" Condition=" '$(Configuration)' == 'Release' ">
+    <PackageReference Include="MinVer" Condition=" '$(Configuration)' == 'Release' ">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

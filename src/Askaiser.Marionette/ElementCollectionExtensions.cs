@@ -1,8 +1,4 @@
-﻿using System;
-#if !NETSTANDARD2_0
-using System.Buffers;
-#endif
-using System.Collections.Generic;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -10,41 +6,59 @@ using System.Threading.Tasks;
 
 namespace Askaiser.Marionette;
 
+/// <summary>
+/// Saves and loads element collections as JSON documents.
+/// </summary>
 public static class ElementCollectionExtensions
 {
+    private const string ImageKind = "image";
+    private const string TextKind = "text";
+
     public static async Task LoadAsync(this ElementCollection elements, Stream stream)
     {
-        JsonDocument? jsonDocument = null;
+        ArgumentNullException.ThrowIfNull(elements);
+        ArgumentNullException.ThrowIfNull(stream);
 
-        try
+        JsonDocument jsonDocument;
+        await using (stream.ConfigureAwait(false))
         {
-#if NETSTANDARD2_0
-            using (stream)
-#else
-            await using (stream.ConfigureAwait(false))
-#endif
-            {
-                jsonDocument = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
-            }
+            jsonDocument = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
+        }
 
+        using (jsonDocument)
+        {
             elements.Clear();
 
             foreach (var jsonObject in jsonDocument.RootElement.EnumerateArray())
             {
-                var elementKind = jsonObject.GetProperty("kind").GetString();
-
-                IElement element = elementKind switch
+                if (jsonObject.ValueKind != JsonValueKind.Object)
                 {
-                    JsonElementKinds.Image => new ImageElement(Deserialize<JsonImageElement>(jsonObject)),
-                    JsonElementKinds.Text => new TextElement(Deserialize<JsonTextElement>(jsonObject)),
-                    null => throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_NullJsonElement),
-                    _ => throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_UnsupportedElementType.FormatInvariant(elementKind)),
-                };
+                    throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_NullJsonElement);
+                }
 
-                if (string.IsNullOrWhiteSpace(element.Name))
+                var kind = GetString(jsonObject, "kind");
+                var name = GetString(jsonObject, "name") ?? string.Empty;
+                var content = GetString(jsonObject, "content") ?? string.Empty;
+
+                if (string.IsNullOrWhiteSpace(name))
                 {
                     throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_InvalidElementName);
                 }
+
+                IElement element = kind switch
+                {
+                    ImageKind => new ImageElement(
+                        name,
+                        Convert.FromBase64String(content),
+                        jsonObject.TryGetProperty("threshold", out var threshold) ? threshold.GetDecimal() : ImageElement.DefaultThreshold,
+                        jsonObject.TryGetProperty("grayscale", out var grayscale) && grayscale.GetBoolean()),
+                    TextKind => new TextElement(name, content, jsonObject.TryGetProperty("options", out var options) ? (TextOptions)options.GetInt32() : TextOptions.None)
+                    {
+                        IgnoreCase = !jsonObject.TryGetProperty("ignoreCase", out var ignoreCase) || ignoreCase.GetBoolean(),
+                    },
+                    null => throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_NullJsonElement),
+                    _ => throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_UnsupportedElementType.FormatInvariant(kind)),
+                };
 
                 if (elements.Contains(element))
                 {
@@ -54,56 +68,56 @@ public static class ElementCollectionExtensions
                 elements.Add(element);
             }
         }
-        finally
-        {
-            jsonDocument?.Dispose();
-        }
     }
 
     public static async Task<ElementCollection> LoadAsync(this ElementCollection elements, string filePath)
     {
-        var stream = File.OpenRead(filePath);
-
-#if NETSTANDARD2_0
-        using (stream)
-#else
-        await using (stream.ConfigureAwait(false))
-#endif
-        {
-            await LoadAsync(elements, stream).ConfigureAwait(false);
-        }
-
+        await LoadAsync(elements, File.OpenRead(filePath)).ConfigureAwait(false);
         return elements;
     }
 
     public static async Task<ElementCollection> SaveAsync(this ElementCollection elements, Stream destinationStream)
     {
-        var jsonElements = new List<object>(elements.Count);
+        ArgumentNullException.ThrowIfNull(elements);
+        ArgumentNullException.ThrowIfNull(destinationStream);
 
-        foreach (var element in elements.OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase))
-        {
-            JsonBaseElement jsonElement = element switch
-            {
-                ImageElement imageElement => new JsonImageElement(imageElement),
-                TextElement textElement => new JsonTextElement(textElement),
-                _ => throw new NotSupportedException(Messages.ElementCollectionExtensions_Throw_UnsupportedElementType.FormatInvariant(element.GetType().FullName ?? "unknown")),
-            };
-
-            jsonElements.Add(jsonElement);
-        }
-
-        var jsonSerializerOptions = new JsonSerializerOptions
-        {
-            WriteIndented = true,
-        };
-
-#if NETSTANDARD2_0
-        using (destinationStream)
-#else
         await using (destinationStream.ConfigureAwait(false))
-#endif
         {
-            await JsonSerializer.SerializeAsync(destinationStream, jsonElements, jsonSerializerOptions).ConfigureAwait(false);
+            var writer = new Utf8JsonWriter(destinationStream, new JsonWriterOptions { Indented = true });
+            await using (writer.ConfigureAwait(false))
+            {
+                writer.WriteStartArray();
+
+                foreach (var element in elements.OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase))
+                {
+                    writer.WriteStartObject();
+
+                    switch (element)
+                    {
+                        case ImageElement image:
+                            writer.WriteString("kind", ImageKind);
+                            writer.WriteString("name", image.Name);
+                            writer.WriteBase64String("content", image.Content);
+                            writer.WriteNumber("threshold", image.Threshold);
+                            writer.WriteBoolean("grayscale", image.Grayscale);
+                            break;
+                        case TextElement text:
+                            writer.WriteString("kind", TextKind);
+                            writer.WriteString("name", text.Name);
+                            writer.WriteString("content", text.Content);
+                            writer.WriteNumber("options", (int)text.Options);
+                            writer.WriteBoolean("ignoreCase", text.IgnoreCase);
+                            break;
+                        default:
+                            throw new NotSupportedException(Messages.ElementCollectionExtensions_Throw_UnsupportedElementType.FormatInvariant(element.GetType().FullName ?? "unknown"));
+                    }
+
+                    writer.WriteEndObject();
+                }
+
+                writer.WriteEndArray();
+                await writer.FlushAsync().ConfigureAwait(false);
+            }
         }
 
         return elements;
@@ -111,31 +125,11 @@ public static class ElementCollectionExtensions
 
     public static async Task SaveAsync(this ElementCollection elements, string filePath)
     {
-        var destinationStream = File.Create(filePath);
-
-#if NETSTANDARD2_0
-        using (destinationStream)
-#else
-        await using (destinationStream.ConfigureAwait(false))
-#endif
-        {
-            await SaveAsync(elements, destinationStream).ConfigureAwait(false);
-        }
+        await SaveAsync(elements, File.Create(filePath)).ConfigureAwait(false);
     }
 
-    private static T Deserialize<T>(JsonElement element)
+    private static string? GetString(JsonElement jsonObject, string propertyName)
     {
-#if NETSTANDARD2_0
-        var json = element.GetRawText();
-        return JsonSerializer.Deserialize<T>(json) ?? throw new InvalidOperationException("Cound not deserialize JSON element");
-#else
-        var bufferWriter = new ArrayBufferWriter<byte>();
-        using (var writer = new Utf8JsonWriter(bufferWriter))
-        {
-            element.WriteTo(writer);
-        }
-
-        return JsonSerializer.Deserialize<T>(bufferWriter.WrittenSpan) ?? throw new InvalidOperationException("Cound not deserialize JSON element");
-#endif
+        return jsonObject.TryGetProperty(propertyName, out var property) && property.ValueKind == JsonValueKind.String ? property.GetString() : null;
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Askaiser.Marionette;
+namespace Askaiser.Marionette;
 
 public enum MouseSpeed
 {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -37,7 +37,7 @@ public sealed class SearchResultCollection : IReadOnlyCollection<SearchResult>
     [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "It's easier to access the search result by element")]
     public SearchResult this[IElement element]
     {
-        get => element != null ? this[element] : throw new ArgumentNullException(nameof(element));
+        get => element != null ? this[element.Name] : throw new ArgumentNullException(nameof(element));
     }
 
     public SearchResult this[string name]

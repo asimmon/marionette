@@ -1,77 +1,48 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0-windows</TargetFrameworks>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <AssemblyTitle>Askaiser.Marionette</AssemblyTitle>
     <PackageId>Askaiser.Marionette</PackageId>
+    <PackageTags>automation;testing;ui;ocr;image-recognition;cross-platform</PackageTags>
     <IsPackable>true</IsPackable>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IsAotCompatible>true</IsAotCompatible>
+    <!-- CS1591: missing XML comment. Public members are documented where it adds value. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Askaiser.Marionette.SourceGenerator\Askaiser.Marionette.SourceGenerator.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\Askaiser.Marionette.SourceGenerator\Askaiser.Marionette.SourceGenerator.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.3">
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OpenCvSharp4" Version="4.5.2.20210404" />
-    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.5.2.20210404" />
-    <PackageReference Include="System.Text.Json" Version="6.0.0" Condition=" '$(TargetFramework)' != 'net6.0' " />
-    <PackageReference Include="Tesseract" Version="4.1.1" IncludeAssets="All" PrivateAssets="None" />
-    <PackageReference Include="Tesseract.Drawing" Version="4.1.1" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" />
+    <PackageReference Include="StbImageSharp" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="tessdata\eng.traineddata">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <PackagePath>content\tessdata;contentFiles\any\any\tessdata</PackagePath>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <Pack>true</Pack>
-    </None>
+    <!-- Text recognition models are embedded so that the library works out of the box, including in single-file apps. -->
+    <EmbeddedResource Include="Recognition\Text\Models\*.onnx" LogicalName="Askaiser.Marionette.Models.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Recognition\Text\Models\*.txt" LogicalName="Askaiser.Marionette.Models.%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Messages.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Messages.Designer.cs">
-      <DesignTime>true</DesignTime>
-      <AutoGen>true</AutoGen>
-      <DependentUpon>Messages.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
+    <AdditionalFiles Include="PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI.Unshipped.txt" />
     <None Include="..\..\README.md" Link="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\THIRD-PARTY-NOTICES.md" Link="THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
+  <!-- Ship the source generator in the same package -->
   <ItemGroup>
-    <Content Include="build\Askaiser.Marionette.targets" Pack="true" PackagePath="build\net45\" />
-    <Content Include="buildTransitive\Askaiser.Marionette.targets" Pack="true" PackagePath="buildTransitive\net45\" />
+    <None Include="..\Askaiser.Marionette.SourceGenerator\bin\$(Configuration)\netstandard2.0\Askaiser.Marionette.SourceGenerator.dll" Pack="true" PackagePath="analyzers\dotnet\cs" Visible="false" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <!-- Insert custom target to pack our source generator into generated package (https://stackoverflow.com/q/40396161/825695) -->
-    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
-  </PropertyGroup>
-
-  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
-    <ItemGroup>
-      <MarionettePrivateAssetsFiles Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')-&gt;WithMetadataValue('PrivateAssets', 'All'))" />
-      <MarionetteSourceGeneratorDlls Include="@(MarionettePrivateAssetsFiles)" Condition=" '%(Filename)' == 'Askaiser.Marionette.SourceGenerator' And '%(Extension)' == '.dll' " />
-    </ItemGroup>
-
-    <!-- Prevent copying the source generator files multiple times (for each targeted framework) -->
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-      <TfmSpecificPackageFile Include="@(MarionetteSourceGeneratorDlls)" PackagePath="analyzers\dotnet\cs" />
-    </ItemGroup>
-  </Target>
 </Project>
