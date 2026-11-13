@@ -3,13 +3,10 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Askaiser.Marionette.Recognition.Images;
-
-internal readonly record struct TemplateMatch(int X, int Y, double Score);
 
 /// <summary>
 /// Finds every occurrence of an <see cref="ImageTemplate"/> in a <see cref="SearchSurface"/>.
@@ -26,7 +23,8 @@ internal static class TemplateMatcher
     /// <summary>Below this many multiply-adds, splitting the search across threads costs more than it saves.</summary>
     private const long ParallelWorkThreshold = 4_000_000;
 
-    public static List<TemplateMatch> Find(SearchSurface surface, ImageTemplate template, CancellationToken cancellationToken = default)
+
+    public static List<TemplateMatch> Find(SearchSurface surface, ImageTemplate template, TemplateSearchStatistics? statistics = null, CancellationToken cancellationToken = default)
     {
         var positionsX = surface.Width - template.Width + 1;
         var positionsY = surface.Height - template.Height + 1;
@@ -38,14 +36,22 @@ internal static class TemplateMatcher
         }
 
         var plane = surface.GetPlane(template.PlaneKind);
-        var blockSums = surface.GetBlockSums(template.PlaneKind, template.BlockSize);
 
-        var work = (long)positionsX * positionsY * template.Kernel.Length;
+        // A color search on a chroma plane also needs the brightness of each window to normalize its correlation.
+        var lumaPlane = !template.IsGrayscale && template.PlaneKind != ColorPlaneKind.Sum ? surface.GetPlane(ColorPlaneKind.Sum) : null;
+
+        var blockSums = new BlockSums[template.Levels.Length];
+        for (var i = 0; i < blockSums.Length; i++)
+        {
+            blockSums[i] = surface.GetBlockSums(template.PlaneKind, template.Levels[i].BlockSize);
+        }
+
+        var work = (long)positionsX * positionsY * (template.CanPrune ? template.Levels[0].Kernel.Length : template.Area);
         var workers = work < ParallelWorkThreshold ? 1 : Math.Min(Environment.ProcessorCount, Math.Max(1, positionsY / 8));
 
         if (workers <= 1)
         {
-            SearchRows(surface, template, plane, blockSums, 0, positionsY, matches, cancellationToken);
+            SearchRows(surface, template, plane, lumaPlane, blockSums, 0, positionsY, matches, statistics, cancellationToken);
         }
         else
         {
@@ -58,7 +64,7 @@ internal static class TemplateMatcher
                 var from = (int)((long)positionsY * band / bandCount);
                 var to = (int)((long)positionsY * (band + 1) / bandCount);
                 var local = new List<TemplateMatch>();
-                SearchRows(surface, template, plane, blockSums, from, to, local, cancellationToken);
+                SearchRows(surface, template, plane, lumaPlane, blockSums, from, to, local, statistics, cancellationToken);
 
                 if (local.Count > 0)
                 {
@@ -134,144 +140,196 @@ internal static class TemplateMatcher
         return kept;
     }
 
-    private static unsafe void SearchRows(SearchSurface surface, ImageTemplate template, short[] plane, BlockSums blockSums, int fromY, int toY, List<TemplateMatch> matches, CancellationToken cancellationToken)
+    private static unsafe void SearchRows(SearchSurface surface, ImageTemplate template, short[] plane, short[]? lumaPlane, BlockSums[] blockSums, int fromY, int toY, List<TemplateMatch> matches, TemplateSearchStatistics? statistics, CancellationToken cancellationToken)
     {
         var width = surface.Width;
         var templateWidth = template.Width;
         var templateHeight = template.Height;
-        var area = (double)template.Area;
+        var inverseArea = 1.0 / template.Area;
+        var flatEnergy = 0.5 * inverseArea;
         var positionsX = width - templateWidth + 1;
-        var blockSize = template.BlockSize;
 
-        // Position x of phase p is stored at phasePositionOffsets[p] + (x - p) / blockSize.
-        var phasePositionOffsets = new int[blockSize + 1];
-        for (var phase = 0; phase < blockSize; phase++)
-        {
-            var count = phase < positionsX ? ((positionsX - 1 - phase) / blockSize) + 1 : 0;
-            phasePositionOffsets[phase + 1] = phasePositionOffsets[phase] + count;
-        }
+        var levels = template.Levels;
+        var first = levels[0];
+        var firstSums = blockSums[0];
+        var blockSize = first.BlockSize;
+        var canPrune = template.CanPrune;
+        var firstLimit = first.Limit * CoarseSlack * CoarseSlack;
+        var firstMeanFactor = (float)first.MeanFactor;
+        var planeWeight = template.IsGrayscale ? 1.0 : 1.0 / ColorPlane.SquaredNorm(template.PlaneKind);
+        var lumaWeight = 1.0 / ColorPlane.SquaredNorm(ColorPlaneKind.Sum);
 
-        var useBound = template.CoarseBound > 0;
-        var boundSquared = useBound ? (float)(template.CoarseBound * template.CoarseBound * template.KernelEnergy) * CoarseSlack * CoarseSlack : 0f;
-        var meanFactor = template.KernelSum * blockSize * blockSize / area;
-
-        var pool = ArrayPool<int>.Shared;
-        var columnSumsArray = pool.Rent(width);
-        var columnSquaresArray = ArrayPool<uint>.Shared.Rent(width);
-        var windowSumsArray = ArrayPool<long>.Shared.Rent(positionsX);
-        var windowSquaresArray = ArrayPool<long>.Shared.Rent(positionsX);
-        var correctionsArray = ArrayPool<float>.Shared.Rent(positionsX);
-        var limitsArray = ArrayPool<float>.Shared.Rent(positionsX);
+        using var planeWindow = new WindowSums(width, positionsX);
+        using var lumaWindow = lumaPlane != null ? new WindowSums(width, positionsX) : null;
         var accumulatorArray = ArrayPool<float>.Shared.Rent(positionsX + Vector<float>.Count);
         var candidates = new List<int>();
+        var passed = new long[levels.Length + 1];
 
         try
         {
-            var columnSums = columnSumsArray.AsSpan(0, width);
-            var columnSquares = columnSquaresArray.AsSpan(0, width);
-            var windowSums = windowSumsArray.AsSpan(0, positionsX);
-            var windowSquares = windowSquaresArray.AsSpan(0, positionsX);
-            var corrections = correctionsArray.AsSpan(0, positionsX);
-            var limits = limitsArray.AsSpan(0, positionsX);
-
-            columnSums.Clear();
-            columnSquares.Clear();
-            for (var y = fromY; y < fromY + templateHeight; y++)
-            {
-                AddRow(plane.AsSpan(y * width, width), columnSums, columnSquares);
-            }
+            planeWindow.Start(plane, width, fromY, templateHeight);
+            lumaWindow?.Start(lumaPlane!, width, fromY, templateHeight);
 
             for (var y = fromY; y < toY; y++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // 1. Sum and sum of squares of the plane over the window at every position of this row.
-                long sum = 0, squares = 0;
-                for (var x = 0; x < templateWidth; x++)
+                planeWindow.ComputeRow(templateWidth);
+                lumaWindow?.ComputeRow(templateWidth);
+
+                var sums = planeWindow.Sums;
+                var squares = planeWindow.Squares;
+                ReadOnlySpan<long> lumaSums = default;
+                ReadOnlySpan<long> lumaSquares = default;
+                if (lumaWindow != null)
                 {
-                    sum += columnSums[x];
-                    squares += columnSquares[x];
+                    lumaSums = lumaWindow.Sums;
+                    lumaSquares = lumaWindow.Squares;
                 }
 
-                var position = 0;
-                for (var index = 0; position < positionsX; index++)
+                // Energy of the window, the quantity correlations are normalized with. Zero means the window has no contrast at all.
+                double EnergyAt(int x, ReadOnlySpan<long> sums, ReadOnlySpan<long> squares, ReadOnlySpan<long> lumaSums, ReadOnlySpan<long> lumaSquares)
                 {
-                    for (var phase = 0; phase < blockSize && position < positionsX; phase++, position++)
+                    var sum = (double)sums[x];
+                    var energy = (squares[x] - (sum * sum * inverseArea)) * planeWeight;
+                    if (!lumaSums.IsEmpty)
                     {
-                        windowSums[position] = sum;
-                        windowSquares[position] = squares;
-
-                        var energy = squares - ((double)sum * sum / area);
-                        var slot = phasePositionOffsets[phase] + index;
-
-                        // A window without any contrast cannot be correlated with anything: an infinite limit rejects it.
-                        limits[slot] = energy * area < 0.5 ? float.PositiveInfinity : (float)(boundSquared * energy);
-                        corrections[slot] = (float)(meanFactor * sum);
-
-                        var next = position + templateWidth;
-                        if (next < width)
-                        {
-                            sum += columnSums[next] - columnSums[position];
-                            squares += (long)columnSquares[next] - columnSquares[position];
-                        }
+                        var lumaSum = (double)lumaSums[x];
+                        energy += (lumaSquares[x] - (lumaSum * lumaSum * inverseArea)) * lumaWeight;
                     }
+
+                    return energy;
                 }
 
-                // 2. Coarse correlation of every position, one horizontal phase at a time.
+                // 2. First coarse test at every position, one horizontal phase at a time.
                 candidates.Clear();
-                fixed (float* blockValues = blockSums.Values)
-                fixed (float* kernel = template.Kernel)
-                fixed (float* accumulator = accumulatorArray)
-                fixed (float* correctionsPtr = corrections)
-                fixed (float* limitsPtr = limits)
+                if (canPrune)
                 {
-                    for (var phase = 0; phase < blockSize; phase++)
+                    fixed (float* blockValues = firstSums.Values)
+                    fixed (float* kernel = first.Kernel)
+                    fixed (float* accumulator = accumulatorArray)
                     {
-                        var count = phasePositionOffsets[phase + 1] - phasePositionOffsets[phase];
-                        if (count == 0)
+                        for (var phase = 0; phase < blockSize && phase < positionsX; phase++)
                         {
-                            continue;
+                            var count = ((positionsX - 1 - phase) / blockSize) + 1;
+                            var rowStart = blockValues + ((long)y * firstSums.RowLength) + firstSums.PhaseOffsets[phase];
+                            Correlate(rowStart, (long)blockSize * firstSums.RowLength, kernel, first.KernelWidth, first.KernelHeight, accumulator, count);
+
+                            for (int index = 0, x = phase; index < count; index++, x += blockSize)
+                            {
+                                var value = accumulator[index] - (firstMeanFactor * sums[x]);
+                                if (value > 0)
+                                {
+                                    var energy = EnergyAt(x, sums, squares, lumaSums, lumaSquares);
+                                    if (energy >= flatEnergy && (double)value * value >= firstLimit * energy)
+                                    {
+                                        candidates.Add(x);
+                                    }
+                                }
+                            }
                         }
-
-                        var rowStart = blockValues + ((long)y * blockSums.RowLength) + blockSums.PhaseOffsets[phase];
-                        Correlate(rowStart, (long)blockSize * blockSums.RowLength, kernel, template.KernelWidth, template.KernelHeight, accumulator, count);
-
-                        var slotOffset = phasePositionOffsets[phase];
-                        CollectCandidates(accumulator, correctionsPtr + slotOffset, limitsPtr + slotOffset, count, useBound, phase, blockSize, candidates);
+                    }
+                }
+                else
+                {
+                    for (var x = 0; x < positionsX; x++)
+                    {
+                        if (EnergyAt(x, sums, squares, lumaSums, lumaSquares) >= flatEnergy)
+                        {
+                            candidates.Add(x);
+                        }
                     }
                 }
 
-                // 3. Exact score of the few positions that passed.
+                passed[0] += candidates.Count;
+
+                // 3. Finer coarse tests, then the exact score, for the few positions that are left.
                 foreach (var x in candidates)
                 {
-                    var planeEnergy = windowSquares[x] - ((double)windowSums[x] * windowSums[x] / area);
+                    var windowSum = sums[x];
+                    var energy = EnergyAt(x, sums, squares, lumaSums, lumaSquares);
+                    var rejected = false;
+
+                    for (var i = 1; i < levels.Length; i++)
+                    {
+                        var level = levels[i];
+                        var value = CorrelateAt(blockSums[i], level, x, y) - (level.MeanFactor * windowSum);
+                        if (value <= 0 || value * value < level.Limit * CoarseSlack * CoarseSlack * energy)
+                        {
+                            rejected = true;
+                            break;
+                        }
+
+                        passed[i]++;
+                    }
+
+                    if (rejected)
+                    {
+                        continue;
+                    }
+
                     var score = template.IsGrayscale
-                        ? ScoreGrayscale(plane, width, template, x, y, windowSums[x], planeEnergy)
+                        ? ScoreGrayscale(plane, width, template, x, y, windowSum, squares[x] - ((double)windowSum * windowSum * inverseArea))
                         : ScoreColor(surface.Pixels.Span, surface.Pixels.Stride, template, x, y);
 
                     if (score >= template.Threshold - ScoreTolerance)
                     {
                         matches.Add(new TemplateMatch(x, y, score));
+                        passed[levels.Length]++;
                     }
                 }
 
                 if (y + 1 < toY)
                 {
-                    SubtractRow(plane.AsSpan(y * width, width), columnSums, columnSquares);
-                    AddRow(plane.AsSpan((y + templateHeight) * width, width), columnSums, columnSquares);
+                    planeWindow.MoveDown(plane, width, y, templateHeight);
+                    lumaWindow?.MoveDown(lumaPlane!, width, y, templateHeight);
                 }
             }
         }
         finally
         {
-            pool.Return(columnSumsArray);
-            ArrayPool<uint>.Shared.Return(columnSquaresArray);
-            ArrayPool<long>.Shared.Return(windowSumsArray);
-            ArrayPool<long>.Shared.Return(windowSquaresArray);
-            ArrayPool<float>.Shared.Return(correctionsArray);
-            ArrayPool<float>.Shared.Return(limitsArray);
             ArrayPool<float>.Shared.Return(accumulatorArray);
         }
+
+        statistics?.Add((long)positionsX * (toY - fromY), passed);
+    }
+
+    /// <summary>
+    /// Computes the dot product between the kernel of a level and the block sums under it, at a single position.
+    /// </summary>
+    private static double CorrelateAt(BlockSums sums, CoarseLevel level, int x, int y)
+    {
+        var blockSize = level.BlockSize;
+        var kernelWidth = level.KernelWidth;
+        var values = sums.Values.AsSpan();
+        var offset = sums.PhaseOffsets[x % blockSize] + (x / blockSize);
+        var total = 0.0;
+
+        for (var ky = 0; ky < level.KernelHeight; ky++)
+        {
+            var row = values.Slice(((y + (ky * blockSize)) * sums.RowLength) + offset, kernelWidth);
+            var kernel = level.Kernel.AsSpan(ky * kernelWidth, kernelWidth);
+            var i = 0;
+
+            if (Vector.IsHardwareAccelerated && kernelWidth >= Vector<float>.Count)
+            {
+                var acc = Vector<float>.Zero;
+                for (; i <= kernelWidth - Vector<float>.Count; i += Vector<float>.Count)
+                {
+                    acc = MultiplyAdd(new Vector<float>(kernel.Slice(i)), new Vector<float>(row.Slice(i)), acc);
+                }
+
+                total += Vector.Sum(acc);
+            }
+
+            for (; i < kernelWidth; i++)
+            {
+                total += kernel[i] * row[i];
+            }
+        }
+
+        return total;
     }
 
     /// <summary>
@@ -355,123 +413,7 @@ internal static class TemplateMatcher
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static Vector<float> MultiplyAdd(Vector<float> a, Vector<float> b, Vector<float> addend)
     {
-#if NET9_0_OR_GREATER
         return Vector.FusedMultiplyAdd(a, b, addend);
-#else
-        return (a * b) + addend;
-#endif
-    }
-
-    /// <summary>
-    /// Keeps the positions whose coarse correlation is high enough for a match to be possible.
-    /// </summary>
-    private static unsafe void CollectCandidates(float* correlations, float* corrections, float* limits, int count, bool useBound, int phase, int blockSize, List<int> candidates)
-    {
-        if (!useBound)
-        {
-            // The coarse search cannot discard anything for this template: every window with some contrast is verified.
-            for (var i = 0; i < count; i++)
-            {
-                if (!float.IsPositiveInfinity(limits[i]))
-                {
-                    candidates.Add(phase + (i * blockSize));
-                }
-            }
-
-            return;
-        }
-
-        var index = 0;
-
-        if (Vector.IsHardwareAccelerated)
-        {
-            var vectorSize = Vector<float>.Count;
-            for (; index <= count - vectorSize; index += vectorSize)
-            {
-                var value = Unsafe.ReadUnaligned<Vector<float>>(correlations + index) - Unsafe.ReadUnaligned<Vector<float>>(corrections + index);
-                var limit = Unsafe.ReadUnaligned<Vector<float>>(limits + index);
-                var passes = Vector.GreaterThan(value, Vector<float>.Zero) & Vector.GreaterThanOrEqual(value * value, limit);
-
-                if (passes == Vector<int>.Zero)
-                {
-                    continue;
-                }
-
-                for (var lane = 0; lane < vectorSize; lane++)
-                {
-                    if (passes[lane] != 0)
-                    {
-                        candidates.Add(phase + ((index + lane) * blockSize));
-                    }
-                }
-            }
-        }
-
-        for (; index < count; index++)
-        {
-            var value = correlations[index] - corrections[index];
-            if (value > 0 && value * value >= limits[index])
-            {
-                candidates.Add(phase + (index * blockSize));
-            }
-        }
-    }
-
-    private static void AddRow(ReadOnlySpan<short> row, Span<int> columnSums, Span<uint> columnSquares)
-    {
-        var x = 0;
-
-        if (Vector.IsHardwareAccelerated)
-        {
-            var sums = MemoryMarshal.Cast<int, int>(columnSums);
-            var squares = MemoryMarshal.Cast<uint, int>(columnSquares);
-            var step = Vector<short>.Count;
-            var half = Vector<int>.Count;
-
-            for (; x <= row.Length - step; x += step)
-            {
-                Vector.Widen(new Vector<short>(row.Slice(x)), out var lo, out var hi);
-                (new Vector<int>(sums.Slice(x)) + lo).CopyTo(sums.Slice(x));
-                (new Vector<int>(sums.Slice(x + half)) + hi).CopyTo(sums.Slice(x + half));
-                (new Vector<int>(squares.Slice(x)) + (lo * lo)).CopyTo(squares.Slice(x));
-                (new Vector<int>(squares.Slice(x + half)) + (hi * hi)).CopyTo(squares.Slice(x + half));
-            }
-        }
-
-        for (; x < row.Length; x++)
-        {
-            int v = row[x];
-            columnSums[x] += v;
-            columnSquares[x] += (uint)(v * v);
-        }
-    }
-
-    private static void SubtractRow(ReadOnlySpan<short> row, Span<int> columnSums, Span<uint> columnSquares)
-    {
-        var x = 0;
-
-        if (Vector.IsHardwareAccelerated)
-        {
-            var squares = MemoryMarshal.Cast<uint, int>(columnSquares);
-            var step = Vector<short>.Count;
-            var half = Vector<int>.Count;
-
-            for (; x <= row.Length - step; x += step)
-            {
-                Vector.Widen(new Vector<short>(row.Slice(x)), out var lo, out var hi);
-                (new Vector<int>(columnSums.Slice(x)) - lo).CopyTo(columnSums.Slice(x));
-                (new Vector<int>(columnSums.Slice(x + half)) - hi).CopyTo(columnSums.Slice(x + half));
-                (new Vector<int>(squares.Slice(x)) - (lo * lo)).CopyTo(squares.Slice(x));
-                (new Vector<int>(squares.Slice(x + half)) - (hi * hi)).CopyTo(squares.Slice(x + half));
-            }
-        }
-
-        for (; x < row.Length; x++)
-        {
-            int v = row[x];
-            columnSums[x] -= v;
-            columnSquares[x] -= (uint)(v * v);
-        }
     }
 
     private static double ScoreGrayscale(short[] plane, int width, ImageTemplate template, int x, int y)

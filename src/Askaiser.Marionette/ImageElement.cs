@@ -43,7 +43,15 @@ public sealed class ImageElement : IElement
     /// <summary>
     /// Initializes a new instance of the <see cref="ImageElement"/> class from an in-memory image.
     /// </summary>
-    public ImageElement(string name, Image image, decimal threshold = DefaultThreshold, bool grayscale = false)
+    public ImageElement(string name, Image image)
+        : this(name, image, DefaultThreshold, grayscale: false)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ImageElement"/> class from an in-memory image.
+    /// </summary>
+    public ImageElement(string name, Image image, decimal threshold, bool grayscale)
     {
         ArgumentNullException.ThrowIfNull(image);
 
@@ -59,7 +67,7 @@ public sealed class ImageElement : IElement
     public string Name
     {
         get => this._name;
-        init => this._name = value is { Length: > 0 } ? value : throw new ArgumentException(Messages.Element_Throw_InvalidName, nameof(this.Name));
+        init => this._name = value is { Length: > 0 } ? value : throw new ArgumentException(Messages.Element_Throw_InvalidName, nameof(value));
     }
 
     /// <summary>
@@ -70,7 +78,7 @@ public sealed class ImageElement : IElement
         get => this._content ??= this._image!.ToPng();
         init
         {
-            this._content = value is { Length: > 0 } ? value : throw new ArgumentException(Messages.ImageElement_Throw_EmptyContent, nameof(this.Content));
+            this._content = value is { Length: > 0 } ? value : throw new ArgumentException(Messages.ImageElement_Throw_EmptyContent, nameof(value));
             this._image = null;
             this._template = null;
             this._templateCreated = false;
@@ -86,7 +94,7 @@ public sealed class ImageElement : IElement
         get => this._threshold;
         init
         {
-            this._threshold = value is >= 0 and <= 1 ? value : throw new ArgumentOutOfRangeException(nameof(this.Threshold), Messages.ImageElement_Throw_ThresholdOutOfRange);
+            this._threshold = value is >= 0 and <= 1 ? value : throw new ArgumentOutOfRangeException(nameof(value), Messages.ImageElement_Throw_ThresholdOutOfRange);
             this._template = null;
             this._templateCreated = false;
         }

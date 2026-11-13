@@ -20,7 +20,9 @@ public sealed class TextElement : IElement
         this.IgnoreCase = true;
     }
 
+#pragma warning disable RS0027 // Kept as is for source compatibility with previous versions
     public TextElement(string content, TextOptions options = TextOptions.None)
+#pragma warning restore RS0027
         : this(Guid.NewGuid().ToString("N"), content, options)
     {
     }
@@ -31,7 +33,7 @@ public sealed class TextElement : IElement
     public string Name
     {
         get => this._name;
-        init => this._name = value?.Trim() is { Length: > 0 } trimmedValue ? trimmedValue : throw new ArgumentException(Messages.Element_Throw_InvalidName, nameof(this.Name));
+        init => this._name = value?.Trim() is { Length: > 0 } trimmedValue ? trimmedValue : throw new ArgumentException(Messages.Element_Throw_InvalidName, nameof(value));
     }
 
     /// <summary>
@@ -40,7 +42,7 @@ public sealed class TextElement : IElement
     public string Content
     {
         get => this._content;
-        init => this._content = value is { Length: > 0 } ? value : throw new ArgumentException(Messages.TextElement_Throw_EmptyContent, nameof(this.Content));
+        init => this._content = value is { Length: > 0 } ? value : throw new ArgumentException(Messages.TextElement_Throw_EmptyContent, nameof(value));
     }
 
     /// <summary>

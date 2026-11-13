@@ -33,7 +33,7 @@ public static class ElementCollectionExtensions
             {
                 if (jsonObject.ValueKind != JsonValueKind.Object)
                 {
-                    throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_NullJsonElement);
+                    throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_NullJsonElement, nameof(stream));
                 }
 
                 var kind = GetString(jsonObject, "kind");
@@ -42,7 +42,7 @@ public static class ElementCollectionExtensions
 
                 if (string.IsNullOrWhiteSpace(name))
                 {
-                    throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_InvalidElementName);
+                    throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_InvalidElementName, nameof(stream));
                 }
 
                 IElement element = kind switch
@@ -56,13 +56,13 @@ public static class ElementCollectionExtensions
                     {
                         IgnoreCase = !jsonObject.TryGetProperty("ignoreCase", out var ignoreCase) || ignoreCase.GetBoolean(),
                     },
-                    null => throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_NullJsonElement),
-                    _ => throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_UnsupportedElementType.FormatInvariant(kind)),
+                    null => throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_NullJsonElement, nameof(stream)),
+                    _ => throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_UnsupportedElementType.FormatInvariant(kind), nameof(stream)),
                 };
 
                 if (elements.Contains(element))
                 {
-                    throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_ElementAlreadyExists.FormatInvariant(element.Name));
+                    throw new ArgumentException(Messages.ElementCollectionExtensions_Throw_ElementAlreadyExists.FormatInvariant(element.Name), nameof(stream));
                 }
 
                 elements.Add(element);

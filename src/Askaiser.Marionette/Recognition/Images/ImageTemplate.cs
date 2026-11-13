@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Askaiser.Marionette.Imaging;
 
 namespace Askaiser.Marionette.Recognition.Images;
@@ -27,6 +28,10 @@ internal sealed class ImageTemplate
     /// </summary>
     private const double MinUsefulBound = 0.05;
 
+    private const double PassRateFactor = 0.4;
+
+    private const double MinPassRate = 1e-4;
+
     private static readonly int[] BlockSizes = { 64, 32, 16, 8, 4, 2, 1 };
 
     private ImageTemplate(int width, int height, double threshold, bool grayscale)
@@ -36,7 +41,6 @@ internal sealed class ImageTemplate
         this.Threshold = threshold;
         this.IsGrayscale = grayscale;
         this.Plane = Array.Empty<short>();
-        this.Kernel = Array.Empty<float>();
         this.Bgra = Array.Empty<byte>();
     }
 
@@ -56,24 +60,17 @@ internal sealed class ImageTemplate
     /// <summary>Gets the color plane the coarse search runs on.</summary>
     public ColorPlaneKind PlaneKind { get; private set; }
 
-    /// <summary>Gets the side of the square blocks averaged by the coarse search. 1 means the coarse search runs at full resolution.</summary>
-    public int BlockSize { get; private set; }
+    /// <summary>
+    /// Gets the successive tests a screen position goes through before being scored exactly, from the coarsest
+    /// and cheapest to the finest. The first one is evaluated at every position, the others only on what is left.
+    /// </summary>
+    public CoarseLevel[] Levels { get; private set; } = Array.Empty<CoarseLevel>();
 
-    public int KernelWidth { get; private set; }
-
-    public int KernelHeight { get; private set; }
-
-    /// <summary>Gets the block means of the centered template plane, row by row.</summary>
-    public float[] Kernel { get; private set; }
-
-    /// <summary>Gets the sum of the kernel values. It is zero when blocks cover the whole template.</summary>
-    public double KernelSum { get; private set; }
-
-    /// <summary>Gets the energy of the kernel expanded to full resolution, in plane units.</summary>
-    public double KernelEnergy { get; private set; }
-
-    /// <summary>Gets the lowest coarse correlation a matching window can have. When it is not positive, the coarse search cannot discard anything.</summary>
-    public double CoarseBound { get; private set; }
+    /// <summary>Gets a value indicating whether the first level can discard positions. When false, every position is scored exactly.</summary>
+    public bool CanPrune
+    {
+        get => this.Levels.Length > 0 && this.Levels[0].Bound > 0;
+    }
 
     /// <summary>Gets the template projected on <see cref="PlaneKind"/>.</summary>
     public short[] Plane { get; private set; }
@@ -175,14 +172,12 @@ internal sealed class ImageTemplate
     }
 
     /// <summary>
-    /// Picks the color plane and block size that make the search cheapest, using a simple model of its cost:
-    /// one multiplication per kernel value at every screen position, plus a full verification of the windows that pass.
+    /// Picks the color plane and the block sizes of the coarse tests that make a search cheapest, according to a simple
+    /// model of its cost. Whatever is picked only affects speed: every combination returns the same matches.
     /// </summary>
     private void SelectCoarseSearch(short[][] planes, long[] sums, double[] energies, ColorPlaneKind[] kinds, bool normDivisor)
     {
         var bestCost = double.MaxValue;
-        var bestBound = double.MinValue;
-        var found = false;
 
         for (var p = 0; p < planes.Length; p++)
         {
@@ -192,63 +187,105 @@ internal sealed class ImageTemplate
             }
 
             var norm = normDivisor ? ColorPlane.SquaredNorm(kinds[p]) : 1;
-
+            var candidates = new List<CoarseLevel>();
             foreach (var blockSize in BlockSizes)
             {
-                var kernelWidth = this.Width / blockSize;
-                var kernelHeight = this.Height / blockSize;
-                if (kernelWidth == 0 || kernelHeight == 0)
+                if (this.Width / blockSize > 0 && this.Height / blockSize > 0)
                 {
-                    continue;
+                    candidates.Add(CreateLevel(planes[p], sums[p], this.Width, blockSize, norm, this.Energy, this.Threshold));
                 }
+            }
 
-                var kernel = BuildKernel(planes[p], sums[p], this.Width, blockSize, kernelWidth, kernelHeight, out var kernelSum, out var kernelEnergy);
-
-                // Share of the template energy carried by the kernel.
-                var alpha2 = Math.Clamp(kernelEnergy / (norm * this.Energy), 0, 1);
-                var alpha = Math.Sqrt(alpha2);
-                var bound = (alpha * this.Threshold) - Math.Sqrt((1 - alpha2) * (1 - (this.Threshold * this.Threshold)));
-
-                var taps = kernel.Length;
-                double cost;
-                if (bound >= MinUsefulBound)
-                {
-                    // Under a rough Gaussian model the coarse correlation of an unrelated window has a standard deviation of 1/sqrt(taps).
-                    // Real screens are far from random (text correlates with text), hence the conservative factor.
-                    var z = 0.5 * bound * Math.Sqrt(taps);
-                    var passRate = Math.Max(1e-4, Math.Exp(-0.5 * z * z));
-                    cost = (taps / 8.0) + (passRate * this.Area);
-                }
-                else
-                {
-                    cost = (taps / 8.0) + this.Area;
-                }
-
+            // There are at most seven block sizes: every ordered subset of them can be evaluated.
+            for (var subset = 1; subset < 1 << candidates.Count; subset++)
+            {
+                var cost = this.EstimateCost(candidates, subset);
                 if (cost < bestCost)
                 {
-                    found = true;
                     bestCost = cost;
-                    bestBound = bound;
                     this.PlaneKind = kinds[p];
                     this.Plane = planes[p];
                     this.PlaneSum = sums[p];
                     this.PlaneEnergy = energies[p];
-                    this.BlockSize = blockSize;
-                    this.KernelWidth = kernelWidth;
-                    this.KernelHeight = kernelHeight;
-                    this.Kernel = kernel;
-                    this.KernelSum = kernelSum;
-                    this.KernelEnergy = kernelEnergy;
+
+                    var levels = new List<CoarseLevel>();
+                    for (var i = 0; i < candidates.Count; i++)
+                    {
+                        if ((subset & (1 << i)) != 0)
+                        {
+                            levels.Add(candidates[i]);
+                        }
+                    }
+
+                    this.Levels = levels.ToArray();
                 }
             }
         }
+    }
 
-        if (!found)
+    /// <summary>
+    /// Estimates the number of vector operations a search spends on a screen of typical size with a cascade of levels.
+    /// </summary>
+    private double EstimateCost(List<CoarseLevel> candidates, int subset)
+    {
+        // Assumptions of the model: a full HD screen, on which the template appears once.
+        const double positions = 1920 * 1080;
+        const double occurrences = 1;
+
+        // Cost of scoring one position exactly, and fixed cost of evaluating one more level at one position.
+        var exactCost = this.Area / 4.0;
+        const double levelOverhead = 8;
+
+        var cost = 0.0;
+        var reaching = positions;
+        var isFirst = true;
+
+        for (var i = 0; i < candidates.Count; i++)
         {
-            throw new InvalidOperationException("No coarse search configuration could be selected.");
+            if ((subset & (1 << i)) == 0)
+            {
+                continue;
+            }
+
+            var level = candidates[i];
+            if (level.Bound <= 0)
+            {
+                // A level that cannot discard anything is only acceptable alone, as the brute-force fallback.
+                return subset == 1 << i ? positions * exactCost : double.MaxValue;
+            }
+
+            // The first level is vectorized across positions, the next ones are evaluated one position at a time.
+            cost += reaching * ((level.Kernel.Length / 8.0) + (isFirst ? 0 : levelOverhead));
+
+            // Positions that pass a level are of two kinds. Unrelated windows pass by chance: their correlation is roughly centered
+            // on zero with a standard deviation of 1/sqrt(values), and real screens being far from random (text correlates with
+            // text), a conservative factor is applied. Windows next to an occurrence pass because, seen through blocks, a slightly
+            // shifted template still looks like itself.
+            var z = PassRateFactor * level.Bound * Math.Sqrt(level.Kernel.Length);
+            var passing = (positions * Math.Max(MinPassRate, Math.Exp(-0.5 * z * z))) + (occurrences * level.NeighborhoodArea);
+            if (passing >= reaching)
+            {
+                return double.MaxValue;
+            }
+
+            reaching = passing;
+            isFirst = false;
         }
 
-        this.CoarseBound = bestBound;
+        return cost + (reaching * exactCost);
+    }
+
+    private static CoarseLevel CreateLevel(short[] plane, long planeSum, int width, int blockSize, int norm, double energy, double threshold)
+    {
+        var kernelWidth = width / blockSize;
+        var kernelHeight = plane.Length / width / blockSize;
+        var kernel = BuildKernel(plane, planeSum, width, blockSize, kernelWidth, kernelHeight, out var kernelSum, out var kernelEnergy);
+
+        // Share of the template energy carried by the kernel.
+        var alpha2 = Math.Clamp(kernelEnergy / (norm * energy), 0, 1);
+        var bound = (Math.Sqrt(alpha2) * threshold) - Math.Sqrt((1 - alpha2) * (1 - (threshold * threshold)));
+
+        return new CoarseLevel(blockSize, kernelWidth, kernelHeight, kernel, kernelSum, kernelEnergy * norm, bound < MinUsefulBound ? 0 : bound, plane.Length);
     }
 
     private static float[] BuildKernel(ReadOnlySpan<short> plane, long planeSum, int width, int blockSize, int kernelWidth, int kernelHeight, out double kernelSum, out double kernelEnergy)

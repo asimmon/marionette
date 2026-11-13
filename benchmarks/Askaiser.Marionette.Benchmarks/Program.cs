@@ -59,8 +59,11 @@ public static class Program
                 best = Math.Min(best, sw.Elapsed.TotalMilliseconds);
             }
 
+            var statistics = new TemplateSearchStatistics();
+            TemplateMatcher.Find(shared, template, statistics);
+            Console.WriteLine($"    positions={statistics.Positions} passed=[{string.Join(" ", statistics.Passed)}]");
             var found = matches.Any(m => m.X == region.Left && m.Y == region.Top);
-            Console.WriteLine($"{name,-22} plane={template.PlaneKind,-13} block={template.BlockSize,2} kernel={template.KernelWidth}x{template.KernelHeight} bound={template.CoarseBound:F3} | cold {cold,7:F2} ms | warm {best,7:F2} ms | {matches.Count} match(es){(found ? string.Empty : "  <-- ORIGIN NOT FOUND")}");
+            Console.WriteLine($"{name,-22} plane={template.PlaneKind,-13} levels=[{string.Join(" ", template.Levels.Select(l => $"{l.BlockSize}:{l.KernelWidth}x{l.KernelHeight}@{l.Bound:F2}")),-38}] | cold {cold,7:F2} ms | warm {best,7:F2} ms | {matches.Count} match(es){(found ? string.Empty : "  <-- ORIGIN NOT FOUND")}");
             if (!found)
             {
                 failures++;

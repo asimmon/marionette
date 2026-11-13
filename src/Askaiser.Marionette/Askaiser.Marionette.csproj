@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyTitle>Askaiser.Marionette</AssemblyTitle>
     <PackageId>Askaiser.Marionette</PackageId>
     <PackageTags>automation;testing;ui;ocr;image-recognition;cross-platform</PackageTags>

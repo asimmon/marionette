@@ -11,10 +11,7 @@ public sealed class SearchResultCollection : IReadOnlyCollection<SearchResult>
 
     internal SearchResultCollection(IEnumerable<SearchResult> results)
     {
-        if (results == null)
-        {
-            throw new ArgumentNullException(nameof(results));
-        }
+        ArgumentNullException.ThrowIfNull(results);
 
         this._results = new Dictionary<string, SearchResult>(StringComparer.OrdinalIgnoreCase);
 

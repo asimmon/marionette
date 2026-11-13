@@ -1,9 +1,11 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Askaiser.Marionette;
 
-[SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "I don't want to")]
+/// <summary>
+/// A rectangle in screen pixels. <see cref="Right"/> and <see cref="Bottom"/> are exclusive: a rectangle covering
+/// a single pixel at the origin is <c>(0, 0, 1, 1)</c>.
+/// </summary>
 public record Rectangle
 {
     public Rectangle(int left, int top, int right, int bottom)
@@ -37,55 +39,25 @@ public record Rectangle
 
     public int Bottom { get; private init; }
 
-    public int Width
-    {
-        get => this.Right - this.Left;
-    }
+    public int Width => this.Right - this.Left;
 
-    public int Height
-    {
-        get => this.Bottom - this.Top;
-    }
+    public int Height => this.Bottom - this.Top;
 
-    public Point TopLeft
-    {
-        get => new Point(this.Left, this.Top);
-    }
+    public Point TopLeft => new Point(this.Left, this.Top);
 
-    public Point TopRight
-    {
-        get => new Point(this.Right, this.Top);
-    }
+    public Point TopRight => new Point(this.Right, this.Top);
 
-    public Point BottomLeft
-    {
-        get => new Point(this.Left, this.Bottom);
-    }
+    public Point BottomLeft => new Point(this.Left, this.Bottom);
 
-    public Point BottomRight
-    {
-        get => new Point(this.Right, this.Bottom);
-    }
+    public Point BottomRight => new Point(this.Right, this.Bottom);
 
-    public Point CenterLeft
-    {
-        get => new Point(this.Left, this.Center.Y);
-    }
+    public Point CenterLeft => new Point(this.Left, this.Center.Y);
 
-    public Point CenterRight
-    {
-        get => new Point(this.Right, this.Center.Y);
-    }
+    public Point CenterRight => new Point(this.Right, this.Center.Y);
 
-    public Point CenterTop
-    {
-        get => new Point(this.Center.X, this.Top);
-    }
+    public Point CenterTop => new Point(this.Center.X, this.Top);
 
-    public Point CenterBottom
-    {
-        get => new Point(this.Center.X, this.Bottom);
-    }
+    public Point CenterBottom => new Point(this.Center.X, this.Bottom);
 
     public Point Center
     {
@@ -135,203 +107,71 @@ public record Rectangle
         bottom = this.Bottom;
     }
 
+    /// <summary>Returns the leftmost part of this rectangle, with the specified width.</summary>
     public Rectangle FromLeft(int width)
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        var right = this.Left + width;
-        if (right > this.Right)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        return this with { Right = right };
+        this.EnsureWidthFits(width);
+        return this with { Right = this.Left + width };
     }
 
+    /// <summary>Returns the topmost part of this rectangle, with the specified height.</summary>
     public Rectangle FromTop(int height)
     {
-        if (height < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
-
-        var bottom = this.Top + height;
-        if (bottom > this.Bottom)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
-
-        return this with { Bottom = bottom };
+        this.EnsureHeightFits(height);
+        return this with { Bottom = this.Top + height };
     }
 
+    /// <summary>Returns the bottommost part of this rectangle, with the specified height.</summary>
     public Rectangle FromBottom(int height)
     {
-        if (height < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
-
-        var top = this.Bottom - height;
-        if (top < this.Top)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
-
-        return this with { Top = top };
+        this.EnsureHeightFits(height);
+        return this with { Top = this.Bottom - height };
     }
 
+    /// <summary>Returns the rightmost part of this rectangle, with the specified width.</summary>
     public Rectangle FromRight(int width)
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        var left = this.Right - width;
-        if (left < this.Left)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        return this with { Left = left };
+        this.EnsureWidthFits(width);
+        return this with { Left = this.Right - width };
     }
 
+    /// <summary>Returns the top-left corner of this rectangle, with the specified size.</summary>
     public Rectangle FromTopLeft(int width, int height)
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        if (height < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
-
-        var right = this.Left + width;
-        var bottom = this.Top + height;
-
-        if (right > this.Right)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        if (bottom > this.Bottom)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
-
-        return this with { Right = right, Bottom = bottom };
+        this.EnsureWidthFits(width);
+        this.EnsureHeightFits(height);
+        return this with { Right = this.Left + width, Bottom = this.Top + height };
     }
 
+    /// <summary>Returns the top-right corner of this rectangle, with the specified size.</summary>
     public Rectangle FromTopRight(int width, int height)
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        if (height < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
-
-        var left = this.Right - width;
-        var bottom = this.Top + height;
-
-        if (left < this.Left)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        if (bottom > this.Bottom)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
-
-        return this with { Left = left, Bottom = bottom };
+        this.EnsureWidthFits(width);
+        this.EnsureHeightFits(height);
+        return this with { Left = this.Right - width, Bottom = this.Top + height };
     }
 
+    /// <summary>Returns the bottom-left corner of this rectangle, with the specified size.</summary>
     public Rectangle FromBottomLeft(int width, int height)
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        if (height < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
-
-        var right = this.Left + width;
-        var top = this.Bottom - height;
-
-        if (right > this.Right)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        if (top < this.Top)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
-
-        return this with { Top = top, Right = right };
+        this.EnsureWidthFits(width);
+        this.EnsureHeightFits(height);
+        return this with { Top = this.Bottom - height, Right = this.Left + width };
     }
 
+    /// <summary>Returns the bottom-right corner of this rectangle, with the specified size.</summary>
     public Rectangle FromBottomRight(int width, int height)
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        if (height < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
-
-        var left = this.Right - width;
-        var top = this.Bottom - height;
-
-        if (left < this.Left)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        if (top < this.Top)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
-
-        return this with { Left = left, Top = top };
+        this.EnsureWidthFits(width);
+        this.EnsureHeightFits(height);
+        return this with { Left = this.Right - width, Top = this.Bottom - height };
     }
 
+    /// <summary>Returns the central part of this rectangle, with the specified size.</summary>
     public Rectangle FromCenter(int width, int height)
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        if (height < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
-
-        if (width > this.Width)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        if (height > this.Height)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
+        this.EnsureWidthFits(width);
+        this.EnsureHeightFits(height);
 
         var halfWidth = (int)Math.Round(width / 2d);
         var halfHeight = (int)Math.Round(height / 2d);
@@ -370,5 +210,30 @@ public record Rectangle
     public override string ToString()
     {
         return Messages.Rectangle_ToString.FormatInvariant(this.Left, this.Top, this.Right, this.Bottom);
+    }
+
+    /// <summary>
+    /// Returns the part of this rectangle that is also inside another one, or null when they do not overlap.
+    /// </summary>
+    internal Rectangle? Intersect(Rectangle other)
+    {
+        var left = Math.Max(this.Left, other.Left);
+        var top = Math.Max(this.Top, other.Top);
+        var right = Math.Min(this.Right, other.Right);
+        var bottom = Math.Min(this.Bottom, other.Bottom);
+
+        return left < right && top < bottom ? new Rectangle(left, top, right, bottom) : null;
+    }
+
+    private void EnsureWidthFits(int width)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(width);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(width, this.Width);
+    }
+
+    private void EnsureHeightFits(int height)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(height);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(height, this.Height);
     }
 }

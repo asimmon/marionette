@@ -11,7 +11,6 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <Description>Askaiser.Marionette is a cross-platform test automation framework based on image and text recognition.</Description>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <NuGetAuditMode>direct</NuGetAuditMode>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -20,14 +19,9 @@
     <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Deterministic>true</Deterministic>
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-  </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="StyleCop.Analyzers">
+    <!-- Code style, analyzers and build defaults (deterministic builds, warnings as errors in Release, NuGet auditing...) -->
+    <PackageReference Include="Workleap.DotNet.CodingStandards">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

@@ -25,20 +25,14 @@ public sealed class ElementCollection : IEnumerable<IElement>
 
     public void Add(IElement element)
     {
-        if (element == null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         this._elements.Add(element.Name, element);
     }
 
     public void Remove(IElement element)
     {
-        if (element == null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         this._elements.Remove(element.Name);
     }
@@ -50,10 +44,7 @@ public sealed class ElementCollection : IEnumerable<IElement>
 
     public bool Contains(IElement element)
     {
-        if (element == null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return this.TryGetValue(element.Name, out _);
     }
