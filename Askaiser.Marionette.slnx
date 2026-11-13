@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Askaiser.Marionette/Askaiser.Marionette.csproj" />
+    <Project Path="src/Askaiser.Marionette.SourceGenerator/Askaiser.Marionette.SourceGenerator.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Askaiser.Marionette.Tests/Askaiser.Marionette.Tests.csproj" />
+    <Project Path="tests/Askaiser.Marionette.SourceGenerator.Tests/Askaiser.Marionette.SourceGenerator.Tests.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/Askaiser.Marionette.ConsoleApp/Askaiser.Marionette.ConsoleApp.csproj" />
+  </Folder>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Askaiser.Marionette.Benchmarks/Askaiser.Marionette.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="README.md" />
+  </Folder>
+</Solution>

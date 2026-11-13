@@ -4,12 +4,15 @@
     <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <NoWarn>$(NoWarn);CA2007;CA1303;SA1600</NoWarn>
-    <TieredPGO>true</TieredPGO>
+    <!-- CA1303: this console application is not localized -->
+    <NoWarn>$(NoWarn);CA1303</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Askaiser.Marionette\Askaiser.Marionette.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\tests\Askaiser.Marionette.Tests\Assets\test-bench.png" Link="test-bench.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
