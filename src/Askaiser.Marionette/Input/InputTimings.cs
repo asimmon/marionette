@@ -19,6 +19,7 @@ internal sealed record InputTimings
         AfterScroll = TimeSpan.Zero,
         FastMove = TimeSpan.Zero,
         SlowMove = TimeSpan.Zero,
+        ModifierSettle = TimeSpan.Zero,
     };
 
     /// <summary>Gets the pause between the arrival of the cursor and a button event.</summary>
@@ -38,6 +39,9 @@ internal sealed record InputTimings
 
     /// <summary>Gets the duration of a cursor move at <see cref="MouseSpeed.Slow"/> speed.</summary>
     public TimeSpan SlowMove { get; init; } = TimeSpan.FromMilliseconds(700);
+
+    /// <summary>Gets the pause after a modifier key went down or before it comes back up: some applications, macOS ones in particular, miss shortcuts that are faster than a person.</summary>
+    public TimeSpan ModifierSettle { get; init; } = TimeSpan.FromMilliseconds(30);
 
     /// <summary>Gets the pause between two positions of the cursor during a move.</summary>
     public TimeSpan MoveStep { get; init; } = TimeSpan.FromMilliseconds(8);

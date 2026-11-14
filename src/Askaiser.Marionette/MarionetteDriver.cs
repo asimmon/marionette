@@ -47,7 +47,7 @@ public sealed class MarionetteDriver : IDisposable
         this._screen = new ScreenService(platform.Display, options.ScreenshotCacheDuration);
         this._locator = new ElementLocator(options, this._screen, recognizers, failureWriter, timeProvider);
         this._mouse = new MouseController(platform.Mouse, timings, timeProvider);
-        this._keyboard = new KeyboardController(platform.Keyboard);
+        this._keyboard = new KeyboardController(platform.Keyboard, timings);
 
         this._monitorIndex = 0;
         this._mouseSpeed = options.MouseSpeed;

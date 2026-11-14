@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Askaiser.Marionette.Platform;
 
@@ -10,10 +12,12 @@ namespace Askaiser.Marionette.Input;
 internal sealed class KeyboardController
 {
     private readonly IKeyboardDevice _device;
+    private readonly InputTimings _timings;
 
-    public KeyboardController(IKeyboardDevice device)
+    public KeyboardController(IKeyboardDevice device, InputTimings timings)
     {
         this._device = device;
+        this._timings = timings;
     }
 
     /// <summary>
@@ -82,11 +86,14 @@ internal sealed class KeyboardController
 
             try
             {
+                this.Settle(modifiers.Count > 0);
                 foreach (var key in others)
                 {
                     this._device.Press(key);
                     this._device.Release(key);
                 }
+
+                this.Settle(modifiers.Count > 0);
             }
             finally
             {
@@ -127,4 +134,12 @@ internal sealed class KeyboardController
         or VirtualKeyCode.Alt or VirtualKeyCode.LeftAlt or VirtualKeyCode.RightAlt
         or VirtualKeyCode.LeftWindows or VirtualKeyCode.RightWindows
         or VirtualKeyCode.ControlOrCommand;
+
+    private void Settle(bool hasModifiers)
+    {
+        if (hasModifiers && this._timings.ModifierSettle > TimeSpan.Zero)
+        {
+            Thread.Sleep(this._timings.ModifierSettle);
+        }
+    }
 }
