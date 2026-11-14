@@ -118,7 +118,8 @@ public sealed class DesktopTests
 
             // 5) Keyboard shortcut: select the content of the email field and replace it
             await driver.SingleClickAsync("Jürgen.Müller@example.com", searchRect: (await driver.GetCurrentMonitorAsync(cancellationToken)).FromTop(700), cancellationToken: cancellationToken);
-            await driver.KeyPressAsync([VirtualKeyCode.ControlOrCommand, VirtualKeyCode.A], cancellationToken: cancellationToken);
+            // A browser applies a shortcut asynchronously: without a pause, the text typed next can reach the field before it is selected.
+            await driver.KeyPressAsync([VirtualKeyCode.ControlOrCommand, VirtualKeyCode.A], sleepAfter: TimeSpan.FromMilliseconds(300), cancellationToken: cancellationToken);
             await driver.TypeTextAsync("replaced@example.com", sleepAfter: TimeSpan.FromMilliseconds(300), cancellationToken: cancellationToken);
             await driver.SingleClickAsync("Log in", cancellationToken: cancellationToken);
             await driver.WaitForAsync("Welcome back, replaced@example.com", waitFor: ReactionTimeout, cancellationToken: cancellationToken);
