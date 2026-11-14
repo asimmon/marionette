@@ -65,6 +65,17 @@ jobs:
         env:
           MARIONETTE_DESKTOP_TESTS: "1"
         run: |
+          # The machine sometimes stops responding during these tests, which leaves no log: its state is printed while they run.
+          export MARIONETTE_DESKTOP_PROGRESS="$RUNNER_TEMP/desktop-progress.txt"
+          : > "$MARIONETTE_DESKTOP_PROGRESS"
+          (
+            while true; do
+              sleep 2 > /dev/null 2>&1 < /dev/null
+              echo "[monitor] $(date -u +%H:%M:%S) step='$(tail -n 1 "$MARIONETTE_DESKTOP_PROGRESS")' console=$(stat -f %Su /dev/console) windowserver=$(pgrep -x WindowServer | xargs) free=$(vm_stat | awk '/Pages free/ {print $3}') load=$(sysctl -n vm.loadavg) tests=$(ps -axo rss=,%cpu=,command= | awk '/Askaiser.Marionette.Tests/ && !/Chrome/ && !/awk/ {printf "%dMB/%s%% ", $1/1024, $2}')"
+            done
+          ) &
+          monitor=$!
+
           dotnet test --project tests/Askaiser.Marionette.Tests -c Release --no-build --treenode-filter "/*/*/DesktopTests/*" --timeout 6m --output Detailed &
           tests=$!
 
@@ -92,7 +103,7 @@ jobs:
 
           status=0
           wait "$tests" || status=$?
-          kill "$watchdog" 2> /dev/null || true
+          kill "$watchdog" "$monitor" 2> /dev/null || true
           exit "$status"
 
       - name: Upload test results

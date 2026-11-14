@@ -87,25 +87,28 @@ public sealed class DesktopTests
 
         try
         {
+            Step("0) Browser started, creating the driver");
+
             // The screen is recorded during the whole test: if a step fails, the video shows what led to it.
             using var driver = MarionetteDriver.Create(new DriverOptions { FailureVideoPath = failuresDirectory, FailureVideoDuration = TimeSpan.FromSeconds(15) });
 
-            // 1) Read the screen
+            Step("1) Read the screen");
             await driver.WaitForAsync("Account overview", waitFor: PageTimeout, cancellationToken: cancellationToken);
             await Assert.That(await driver.IsVisibleAsync("Recent orders", cancellationToken: cancellationToken)).IsTrue();
             await Assert.That(await driver.IsVisibleAsync("This text is not on the page", cancellationToken: cancellationToken)).IsFalse();
 
-            // 2) Click on text and observe the reaction of the page
+            Step("2) Click on text and observe the reaction of the page");
             await driver.SingleClickAsync("Cancel", cancellationToken: cancellationToken);
             await driver.WaitForAsync("Operation cancelled", waitFor: ReactionTimeout, cancellationToken: cancellationToken);
 
-            // 3) Type text, including characters that are not on a US keyboard, and a tabulation to change field
+            Step("3) Type text, including characters that are not on a US keyboard, and a tabulation to change field");
             await driver.SingleClickAsync("Email address", cancellationToken: cancellationToken);
             await driver.TypeTextAsync("Jürgen.Müller@example.com\tsecret", sleepAfter: TimeSpan.FromMilliseconds(300), cancellationToken: cancellationToken);
+            Step("3) Typed, clicking on Log in");
             await driver.SingleClickAsync("Log in", cancellationToken: cancellationToken);
             await driver.WaitForAsync("Welcome back, Jürgen.Müller@example.com", waitFor: ReactionTimeout, cancellationToken: cancellationToken);
 
-            // 4) Find an image taken from the screen itself, and click on it
+            Step("4) Find an image taken from the screen itself, and click on it");
             var saveButton = await driver.WaitForAsync("Save changes", searchRect: (await driver.GetCurrentMonitorAsync(cancellationToken)).FromTop(300), cancellationToken: cancellationToken);
             var screenshot = await driver.GetScreenshotAsync(cancellationToken);
             var monitor = await driver.GetCurrentMonitorAsync(cancellationToken);
@@ -117,15 +120,18 @@ public sealed class DesktopTests
             await driver.SingleClickAsync(buttonImage, cancellationToken: cancellationToken);
             await driver.WaitForAsync("Changes saved successfully", waitFor: ReactionTimeout, cancellationToken: cancellationToken);
 
-            // 5) Keyboard shortcut: select the content of the email field and replace it
+            Step("5) Keyboard shortcut: select the content of the email field and replace it");
             await driver.SingleClickAsync("Jürgen.Müller@example.com", searchRect: (await driver.GetCurrentMonitorAsync(cancellationToken)).FromTop(700), cancellationToken: cancellationToken);
+            Step("5) Clicked in the field, pressing the shortcut");
             // A browser applies a shortcut asynchronously: without a pause, the text typed next can reach the field before it is selected.
             await driver.KeyPressAsync([VirtualKeyCode.ControlOrCommand, VirtualKeyCode.A], sleepAfter: TimeSpan.FromMilliseconds(300), cancellationToken: cancellationToken);
+            Step("5) Shortcut pressed, typing");
             await driver.TypeTextAsync("replaced@example.com", sleepAfter: TimeSpan.FromMilliseconds(300), cancellationToken: cancellationToken);
+            Step("5) Typed, clicking on Log in");
             await driver.SingleClickAsync("Log in", cancellationToken: cancellationToken);
             await driver.WaitForAsync("Welcome back, replaced@example.com", waitFor: ReactionTimeout, cancellationToken: cancellationToken);
 
-            // 6) A search that fails saves a video of what the screen displayed during the last seconds
+            Step("6) A search that fails saves a video of what the screen displayed during the last seconds");
             var existingVideos = Directory.Exists(failuresDirectory) ? Directory.GetFiles(failuresDirectory) : [];
             await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitForAsync("This text is not on the page", waitFor: TimeSpan.FromSeconds(1), cancellationToken: cancellationToken));
 
@@ -147,6 +153,8 @@ public sealed class DesktopTests
         }
         finally
         {
+            Step("Closing the browser");
+
             try
             {
                 browser.Kill(entireProcessTree: true);
@@ -157,6 +165,20 @@ public sealed class DesktopTests
             {
                 Debug.WriteLine(ex);
             }
+        }
+    }
+
+    /// <summary>
+    /// Announces a step of a test. Steps are part of the output of the test, and continuous integration follows them while the
+    /// test runs through the file named by the MARIONETTE_DESKTOP_PROGRESS environment variable.
+    /// </summary>
+    private static void Step(string description)
+    {
+        Console.WriteLine(description);
+
+        if (Environment.GetEnvironmentVariable("MARIONETTE_DESKTOP_PROGRESS") is { Length: > 0 } progressPath)
+        {
+            File.AppendAllText(progressPath, description + Environment.NewLine);
         }
     }
 }
