@@ -23,13 +23,17 @@ internal sealed class ScreenFrame
     private readonly ConcurrentDictionary<(IElement Element, Rectangle Region), Lazy<Task<IReadOnlyList<Rectangle>>>> _results = new();
     private int _references = 1;
 
-    public ScreenFrame(PixelBuffer pixels, DisplayInfo display)
+    public ScreenFrame(PixelBuffer pixels, DisplayInfo display, long sequence = 0)
     {
         this._pixels = pixels;
         this.Display = display;
+        this.Sequence = sequence;
     }
 
     public DisplayInfo Display { get; }
+
+    /// <summary>Gets the rank of the frame among the frames of its screen service: a frame captured later has a greater rank.</summary>
+    public long Sequence { get; }
 
     public PixelBuffer Pixels => this._pixels;
 

@@ -1,14 +1,16 @@
 using System.Diagnostics;
 using System.Globalization;
 using Askaiser.Marionette.Imaging;
+using Askaiser.Marionette.Platform;
 using Askaiser.Marionette.Recognition.Images;
 using Askaiser.Marionette.Recognition.Text;
+using Askaiser.Marionette.Screen;
 
 namespace Askaiser.Marionette.Benchmarks;
 
 /// <summary>
-/// Measures image and text recognition on a screenshot, without needing a desktop.
-/// Usage: dotnet run -c Release --project benchmarks/Askaiser.Marionette.Benchmarks [path/to/screenshot.png]
+/// Measures image recognition, text recognition and screen recording on a screenshot, without needing a desktop.
+/// Usage: dotnet run -c Release --project benchmarks/Askaiser.Marionette.Benchmarks [path/to/screenshot.png] [path/to/video.png]
 /// </summary>
 public static class Program
 {
@@ -21,6 +23,7 @@ public static class Program
         Console.WriteLine();
 
         BenchmarkImageRecognition(screen);
+        BenchmarkScreenRecording(screen, args.Length > 1 ? args[1] : null);
         BenchmarkTextRecognition(screen);
     }
 
@@ -79,6 +82,92 @@ public static class Program
         Console.WriteLine();
     }
 
+    /// <summary>
+    /// Records what a test typically does to a screen, and measures what each capture costs and what the video weighs.
+    /// </summary>
+    private static void BenchmarkScreenRecording(Image screen, string? videoPath)
+    {
+        using var device = new NoDisplayDevice();
+        using var screenService = new ScreenService(device, TimeSpan.Zero);
+        using var recorder = new ScreenRecorder(screenService, TimeSpan.FromMinutes(1), ScreenRecorderSettings.Default with { MaxPixels = int.MaxValue }, TimeProvider.System);
+
+        var display = new DisplayInfo(new Rectangle(0, 0, screen.Width, screen.Height), IsPrimary: true, 1f, 0);
+        var sequence = 0L;
+        var pixels = screen.Pixels.ToArray();
+
+        Console.WriteLine("Screen recording                         time per capture");
+
+        double Record(string name, Action<byte[]> change, int captures)
+        {
+            var total = 0d;
+            for (var i = 0; i < captures; i++)
+            {
+                change(pixels);
+
+                var buffer = PixelBuffer.Rent(screen.Width, screen.Height);
+                pixels.CopyTo(buffer.Span);
+                var frame = new ScreenFrame(buffer, display, ++sequence);
+
+                var watch = Stopwatch.StartNew();
+                recorder.Record(frame);
+                total += watch.Elapsed.TotalMilliseconds;
+                frame.Release();
+
+                // Videos are paced by the clock: leave some time between two captures.
+                Thread.Sleep(20);
+            }
+
+            Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"{name,-38}  {total / captures,9:F2} ms"));
+            return total;
+        }
+
+        var stride = screen.Width * 4;
+        var step = 0;
+
+        Record("first capture", static _ => { }, 1);
+        Record("same screen, compared", static _ => { }, 10);
+        Record("cursor moves, 32x32 changed", current =>
+        {
+            // A square that moves along a diagonal, like a cursor: its previous position changes too.
+            step++;
+            for (var y = 0; y < 32; y++)
+            {
+                current.AsSpan((((step * 9) + y) * stride) + (step * 16 * 4), 32 * 4).Fill((byte)(step * 37));
+            }
+        }, 20);
+        Record("text typed, 300x20 changed", current =>
+        {
+            step++;
+            for (var y = 0; y < 20; y++)
+            {
+                var row = current.AsSpan(((400 + y) * stride) + (500 * 4), 300 * 4);
+                for (var x = 0; x < row.Length; x += 4)
+                {
+                    row[x] = row[x + 1] = row[x + 2] = (byte)(((x / 4) + step) % 7 == 0 ? 0 : 255);
+                }
+            }
+        }, 20);
+        Record("page scrolled, whole screen changed", current =>
+        {
+            // Everything moves up by 40 rows.
+            current.AsSpan(40 * stride).CopyTo(current);
+        }, 5);
+
+        using var video = new MemoryStream();
+        var encodeWatch = Stopwatch.StartNew();
+        recorder.TryEncode(video);
+        var encodeTime = encodeWatch.Elapsed.TotalMilliseconds;
+
+        var screenshotSize = screen.ToPng().Length;
+        Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"video of these {sequence} captures written in {encodeTime:F0} ms: {video.Length / 1024} KB, a screenshot is {screenshotSize / 1024} KB"));
+        Console.WriteLine();
+
+        if (videoPath != null)
+        {
+            File.WriteAllBytes(videoPath, video.ToArray());
+        }
+    }
+
     private static void BenchmarkTextRecognition(Image screen)
     {
         using var engine = new TextRecognitionEngine(TextRecognitionModel.Default);
@@ -103,6 +192,20 @@ public static class Program
     private static SearchSurface CreateSurface(Image image)
     {
         return new SearchSurface(PixelBuffer.Wrap(image.Pixels.ToArray(), image.Width, image.Height), ownsPixels: true);
+    }
+
+    /// <summary>
+    /// The recorder is given frames directly: this device is never asked for anything.
+    /// </summary>
+    private sealed class NoDisplayDevice : IDisplayDevice
+    {
+        public IReadOnlyList<DisplayInfo> GetDisplays() => [];
+
+        public PixelBuffer Capture(DisplayInfo display) => throw new NotSupportedException();
+
+        public void Dispose()
+        {
+        }
     }
 
     /// <summary>

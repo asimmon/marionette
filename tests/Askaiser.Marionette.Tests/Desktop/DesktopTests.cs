@@ -87,7 +87,8 @@ public sealed class DesktopTests
 
         try
         {
-            using var driver = MarionetteDriver.Create(new DriverOptions { FailureScreenshotPath = failuresDirectory });
+            // The screen is recorded during the whole test: if a step fails, the video shows what led to it.
+            using var driver = MarionetteDriver.Create(new DriverOptions { FailureVideoPath = failuresDirectory, FailureVideoDuration = TimeSpan.FromSeconds(15) });
 
             // 1) Read the screen
             await driver.WaitForAsync("Account overview", waitFor: PageTimeout, cancellationToken: cancellationToken);
@@ -123,6 +124,26 @@ public sealed class DesktopTests
             await driver.TypeTextAsync("replaced@example.com", sleepAfter: TimeSpan.FromMilliseconds(300), cancellationToken: cancellationToken);
             await driver.SingleClickAsync("Log in", cancellationToken: cancellationToken);
             await driver.WaitForAsync("Welcome back, replaced@example.com", waitFor: ReactionTimeout, cancellationToken: cancellationToken);
+
+            // 6) A search that fails saves a video of what the screen displayed during the last seconds
+            var existingVideos = Directory.Exists(failuresDirectory) ? Directory.GetFiles(failuresDirectory) : [];
+            await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitForAsync("This text is not on the page", waitFor: TimeSpan.FromSeconds(1), cancellationToken: cancellationToken));
+
+            var videoPath = await Assert.That(Directory.GetFiles(failuresDirectory).Except(existingVideos)).HasSingleItem();
+            var video = AnimatedPngReader.Read(await File.ReadAllBytesAsync(videoPath!, cancellationToken));
+
+            // Large monitors are recorded at a fraction of their size.
+            var videoMonitor = await driver.GetCurrentMonitorAsync(cancellationToken);
+            var reduction = videoMonitor.Width / video.Width;
+            await Assert.That((video.Width, video.Height)).IsEqualTo((videoMonitor.Width / reduction, videoMonitor.Height / reduction));
+            await Assert.That(video.Frames.Count).IsGreaterThan(1).Because("The page changed several times during the last seconds");
+            await Assert.That(video.Duration).IsGreaterThan(TimeSpan.FromSeconds(5));
+            await Assert.That(video.Frames[^1].Picture.Pixels.SequenceEqual(video.DefaultImage.Pixels)).IsTrue();
+
+            // This failure was expected: the video is kept apart from those of real failures, which continuous integration publishes too.
+            var expectedVideosDirectory = Path.Combine(AppContext.BaseDirectory, "desktop-videos");
+            Directory.CreateDirectory(expectedVideosDirectory);
+            File.Move(videoPath!, Path.Combine(expectedVideosDirectory, "expected-failure.png"), overwrite: true);
         }
         finally
         {

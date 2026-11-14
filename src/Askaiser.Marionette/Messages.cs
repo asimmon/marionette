@@ -22,6 +22,9 @@ internal static class Messages
     public const string DriverOptions_Throw_NegativeWaitForThrottlingInterval = "'waitFor' throttling interval cannot be negative.";
     public const string DriverOptions_Throw_NegativeDefaultWaitForDuration = "Default 'waitFor' duration cannot be negative.";
     public const string DriverOptions_Throw_NegativeDefaultKeyboardSleepAfterDuration = "Default 'sleepAfter' duration cannot be negative.";
+    public const string DriverOptions_Throw_EmptyFailurePath = "The path of the directory cannot be empty.";
+    public const string DriverOptions_Throw_FailureVideoDurationNotPositive = "The duration of failure videos must be greater than zero.";
+    public const string DriverOptions_Throw_FailureScreenshotAndVideo = "Failures are saved either as screenshots or as videos: set FailureScreenshotPath or FailureVideoPath, not both.";
     public const string MarionetteDriver_Throw_ElementsEmpty = "Elements cannot be empty.";
     public const string MarionetteDriver_Throw_ScrollTicksNotGreaterThanZero = "Scroll ticks must be greater than zero.";
     public const string MarionetteDriver_Throw_EmptyKeyCodes = "Key codes cannot be empty.";
@@ -36,7 +39,7 @@ internal static class Messages
     public const string TextElement_Throw_EmptyContent = "Content cannot be null or empty.";
     public const string SearchResultCollection_Throw_ResultsEmpty = "Results cannot be empty.";
     public const string SearchResult_ToString = "Search results for '{0}': {1}";
-    public const string FailureScreenshotFileNameFormat = "{0:yyyy-MM-dd-HH-mm-ss-ffff}_{1}.png";
+    public const string FailureFileNameFormat = "{0:yyyy-MM-dd-HH-mm-ss-ffff}_{1}.png";
     public const string MonitorService_Throw_MonitorNotFound = "Requested monitor index '{0}' not found.";
     public const string ElementCollectionExtensions_Throw_ElementAlreadyExists = "An element with the name '{0}' already exists.";
     public const string ElementCollectionExtensions_Throw_InvalidElementName = "An element cannot have a null or empty name.";

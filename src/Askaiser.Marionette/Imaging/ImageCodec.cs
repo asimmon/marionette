@@ -13,7 +13,8 @@ namespace Askaiser.Marionette.Imaging;
 /// </summary>
 internal static class ImageCodec
 {
-    private static readonly byte[] PngSignature = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+    /// <summary>Gets the bytes every PNG file starts with.</summary>
+    public static ReadOnlySpan<byte> PngSignature => [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
 
     private static readonly uint[] Crc32Table = CreateCrc32Table();
 
@@ -194,16 +195,28 @@ internal static class ImageCodec
         return false;
     }
 
-    private static void WriteChunk(Stream destination, ReadOnlySpan<byte> type, ReadOnlySpan<byte> data)
+    /// <summary>
+    /// Writes a PNG chunk: its length, its type, its data and the checksum of the last two.
+    /// </summary>
+    public static void WriteChunk(Stream destination, ReadOnlySpan<byte> type, ReadOnlySpan<byte> data)
+    {
+        WriteChunk(destination, type, ReadOnlySpan<byte>.Empty, data);
+    }
+
+    /// <summary>
+    /// Writes a PNG chunk whose data is made of two parts, which avoids copying them next to each other.
+    /// </summary>
+    public static void WriteChunk(Stream destination, ReadOnlySpan<byte> type, ReadOnlySpan<byte> prefix, ReadOnlySpan<byte> data)
     {
         Span<byte> buffer = stackalloc byte[4];
 
-        BinaryPrimitives.WriteInt32BigEndian(buffer, data.Length);
+        BinaryPrimitives.WriteInt32BigEndian(buffer, prefix.Length + data.Length);
         destination.Write(buffer);
         destination.Write(type);
+        destination.Write(prefix);
         destination.Write(data);
 
-        var crc = UpdateCrc32(UpdateCrc32(0xFFFFFFFFu, type), data) ^ 0xFFFFFFFFu;
+        var crc = UpdateCrc32(UpdateCrc32(UpdateCrc32(0xFFFFFFFFu, type), prefix), data) ^ 0xFFFFFFFFu;
         BinaryPrimitives.WriteUInt32BigEndian(buffer, crc);
         destination.Write(buffer);
     }

@@ -41,7 +41,20 @@ await driver.SingleClickAnyAsync(new IElement[] { okButton, yesButton }); // whi
 
 Elements are text (`TextElement`, or just a `string`) or images (`ImageElement`). Images are matched by normalized cross-correlation, with an optional threshold and grayscale mode; the search is exact and fast: a typical icon is found on a 1080p screen in about 15 ms. Text is detected and read by a bundled neural OCR (PP-OCR on ONNX Runtime), which also tells where each character is, so you can click a single word inside a sentence. Text is matched whatever its case, unless `TextElement.IgnoreCase` is false. `TextOptions` preprocess the screen before it is read (grayscale, black and white, negative), which is rarely needed.
 
-When an element is not found, a screenshot of what was searched is written to `DriverOptions.FailureScreenshotPath`.
+### When a search fails
+
+A search that does not find its element, or finds it more than once, throws. To understand why, ask the driver to save what the screen displayed, either as a screenshot of the area that was searched, or as a video of the last seconds:
+
+```csharp
+var options = new DriverOptions { FailureScreenshotPath = "failures" };
+
+// or
+var options = new DriverOptions { FailureVideoPath = "failures", FailureVideoDuration = TimeSpan.FromSeconds(5) };
+```
+
+A video shows what led to the failure: the clicks that did nothing, the dialog that appeared in front of the application. It follows the current monitor, including when you change it. It is an **animated PNG** file: lossless, so that small text stays readable, and barely larger than a screenshot when little changes on the screen. Open it with a web browser to play it; image viewers that do not play animated PNG files show its last image, the screen at the time of the failure.
+
+Recording runs for as long as the driver exists. Ten times per second, it captures the screen and keeps what changed since the previous capture, compressed, within 64 MB of memory. On a 1920x1080 screen this takes about 4 milliseconds each time, most of it for the capture itself, which adds up to 6 to 8% of one processor core, and less while searches run because they share their captures with the recorder. Recording never takes more than a quarter of a core: it captures less often instead. Monitors with more pixels than 2560x1600 are recorded at half their size or less.
 
 ### Cancellation
 

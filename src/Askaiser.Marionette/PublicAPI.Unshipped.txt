@@ -7,6 +7,10 @@ Askaiser.Marionette.DriverOptions.DefaultWaitForDuration.init -> void
 Askaiser.Marionette.DriverOptions.DriverOptions() -> void
 Askaiser.Marionette.DriverOptions.FailureScreenshotPath.get -> string?
 Askaiser.Marionette.DriverOptions.FailureScreenshotPath.init -> void
+Askaiser.Marionette.DriverOptions.FailureVideoDuration.get -> System.TimeSpan
+Askaiser.Marionette.DriverOptions.FailureVideoDuration.init -> void
+Askaiser.Marionette.DriverOptions.FailureVideoPath.get -> string?
+Askaiser.Marionette.DriverOptions.FailureVideoPath.init -> void
 Askaiser.Marionette.DriverOptions.MouseSpeed.get -> Askaiser.Marionette.MouseSpeed
 Askaiser.Marionette.DriverOptions.MouseSpeed.init -> void
 Askaiser.Marionette.DriverOptions.ScreenshotCacheDuration.get -> System.TimeSpan

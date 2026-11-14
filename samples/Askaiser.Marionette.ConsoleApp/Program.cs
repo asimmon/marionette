@@ -8,8 +8,10 @@ public static class Program
     {
         var options = new DriverOptions
         {
-            // When an element cannot be found, a screenshot of what was searched is saved here
-            FailureScreenshotPath = Path.Combine(Path.GetTempPath(), "marionette-sample-failures"),
+            // When an element cannot be found, a video of what the screen displayed during the last seconds is saved here.
+            // It is an animated PNG file: open it with a web browser. Use FailureScreenshotPath to save a screenshot instead.
+            FailureVideoPath = Path.Combine(Path.GetTempPath(), "marionette-sample-failures"),
+            FailureVideoDuration = TimeSpan.FromSeconds(5),
             MouseSpeed = MouseSpeed.Fast,
         };
 

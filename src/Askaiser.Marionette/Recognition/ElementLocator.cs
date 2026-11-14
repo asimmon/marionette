@@ -23,16 +23,18 @@ internal sealed partial class ElementLocator
     private readonly DriverOptions _options;
     private readonly ScreenService _screen;
     private readonly IReadOnlyList<IElementRecognizer> _recognizers;
-    private readonly IFailureScreenshotWriter _failureWriter;
+    private readonly IFailureFileWriter _failureWriter;
+    private readonly ScreenRecorder? _recorder;
     private readonly TimeProvider _timeProvider;
     private readonly Func<ScreenFrame, IElement, Rectangle, CancellationToken, Task<IReadOnlyList<Rectangle>>> _recognize;
 
-    public ElementLocator(DriverOptions options, ScreenService screen, IReadOnlyList<IElementRecognizer> recognizers, IFailureScreenshotWriter failureWriter, TimeProvider timeProvider)
+    public ElementLocator(DriverOptions options, ScreenService screen, IReadOnlyList<IElementRecognizer> recognizers, IFailureFileWriter failureWriter, ScreenRecorder? recorder, TimeProvider timeProvider)
     {
         this._options = options;
         this._screen = screen;
         this._recognizers = recognizers;
         this._failureWriter = failureWriter;
+        this._recorder = recorder;
         this._timeProvider = timeProvider;
         this._recognize = this.RecognizeAsync;
     }
@@ -73,10 +75,10 @@ internal sealed partial class ElementLocator
         return new SearchResultCollection(search.Results);
     }
 
-    private static string MakeFailureScreenshotFileName(IElement element, DateTimeOffset now)
+    private static string MakeFailureFileName(IElement element, DateTimeOffset now)
     {
         var descriptor = NotAlphanumericRegex().Replace(WhitespaceRegex().Replace(element.ToString()?.Trim() ?? string.Empty, "-"), string.Empty);
-        return Messages.FailureScreenshotFileNameFormat.FormatInvariant(now.UtcDateTime, descriptor.ToLowerInvariant());
+        return Messages.FailureFileNameFormat.FormatInvariant(now.UtcDateTime, descriptor.ToLowerInvariant());
     }
 
     [GeneratedRegex("[^a-z0-9\\-]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 1000)]
@@ -264,7 +266,7 @@ internal sealed partial class ElementLocator
                 }
                 catch (MarionetteException)
                 {
-                    await this.SaveFailureScreenshotAsync(search, result.Element).ConfigureAwait(false);
+                    await this.SaveFailureAsync(search, result.Element).ConfigureAwait(false);
                     throw;
                 }
             }
@@ -287,13 +289,21 @@ internal sealed partial class ElementLocator
     }
 
     /// <summary>
-    /// Saves the part of the screen that was searched when an element could not be found.
+    /// Saves what the screen displayed when an element could not be found: a video of the last moments when the screen is recorded,
+    /// a screenshot of the searched region otherwise.
     /// </summary>
     /// <remarks>
     /// This is not canceled along with the search: the search already failed, and what explains why is worth the few milliseconds it takes to write.
     /// </remarks>
-    private async Task SaveFailureScreenshotAsync(Search search, IElement element)
+    private async Task SaveFailureAsync(Search search, IElement element)
     {
+        if (this._recorder != null)
+        {
+            var videoPath = Path.Combine(this._options.FailureVideoPath!, MakeFailureFileName(element, this._timeProvider.GetUtcNow()));
+            await this._recorder.SaveAsync(search.Frame, videoPath, this._failureWriter).ConfigureAwait(false);
+            return;
+        }
+
         if (this._options.FailureScreenshotPath == null)
         {
             return;
@@ -306,8 +316,8 @@ internal sealed partial class ElementLocator
             png = ImageCodec.EncodePng(cropped.Span, cropped.Width, cropped.Height);
         }
 
-        var fileName = MakeFailureScreenshotFileName(element, this._timeProvider.GetUtcNow());
-        await this._failureWriter.SaveAsync(Path.Combine(this._options.FailureScreenshotPath, fileName), png).ConfigureAwait(false);
+        var path = Path.Combine(this._options.FailureScreenshotPath, MakeFailureFileName(element, this._timeProvider.GetUtcNow()));
+        await this._failureWriter.SaveAsync(path, png, CancellationToken.None).ConfigureAwait(false);
     }
 
     private sealed record Search(SearchResult[] Results, ScreenFrame Frame, Rectangle Region);

@@ -29,6 +29,7 @@ public sealed class MarionetteDriver : IDisposable
 {
     private readonly DesktopPlatform _platform;
     private readonly ScreenService _screen;
+    private readonly ScreenRecorder? _recorder;
     private readonly ElementLocator _locator;
     private readonly MouseController _mouse;
     private readonly KeyboardController _keyboard;
@@ -45,17 +46,24 @@ public sealed class MarionetteDriver : IDisposable
         DriverOptions options,
         DesktopPlatform platform,
         IReadOnlyList<IElementRecognizer> recognizers,
-        IFailureScreenshotWriter failureWriter,
+        IFailureFileWriter failureWriter,
         InputTimings timings,
+        ScreenRecorderSettings recorderSettings,
         TimeProvider timeProvider,
         params IDisposable[] disposables)
     {
+        if (options.FailureScreenshotPath != null && options.FailureVideoPath != null)
+        {
+            throw new ArgumentException(Messages.DriverOptions_Throw_FailureScreenshotAndVideo, nameof(options));
+        }
+
         this._platform = platform;
         this._timeProvider = timeProvider;
         this._disposables = disposables;
 
         this._screen = new ScreenService(platform.Display, options.ScreenshotCacheDuration);
-        this._locator = new ElementLocator(options, this._screen, recognizers, failureWriter, timeProvider);
+        this._recorder = options.FailureVideoPath != null ? new ScreenRecorder(this._screen, options.FailureVideoDuration, recorderSettings, timeProvider) : null;
+        this._locator = new ElementLocator(options, this._screen, recognizers, failureWriter, this._recorder, timeProvider);
         this._mouse = new MouseController(platform.Mouse, timings, timeProvider);
         this._keyboard = new KeyboardController(platform.Keyboard, timings);
 
@@ -63,6 +71,8 @@ public sealed class MarionetteDriver : IDisposable
         this._mouseSpeed = options.MouseSpeed;
         this._defaultWaitForDuration = options.DefaultWaitForDuration;
         this._defaultKeyboardSleepAfterDuration = options.DefaultKeyboardSleepAfterDuration;
+
+        this._recorder?.Start();
     }
 
     /// <summary>
@@ -78,16 +88,22 @@ public sealed class MarionetteDriver : IDisposable
     /// Creates a driver for the desktop of the current user.
     /// </summary>
     /// <param name="options">The settings of the driver.</param>
+    /// <exception cref="ArgumentException">The options ask for both screenshots and videos of failures.</exception>
     /// <exception cref="PlatformNotSupportedException">The operating system is not Windows, Linux with X11, or macOS.</exception>
     public static MarionetteDriver Create(DriverOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
 
+        if (options.FailureScreenshotPath != null && options.FailureVideoPath != null)
+        {
+            throw new ArgumentException(Messages.DriverOptions_Throw_FailureScreenshotAndVideo, nameof(options));
+        }
+
         var platform = DesktopPlatform.Create();
         var textRecognizer = new TextElementRecognizer(options.TextRecognitionModel);
         IElementRecognizer[] recognizers = [new ImageElementRecognizer(), textRecognizer];
 
-        return new MarionetteDriver(options, platform, recognizers, new FailureScreenshotWriter(), InputTimings.Default, TimeProvider.System, textRecognizer);
+        return new MarionetteDriver(options, platform, recognizers, new FailureFileWriter(), InputTimings.Default, ScreenRecorderSettings.Default, TimeProvider.System, textRecognizer);
     }
 
     /// <summary>
@@ -419,6 +435,7 @@ public sealed class MarionetteDriver : IDisposable
         ArgumentOutOfRangeException.ThrowIfNegative(monitorIndex);
 
         this._monitorIndex = monitorIndex;
+        this._recorder?.MonitorIndex = monitorIndex;
         return this;
     }
 
@@ -484,7 +501,7 @@ public sealed class MarionetteDriver : IDisposable
     }
 
     /// <summary>
-    /// Releases the resources of the driver, such as the text recognition model.
+    /// Releases the resources of the driver: it stops recording the screen and unloads the text recognition model.
     /// Operations in progress should be completed or canceled first.
     /// </summary>
     public void Dispose()
@@ -494,6 +511,7 @@ public sealed class MarionetteDriver : IDisposable
             return;
         }
 
+        this._recorder?.Dispose();
         this._screen.Dispose();
 
         foreach (var disposable in this._disposables)

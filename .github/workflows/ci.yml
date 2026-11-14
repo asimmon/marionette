@@ -75,3 +75,4 @@ jobs:
           path: |
             TestResults/
             tests/**/bin/Release/**/desktop-failures/
+            tests/**/bin/Release/**/desktop-videos/

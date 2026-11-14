@@ -205,7 +205,7 @@ public class MarionetteDriverSearchTests
         var searchRect = withSearchRectangle ? new Rectangle(100, 200, 400, 600) : null;
         await Assert.ThrowsAsync<ElementNotFoundException>(() => fixture.Driver.WaitForAsync(needle, searchRect: searchRect, cancellationToken: cancellationToken));
 
-        var (path, image) = await Assert.That(fixture.FailureWriter.Saved).HasSingleItem();
+        var (path, image, _) = await Assert.That(fixture.FailureWriter.Saved).HasSingleItem();
         await Assert.That(path).StartsWith("failures");
         await Assert.That(path).EndsWith("_my-needle-1.png");
         await Assert.That((image.Width, image.Height)).IsEqualTo(withSearchRectangle ? (300, 400) : (1920, 1080));
