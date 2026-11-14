@@ -3,6 +3,9 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.Intrinsics;
+using System.Runtime.Intrinsics.Arm;
+using System.Runtime.Intrinsics.X86;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -351,35 +354,59 @@ internal static class TemplateMatcher
     /// <summary>
     /// Computes the dot product between the kernel of a level and the block sums under it, at a single position.
     /// </summary>
-    private static double CorrelateAt(BlockSums sums, CoarseLevel level, int x, int y)
+    private static unsafe double CorrelateAt(BlockSums sums, CoarseLevel level, int x, int y)
     {
         var blockSize = level.BlockSize;
         var kernelWidth = level.KernelWidth;
-        var values = sums.Values.AsSpan();
         var offset = sums.PhaseOffsets[x % blockSize] + (x / blockSize);
+        var rowLength = sums.RowLength;
         var total = 0.0;
 
-        for (var ky = 0; ky < level.KernelHeight; ky++)
+        fixed (float* values = sums.Values)
+        fixed (float* kernels = level.Kernel)
         {
-            var row = values.Slice(((y + (ky * blockSize)) * sums.RowLength) + offset, kernelWidth);
-            var kernel = level.Kernel.AsSpan(ky * kernelWidth, kernelWidth);
-            var i = 0;
-
-            if (Vector.IsHardwareAccelerated && kernelWidth >= Vector<float>.Count)
+            for (var ky = 0; ky < level.KernelHeight; ky++)
             {
-                var acc = Vector<float>.Zero;
-                for (; i <= kernelWidth - Vector<float>.Count; i += Vector<float>.Count)
-                {
-                    acc = MultiplyAdd(new Vector<float>(kernel.Slice(i)), new Vector<float>(row.Slice(i)), acc);
-                }
+                total += Dot(kernels + ((long)ky * kernelWidth), values + (((long)(y + (ky * blockSize)) * rowLength) + offset), kernelWidth);
+            }
+        }
 
-                total += Vector.Sum(acc);
+        return total;
+    }
+
+    /// <summary>
+    /// Dot product of two float rows. Several independent accumulators hide the latency of the fused multiply-add,
+    /// which would otherwise limit the loop to a quarter of what the processor can do.
+    /// </summary>
+    private static unsafe float Dot(float* a, float* b, int length)
+    {
+        var i = 0;
+        var total = 0f;
+
+        if (Vector.IsHardwareAccelerated && length >= Vector<float>.Count)
+        {
+            var size = Vector<float>.Count;
+            Vector<float> acc0 = Vector<float>.Zero, acc1 = Vector<float>.Zero, acc2 = Vector<float>.Zero, acc3 = Vector<float>.Zero;
+
+            for (; i <= length - (4 * size); i += 4 * size)
+            {
+                acc0 = MultiplyAdd(Unsafe.ReadUnaligned<Vector<float>>(a + i), Unsafe.ReadUnaligned<Vector<float>>(b + i), acc0);
+                acc1 = MultiplyAdd(Unsafe.ReadUnaligned<Vector<float>>(a + i + size), Unsafe.ReadUnaligned<Vector<float>>(b + i + size), acc1);
+                acc2 = MultiplyAdd(Unsafe.ReadUnaligned<Vector<float>>(a + i + (2 * size)), Unsafe.ReadUnaligned<Vector<float>>(b + i + (2 * size)), acc2);
+                acc3 = MultiplyAdd(Unsafe.ReadUnaligned<Vector<float>>(a + i + (3 * size)), Unsafe.ReadUnaligned<Vector<float>>(b + i + (3 * size)), acc3);
             }
 
-            for (; i < kernelWidth; i++)
+            for (; i <= length - size; i += size)
             {
-                total += kernel[i] * row[i];
+                acc0 = MultiplyAdd(Unsafe.ReadUnaligned<Vector<float>>(a + i), Unsafe.ReadUnaligned<Vector<float>>(b + i), acc0);
             }
+
+            total = Vector.Sum((acc0 + acc1) + (acc2 + acc3));
+        }
+
+        for (; i < length; i++)
+        {
+            total += a[i] * b[i];
         }
 
         return total;
@@ -570,7 +597,15 @@ internal static class TemplateMatcher
     {
         var i = 0;
 
-        if (Vector.IsHardwareAccelerated && Vector<byte>.Count >= 16 && window.Length >= Vector<byte>.Count)
+        if (Avx2.IsSupported && window.Length >= 32)
+        {
+            i = AccumulateColorRowAvx2(window, reference, ref dot, ref sumB, ref sumG, ref sumR, ref squares);
+        }
+        else if (AdvSimd.Arm64.IsSupported && window.Length >= 16)
+        {
+            i = AccumulateColorRowNeon(window, reference, ref dot, ref sumB, ref sumG, ref sumR, ref squares);
+        }
+        else if (Vector.IsHardwareAccelerated && Vector<byte>.Count >= 16 && window.Length >= Vector<byte>.Count)
         {
             // Lanes of the 32-bit accumulators cycle through B, G, R, A. The alpha lane is ignored:
             // the template alpha is zero, and window alpha is excluded from the sums below.
@@ -583,14 +618,18 @@ internal static class TemplateMatcher
             {
                 Vector.Widen(new Vector<byte>(window.Slice(i)), out var wlo, out var whi);
                 Vector.Widen(new Vector<byte>(reference.Slice(i)), out var rlo, out var rhi);
+
+                // The product of two bytes fits in 16 bits: multiplying 16-bit lanes is much cheaper than 32-bit ones.
+                Vector.Widen(wlo * rlo, out var d0, out var d1);
+                Vector.Widen(whi * rhi, out var d2, out var d3);
+                Vector.Widen(wlo * wlo, out var s0, out var s1);
+                Vector.Widen(whi * whi, out var s2, out var s3);
                 Vector.Widen(wlo, out var w0, out var w1);
                 Vector.Widen(whi, out var w2, out var w3);
-                Vector.Widen(rlo, out var r0, out var r1);
-                Vector.Widen(rhi, out var r2, out var r3);
 
-                dots += (w0 * r0) + (w1 * r1) + (w2 * r2) + (w3 * r3);
-                sums += w0 + w1 + w2 + w3;
-                squared += (w0 * w0) + (w1 * w1) + (w2 * w2) + (w3 * w3);
+                dots += (d0 + d1) + (d2 + d3);
+                squared += (s0 + s1) + (s2 + s3);
+                sums += (w0 + w1) + (w2 + w3);
 
                 if (++pending == 4096)
                 {
@@ -611,6 +650,141 @@ internal static class TemplateMatcher
             sumG += g;
             sumR += r;
             squares += (b * b) + (g * g) + (r * r);
+        }
+    }
+
+    /// <summary>
+    /// Accumulates 32 bytes (8 pixels) per iteration with <c>vpmaddwd</c>, which multiplies 16-bit lanes and adds neighbors in one instruction.
+    /// </summary>
+    /// <returns>The number of bytes that were processed, a multiple of 32.</returns>
+    private static unsafe int AccumulateColorRowAvx2(ReadOnlySpan<byte> window, ReadOnlySpan<byte> reference, ref long dot, ref long sumB, ref long sumG, ref long sumR, ref long squares)
+    {
+        // Window alpha must not count in sums and squares. The template alpha is zero, so the dot product is not affected.
+        var mask = Vector256.Create(0x00FFFFFFu).AsByte();
+        var zero = Vector256<byte>.Zero;
+        var dots = Vector256<int>.Zero;
+        var squared = Vector256<int>.Zero;
+        var sums = Vector256<ushort>.Zero;
+        var pending = 0;
+        var i = 0;
+
+        fixed (byte* windowPointer = window)
+        fixed (byte* referencePointer = reference)
+        {
+            for (; i <= window.Length - 32; i += 32)
+            {
+                var pixels = Avx2.And(Avx.LoadVector256(windowPointer + i), mask);
+                var template = Avx.LoadVector256(referencePointer + i);
+
+                // Unpacking works within each 128-bit half. It does not matter that lanes are not in memory order, as long as both sides are unpacked the same way.
+                var wlo = Avx2.UnpackLow(pixels, zero).AsInt16();
+                var whi = Avx2.UnpackHigh(pixels, zero).AsInt16();
+                var rlo = Avx2.UnpackLow(template, zero).AsInt16();
+                var rhi = Avx2.UnpackHigh(template, zero).AsInt16();
+
+                dots = Avx2.Add(dots, Avx2.Add(Avx2.MultiplyAddAdjacent(wlo, rlo), Avx2.MultiplyAddAdjacent(whi, rhi)));
+                squared = Avx2.Add(squared, Avx2.Add(Avx2.MultiplyAddAdjacent(wlo, wlo), Avx2.MultiplyAddAdjacent(whi, whi)));
+
+                // 16-bit lanes keep their channel (lane % 4) and can take 128 additions of two bytes before they overflow.
+                sums = Avx2.Add(sums, Avx2.Add(wlo.AsUInt16(), whi.AsUInt16()));
+
+                if (++pending == 128)
+                {
+                    FlushSums(sums, ref sumB, ref sumG, ref sumR);
+                    sums = Vector256<ushort>.Zero;
+                    dot += Vector256.Sum(dots);
+                    squares += Vector256.Sum(squared);
+                    dots = squared = Vector256<int>.Zero;
+                    pending = 0;
+                }
+            }
+        }
+
+        FlushSums(sums, ref sumB, ref sumG, ref sumR);
+        dot += Vector256.Sum(dots);
+        squares += Vector256.Sum(squared);
+        return i;
+    }
+
+    /// <summary>
+    /// Same as <see cref="AccumulateColorRowAvx2"/> for ARM: widening multiplications whose neighbors are added into 32-bit lanes (<c>umull</c> and <c>uadalp</c>).
+    /// </summary>
+    /// <returns>The number of bytes that were processed, a multiple of 16.</returns>
+    private static unsafe int AccumulateColorRowNeon(ReadOnlySpan<byte> window, ReadOnlySpan<byte> reference, ref long dot, ref long sumB, ref long sumG, ref long sumR, ref long squares)
+    {
+        var mask = Vector128.Create(0x00FFFFFFu).AsByte();
+        var dots = Vector128<uint>.Zero;
+        var squared = Vector128<uint>.Zero;
+        var sums = Vector128<ushort>.Zero;
+        var pending = 0;
+        var i = 0;
+
+        fixed (byte* windowPointer = window)
+        fixed (byte* referencePointer = reference)
+        {
+            for (; i <= window.Length - 16; i += 16)
+            {
+                var pixels = AdvSimd.And(AdvSimd.LoadVector128(windowPointer + i), mask);
+                var template = AdvSimd.LoadVector128(referencePointer + i);
+                var pixelsLow = pixels.GetLower();
+                var pixelsHigh = pixels.GetUpper();
+
+                dots = AdvSimd.AddPairwiseWideningAndAdd(dots, AdvSimd.MultiplyWideningLower(pixelsLow, template.GetLower()));
+                dots = AdvSimd.AddPairwiseWideningAndAdd(dots, AdvSimd.MultiplyWideningLower(pixelsHigh, template.GetUpper()));
+                squared = AdvSimd.AddPairwiseWideningAndAdd(squared, AdvSimd.MultiplyWideningLower(pixelsLow, pixelsLow));
+                squared = AdvSimd.AddPairwiseWideningAndAdd(squared, AdvSimd.MultiplyWideningLower(pixelsHigh, pixelsHigh));
+                sums = AdvSimd.Add(sums, AdvSimd.Add(AdvSimd.ZeroExtendWideningLower(pixelsLow), AdvSimd.ZeroExtendWideningLower(pixelsHigh)));
+
+                if (++pending == 128)
+                {
+                    FlushSums(sums, ref sumB, ref sumG, ref sumR);
+                    sums = Vector128<ushort>.Zero;
+                    dot += Vector128.Sum(dots);
+                    squares += Vector128.Sum(squared);
+                    dots = squared = Vector128<uint>.Zero;
+                    pending = 0;
+                }
+            }
+        }
+
+        FlushSums(sums, ref sumB, ref sumG, ref sumR);
+        dot += Vector128.Sum(dots);
+        squares += Vector128.Sum(squared);
+        return i;
+    }
+
+    private static void FlushSums(Vector256<ushort> sums, ref long sumB, ref long sumG, ref long sumR)
+    {
+        for (var lane = 0; lane < Vector256<ushort>.Count; lane++)
+        {
+            AddToChannel(lane, sums.GetElement(lane), ref sumB, ref sumG, ref sumR);
+        }
+    }
+
+    private static void FlushSums(Vector128<ushort> sums, ref long sumB, ref long sumG, ref long sumR)
+    {
+        for (var lane = 0; lane < Vector128<ushort>.Count; lane++)
+        {
+            AddToChannel(lane, sums.GetElement(lane), ref sumB, ref sumG, ref sumR);
+        }
+    }
+
+    /// <summary>Lanes cycle through the channels of a pixel: B, G, R, then A which is ignored.</summary>
+    private static void AddToChannel(int lane, ushort value, ref long sumB, ref long sumG, ref long sumR)
+    {
+        switch (lane & 3)
+        {
+            case 0:
+                sumB += value;
+                break;
+            case 1:
+                sumG += value;
+                break;
+            case 2:
+                sumR += value;
+                break;
+            default:
+                break;
         }
     }
 
