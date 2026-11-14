@@ -61,9 +61,10 @@ jobs:
 
       - name: Desktop tests (macOS)
         if: runner.os == 'macOS'
+        timeout-minutes: 8
         env:
           MARIONETTE_DESKTOP_TESTS: "1"
-        run: dotnet test --project tests/Askaiser.Marionette.Tests -c Release --no-build --treenode-filter "/*/*/DesktopTests/*"
+        run: dotnet test --project tests/Askaiser.Marionette.Tests -c Release --no-build --treenode-filter "/*/*/DesktopTests/*" --timeout 6m --output Detailed
 
       - name: Upload test results
         if: always()
