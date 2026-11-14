@@ -61,10 +61,39 @@ jobs:
 
       - name: Desktop tests (macOS)
         if: runner.os == 'macOS'
-        timeout-minutes: 8
+        timeout-minutes: 10
         env:
           MARIONETTE_DESKTOP_TESTS: "1"
-        run: dotnet test --project tests/Askaiser.Marionette.Tests -c Release --no-build --treenode-filter "/*/*/DesktopTests/*" --timeout 6m --output Detailed
+        run: |
+          dotnet test --project tests/Askaiser.Marionette.Tests -c Release --no-build --treenode-filter "/*/*/DesktopTests/*" --timeout 6m --output Detailed &
+          tests=$!
+
+          # Tests that hang are described, then killed along with the browser they started: this step would not end while they run.
+          (
+            sleep 300 > /dev/null 2>&1 < /dev/null
+            echo "::error::The desktop tests did not complete in 5 minutes."
+            mkdir -p TestResults/hang
+            screencapture -x TestResults/hang/screen.png || true
+            ps -axo pid,ppid,etime,%cpu,rss,command > TestResults/hang/processes.txt || true
+            dotnet tool install --tool-path TestResults/hang/tools dotnet-stack > /dev/null 2>&1 || true
+            for pid in $(pgrep -f "Askaiser.Marionette.Tests"); do
+              if ps -p "$pid" -o command= | grep -q -e "Chrome" -e "Edge" -e "Chromium"; then continue; fi
+              sample "$pid" 2 -file "TestResults/hang/native-stacks-$pid.txt" > /dev/null 2>&1 || true
+              TestResults/hang/tools/dotnet-stack report --process-id "$pid" > "TestResults/hang/managed-stacks-$pid.txt" 2>&1 &
+              stacks=$!
+              (sleep 30 > /dev/null 2>&1 < /dev/null; kill -9 "$stacks" 2> /dev/null) &
+              wait "$stacks" || true
+            done
+            rm -rf TestResults/hang/tools
+            pkill -9 -f "marionette-tests-" || true
+            pkill -9 -f "Askaiser.Marionette.Tests" || true
+          ) &
+          watchdog=$!
+
+          status=0
+          wait "$tests" || status=$?
+          kill "$watchdog" 2> /dev/null || true
+          exit "$status"
 
       - name: Upload test results
         if: always()
