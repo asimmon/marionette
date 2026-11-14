@@ -37,16 +37,28 @@ public class MarionetteDriverCancellationTests
     {
         using var fixture = new DriverFixture(new DriverOptions { FailureScreenshotPath = "failures" });
         var needle = new FakeElement("needle");
-        fixture.Recognizer.Setup(needle);
+        // The element is never found: once it was searched twice, the driver waits before it searches again, or will shortly.
+        var searchedTwice = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        fixture.Recognizer.Setup(needle, attempt =>
+        {
+            if (attempt == 2)
+            {
+                searchedTwice.SetResult();
+            }
+
+            return [];
+        });
 
         using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        cancellation.CancelAfter(TimeSpan.FromMilliseconds(200));
 
         var watch = Stopwatch.StartNew();
-        await Assert.ThrowsAsync<OperationCanceledException>(() => fixture.Driver.WaitForAsync(needle, waitFor: Forever, cancellationToken: cancellation.Token));
+        var search = fixture.Driver.WaitForAsync(needle, waitFor: Forever, cancellationToken: cancellation.Token);
 
+        await searchedTwice.Task.WaitAsync(cancellationToken);
+        await cancellation.CancelAsync();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() => search);
         await Assert.That(watch.Elapsed).IsLessThan(TimeSpan.FromSeconds(30));
-        await Assert.That(fixture.Recognizer.CallCount).IsGreaterThan(1);
 
         // A canceled search did not fail: there is nothing to explain with a screenshot.
         await Assert.That(fixture.FailureWriter.Saved).IsEmpty();
