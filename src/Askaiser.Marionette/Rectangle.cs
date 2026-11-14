@@ -8,6 +8,14 @@ namespace Askaiser.Marionette;
 /// </summary>
 public record Rectangle
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Rectangle"/> class from the coordinates of its edges.
+    /// </summary>
+    /// <param name="left">The X coordinate of the left edge, which is the first column of pixels inside the rectangle.</param>
+    /// <param name="top">The Y coordinate of the top edge, which is the first row of pixels inside the rectangle.</param>
+    /// <param name="right">The X coordinate of the right edge, which is the first column of pixels after the rectangle.</param>
+    /// <param name="bottom">The Y coordinate of the bottom edge, which is the first row of pixels after the rectangle.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="left"/> is greater than <paramref name="right"/>, or <paramref name="top"/> is greater than <paramref name="bottom"/>.</exception>
     public Rectangle(int left, int top, int right, int bottom)
     {
         if (left > right)
@@ -26,39 +34,60 @@ public record Rectangle
         this.Bottom = bottom;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Rectangle"/> class from two opposite corners.
+    /// </summary>
+    /// <param name="topLeft">The top-left corner, which is inside the rectangle.</param>
+    /// <param name="bottomRight">The bottom-right corner, which is just outside the rectangle.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="topLeft"/> is on the right of, or below, <paramref name="bottomRight"/>.</exception>
     public Rectangle(Point topLeft, Point bottomRight)
         : this(topLeft.X, topLeft.Y, bottomRight.X, bottomRight.Y)
     {
     }
 
+    /// <summary>Gets the X coordinate of the left edge, which is the first column of pixels inside the rectangle.</summary>
     public int Left { get; private init; }
 
+    /// <summary>Gets the Y coordinate of the top edge, which is the first row of pixels inside the rectangle.</summary>
     public int Top { get; private init; }
 
+    /// <summary>Gets the X coordinate of the right edge, which is the first column of pixels after the rectangle.</summary>
     public int Right { get; private init; }
 
+    /// <summary>Gets the Y coordinate of the bottom edge, which is the first row of pixels after the rectangle.</summary>
     public int Bottom { get; private init; }
 
+    /// <summary>Gets the width of the rectangle in pixels.</summary>
     public int Width => this.Right - this.Left;
 
+    /// <summary>Gets the height of the rectangle in pixels.</summary>
     public int Height => this.Bottom - this.Top;
 
+    /// <summary>Gets the top-left corner of the rectangle.</summary>
     public Point TopLeft => new Point(this.Left, this.Top);
 
+    /// <summary>Gets the top-right corner of the rectangle.</summary>
     public Point TopRight => new Point(this.Right, this.Top);
 
+    /// <summary>Gets the bottom-left corner of the rectangle.</summary>
     public Point BottomLeft => new Point(this.Left, this.Bottom);
 
+    /// <summary>Gets the bottom-right corner of the rectangle.</summary>
     public Point BottomRight => new Point(this.Right, this.Bottom);
 
+    /// <summary>Gets the middle of the left edge of the rectangle.</summary>
     public Point CenterLeft => new Point(this.Left, this.Center.Y);
 
+    /// <summary>Gets the middle of the right edge of the rectangle.</summary>
     public Point CenterRight => new Point(this.Right, this.Center.Y);
 
+    /// <summary>Gets the middle of the top edge of the rectangle.</summary>
     public Point CenterTop => new Point(this.Center.X, this.Top);
 
+    /// <summary>Gets the middle of the bottom edge of the rectangle.</summary>
     public Point CenterBottom => new Point(this.Center.X, this.Bottom);
 
+    /// <summary>Gets the center of the rectangle. This is where mouse actions on an element happen.</summary>
     public Point Center
     {
         get
@@ -69,6 +98,11 @@ public record Rectangle
         }
     }
 
+    /// <summary>
+    /// Moves a rectangle by a horizontal and a vertical distance, without changing its size.
+    /// </summary>
+    /// <param name="rect">The rectangle to move.</param>
+    /// <param name="xy">The distances, in pixels, to add to the X and Y coordinates.</param>
     public static Rectangle operator +(Rectangle rect, ValueTuple<int, int> xy) => rect with
     {
         Left = rect.Left + xy.Item1,
@@ -77,6 +111,11 @@ public record Rectangle
         Bottom = rect.Bottom + xy.Item2,
     };
 
+    /// <summary>
+    /// Moves a rectangle by a horizontal and a vertical distance in the opposite direction, without changing its size.
+    /// </summary>
+    /// <param name="rect">The rectangle to move.</param>
+    /// <param name="xy">The distances, in pixels, to subtract from the X and Y coordinates.</param>
     public static Rectangle operator -(Rectangle rect, ValueTuple<int, int> xy) => rect with
     {
         Left = rect.Left - xy.Item1,
@@ -85,10 +124,28 @@ public record Rectangle
         Bottom = rect.Bottom - xy.Item2,
     };
 
+    /// <summary>
+    /// Moves a rectangle by the coordinates of a point, without changing its size.
+    /// This converts a rectangle relative to a monitor into desktop coordinates when the point is the top-left corner of the monitor.
+    /// </summary>
+    /// <param name="rect">The rectangle to move.</param>
+    /// <param name="xy">The point whose coordinates are added to those of the rectangle.</param>
     public static Rectangle operator +(Rectangle rect, Point xy) => rect + (xy.X, xy.Y);
 
+    /// <summary>
+    /// Moves a rectangle by the coordinates of a point in the opposite direction, without changing its size.
+    /// This converts a rectangle in desktop coordinates into a rectangle relative to a monitor when the point is the top-left corner of the monitor.
+    /// </summary>
+    /// <param name="rect">The rectangle to move.</param>
+    /// <param name="xy">The point whose coordinates are subtracted from those of the rectangle.</param>
     public static Rectangle operator -(Rectangle rect, Point xy) => rect - (xy.X, xy.Y);
 
+    /// <summary>
+    /// Scales a rectangle from the origin: the coordinates of its edges are multiplied by a horizontal and a vertical factor, then rounded.
+    /// Both the position and the size of the rectangle change.
+    /// </summary>
+    /// <param name="rect">The rectangle to scale.</param>
+    /// <param name="xy">The factors that the X and Y coordinates are multiplied by.</param>
     public static Rectangle operator *(Rectangle rect, ValueTuple<double, double> xy) => rect with
     {
         Left = (int)Math.Round(rect.Left * xy.Item1),
@@ -97,8 +154,21 @@ public record Rectangle
         Bottom = (int)Math.Round(rect.Bottom * xy.Item2),
     };
 
+    /// <summary>
+    /// Scales a rectangle from the origin: the coordinates of its edges are divided by a horizontal and a vertical factor, then rounded.
+    /// Both the position and the size of the rectangle change.
+    /// </summary>
+    /// <param name="rect">The rectangle to scale.</param>
+    /// <param name="xy">The factors that the X and Y coordinates are divided by.</param>
     public static Rectangle operator /(Rectangle rect, ValueTuple<double, double> xy) => rect * (1d / xy.Item1, 1d / xy.Item2);
 
+    /// <summary>
+    /// Deconstructs the rectangle into the coordinates of its edges.
+    /// </summary>
+    /// <param name="left">The X coordinate of the left edge.</param>
+    /// <param name="top">The Y coordinate of the top edge.</param>
+    /// <param name="right">The X coordinate of the right edge, which is exclusive.</param>
+    /// <param name="bottom">The Y coordinate of the bottom edge, which is exclusive.</param>
     public void Deconstruct(out int left, out int top, out int right, out int bottom)
     {
         left = this.Left;
@@ -207,6 +277,7 @@ public record Rectangle
         return new Rectangle(left, top, right, bottom);
     }
 
+    /// <summary>Returns the coordinates of the edges of the rectangle, formatted as <c>(left,top,right,bottom)</c>.</summary>
     public override string ToString()
     {
         return Messages.Rectangle_ToString.FormatInvariant(this.Left, this.Top, this.Right, this.Bottom);

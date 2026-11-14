@@ -136,6 +136,7 @@ public sealed class ImageElement : IElement
         }
     }
 
+    /// <summary>Returns the name of the element.</summary>
     public override string ToString()
     {
         return this.Name;

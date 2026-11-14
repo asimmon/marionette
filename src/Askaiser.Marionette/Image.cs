@@ -150,6 +150,7 @@ public sealed class Image
         ImageCodec.EncodePng(this._bgra, this.Width, this.Height, stream);
     }
 
+    /// <summary>Returns the size of the image, formatted as <c>Image widthxheight</c>.</summary>
     public override string ToString()
     {
         return "Image " + this.Width.ToString(System.Globalization.CultureInfo.InvariantCulture) + "x" + this.Height.ToString(System.Globalization.CultureInfo.InvariantCulture);

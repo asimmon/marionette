@@ -12,6 +12,13 @@ public sealed class TextElement : IElement
     private readonly string _name = string.Empty;
     private readonly string _content = string.Empty;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TextElement"/> class with a name. The case of letters is ignored unless <see cref="IgnoreCase"/> is set to false.
+    /// </summary>
+    /// <param name="name">The name of the element.</param>
+    /// <param name="content">The text to look for.</param>
+    /// <param name="options">The preprocessing applied to the screen before text recognition.</param>
+    /// <exception cref="ArgumentException"><paramref name="name"/> or <paramref name="content"/> is null or empty.</exception>
     public TextElement(string name, string content, TextOptions options)
     {
         this.Name = name;
@@ -20,6 +27,12 @@ public sealed class TextElement : IElement
         this.IgnoreCase = true;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TextElement"/> class with a generated unique name. The case of letters is ignored unless <see cref="IgnoreCase"/> is set to false.
+    /// </summary>
+    /// <param name="content">The text to look for.</param>
+    /// <param name="options">The preprocessing applied to the screen before text recognition.</param>
+    /// <exception cref="ArgumentException"><paramref name="content"/> is null or empty.</exception>
     public TextElement(string content, TextOptions options = TextOptions.None)
         : this(Guid.NewGuid().ToString("N"), content, options)
     {
@@ -53,6 +66,7 @@ public sealed class TextElement : IElement
     /// </summary>
     public bool IgnoreCase { get; init; }
 
+    /// <summary>Returns the text to look for.</summary>
     public override string ToString()
     {
         return this.Content;

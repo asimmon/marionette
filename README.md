@@ -7,10 +7,10 @@ It runs on **Windows, Linux (X11) and macOS** with .NET 10 or later.
 ```csharp
 using var driver = MarionetteDriver.Create();
 
-await driver.ClickAsync("Sign in");                       // read the screen, click the text
-await driver.ClickAsync(MyLibrary.Instance.LoginButton);  // or an image from your own library
+await driver.SingleClickAsync("Sign in");                       // read the screen, click the text
+await driver.SingleClickAsync(MyLibrary.Instance.LoginButton);  // or an image from your own library
 await driver.TypeTextAsync("jane.doe@example.com");
-await driver.PressAsync(VirtualKeyCode.Enter);
+await driver.KeyPressAsync(VirtualKeyCode.Enter);
 await driver.WaitForAsync("Welcome back");
 ```
 
@@ -36,10 +36,10 @@ Everything is searched on the current monitor by default; pass a `searchRect` to
 await driver.IsVisibleAsync("Settings");
 await driver.WaitForAsync("Saved", waitFor: TimeSpan.FromSeconds(10));
 var matches = await driver.FindLocationsAsync("File");            // every occurrence of a word
-await driver.ClickAnyAsync(new IElement[] { okButton, yesButton }); // whichever shows up
+await driver.SingleClickAnyAsync(new IElement[] { okButton, yesButton }); // whichever shows up
 ```
 
-Elements are text (`TextElement`, or just a `string`) or images (`ImageElement`). Images are matched by normalized cross-correlation, with an optional threshold and grayscale mode; the search is exact and fast: a typical icon is found on a 1080p screen in about 15 ms. Text is detected and read by a bundled neural OCR (PP-OCR on ONNX Runtime), which also tells where each character is, so you can click a single word inside a sentence. Use `TextOptions` to make matching case-insensitive, partial or exact.
+Elements are text (`TextElement`, or just a `string`) or images (`ImageElement`). Images are matched by normalized cross-correlation, with an optional threshold and grayscale mode; the search is exact and fast: a typical icon is found on a 1080p screen in about 15 ms. Text is detected and read by a bundled neural OCR (PP-OCR on ONNX Runtime), which also tells where each character is, so you can click a single word inside a sentence. Text is matched whatever its case, unless `TextElement.IgnoreCase` is false. `TextOptions` preprocess the screen before it is read (grayscale, black and white, negative), which is rarely needed.
 
 When an element is not found, a screenshot of what was searched is written to `DriverOptions.FailureScreenshotPath`.
 
@@ -58,10 +58,10 @@ In a test, pass the token of your test framework: a test that times out or is ab
 
 ### Languages
 
-The default text model reads Latin script (English, French, German, Spanish, Portuguese, Italian and others, with diacritics). To use another model, give your own detection and recognition ONNX files and character list:
+The default text model reads Latin script (English, French, German, Spanish, Portuguese, Italian and others, with diacritics). To read another script, give a PP-OCR recognition model in ONNX format and its character list:
 
 ```csharp
-var options = new DriverOptions { TextRecognitionModel = TextRecognitionModel.FromFiles(detectionPath, recognitionPath, charactersPath) };
+var options = new DriverOptions { TextRecognitionModel = TextRecognitionModel.FromFiles(recognitionModelPath, dictionaryPath) };
 ```
 
 ## Image libraries
@@ -72,7 +72,7 @@ Declare a partial class pointing to a directory of images. A source generator tu
 [ImageLibrary("images")]
 public partial class MyLibrary { }
 
-await driver.ClickAsync(MyLibrary.Instance.Logo);
+await driver.SingleClickAsync(MyLibrary.Instance.Logo);
 ```
 
 | File | Generated member |
