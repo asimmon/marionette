@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace Askaiser.Marionette.Tests.Desktop;
@@ -103,5 +104,43 @@ internal static class DesktopTestEnvironment
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
         return process;
+    }
+
+    /// <summary>
+    /// Closes the browser of a test. Where the operating system allows it, the browser is asked to quit, which lets it leave
+    /// full screen and end its own processes: killing them made the macOS machines of continuous integration stop responding.
+    /// </summary>
+    public static async Task StopBrowserAsync(Process browser)
+    {
+        if (browser.HasExited)
+        {
+            return;
+        }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            browser.Kill(entireProcessTree: true);
+        }
+        else
+        {
+            using var terminate = Process.Start("/bin/kill", ["-TERM", browser.Id.ToString(CultureInfo.InvariantCulture)]);
+            await terminate.WaitForExitAsync();
+        }
+
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+        try
+        {
+            await browser.WaitForExitAsync(timeout.Token);
+        }
+        catch (OperationCanceledException) when (!browser.HasExited)
+        {
+            // The other processes of a browser end by themselves when its main process does.
+            browser.Kill();
+            await browser.WaitForExitAsync(new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // The browser exited, but processes it started still hold its output open.
+        }
     }
 }

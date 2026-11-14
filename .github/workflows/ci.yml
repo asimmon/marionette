@@ -70,8 +70,8 @@ jobs:
           : > "$MARIONETTE_DESKTOP_PROGRESS"
           (
             while true; do
-              sleep 2 > /dev/null 2>&1 < /dev/null
-              echo "[monitor] $(date -u +%H:%M:%S) step='$(tail -n 1 "$MARIONETTE_DESKTOP_PROGRESS")' console=$(stat -f %Su /dev/console) windowserver=$(pgrep -x WindowServer | xargs) free=$(vm_stat | awk '/Pages free/ {print $3}') load=$(sysctl -n vm.loadavg) tests=$(ps -axo rss=,%cpu=,command= | awk '/Askaiser.Marionette.Tests/ && !/Chrome/ && !/awk/ {printf "%dMB/%s%% ", $1/1024, $2}')"
+              sleep 1 > /dev/null 2>&1 < /dev/null
+              echo "[monitor] $(date -u +%H:%M:%S) step='$(tail -n 1 "$MARIONETTE_DESKTOP_PROGRESS")' console=$(stat -f %Su /dev/console) windowserver=$(pgrep -x WindowServer | xargs) free=$(vm_stat | awk '/Pages free/ {print $3}') load=$(sysctl -n vm.loadavg) browser=$(pgrep -f marionette-tests- | wc -l | xargs) tests=$(ps -axo rss=,%cpu=,command= | awk '/Askaiser.Marionette.Tests/ && !/Chrome/ && !/awk/ {printf "%dMB/%s%% ", $1/1024, $2}')"
             done
           ) &
           monitor=$!

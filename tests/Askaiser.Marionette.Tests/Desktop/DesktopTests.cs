@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Askaiser.Marionette.Tests.Desktop;
@@ -135,6 +136,7 @@ public sealed class DesktopTests
             var existingVideos = Directory.Exists(failuresDirectory) ? Directory.GetFiles(failuresDirectory) : [];
             await Assert.ThrowsAsync<ElementNotFoundException>(() => driver.WaitForAsync("This text is not on the page", waitFor: TimeSpan.FromSeconds(1), cancellationToken: cancellationToken));
 
+            Step("6) The search failed, checking the video");
             var videoPath = await Assert.That(Directory.GetFiles(failuresDirectory).Except(existingVideos)).HasSingleItem();
             var video = AnimatedPngReader.Read(await File.ReadAllBytesAsync(videoPath!, cancellationToken));
 
@@ -157,11 +159,11 @@ public sealed class DesktopTests
 
             try
             {
-                browser.Kill(entireProcessTree: true);
-                await browser.WaitForExitAsync(new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token);
+                await DesktopTestEnvironment.StopBrowserAsync(browser);
+                Step("Browser closed");
                 Directory.Delete(profileDirectory, recursive: true);
             }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException or OperationCanceledException)
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException or OperationCanceledException or Win32Exception)
             {
                 Debug.WriteLine(ex);
             }
