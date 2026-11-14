@@ -127,20 +127,17 @@ internal static class DesktopTestEnvironment
             await terminate.WaitForExitAsync();
         }
 
-        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-        try
+        // Waiting for the exit of the process would also wait for the end of its output, which the processes it started can keep open.
+        var asked = Stopwatch.GetTimestamp();
+        while (!browser.HasExited && Stopwatch.GetElapsedTime(asked) < TimeSpan.FromSeconds(15))
         {
-            await browser.WaitForExitAsync(timeout.Token);
+            await Task.Delay(100);
         }
-        catch (OperationCanceledException) when (!browser.HasExited)
+
+        if (!browser.HasExited)
         {
             // The other processes of a browser end by themselves when its main process does.
             browser.Kill();
-            await browser.WaitForExitAsync(new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token);
-        }
-        catch (OperationCanceledException)
-        {
-            // The browser exited, but processes it started still hold its output open.
         }
     }
 }

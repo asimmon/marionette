@@ -90,8 +90,9 @@ public sealed class DesktopTests
         {
             Step("0) Browser started, creating the driver");
 
-            // The screen is recorded during the whole test: if a step fails, the video shows what led to it.
-            using var driver = MarionetteDriver.Create(new DriverOptions { FailureVideoPath = failuresDirectory, FailureVideoDuration = TimeSpan.FromSeconds(15) });
+            // The screen is recorded during the whole test: if a step fails, the video shows what led to it,
+            // which requires a video that is longer than the time a step waits for the reaction of the page.
+            using var driver = MarionetteDriver.Create(new DriverOptions { FailureVideoPath = failuresDirectory, FailureVideoDuration = TimeSpan.FromSeconds(45) });
 
             Step("1) Read the screen");
             await driver.WaitForAsync("Account overview", waitFor: PageTimeout, cancellationToken: cancellationToken);
