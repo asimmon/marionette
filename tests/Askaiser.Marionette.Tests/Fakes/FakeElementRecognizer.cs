@@ -9,7 +9,7 @@ namespace Askaiser.Marionette.Tests.Fakes;
 /// </summary>
 internal sealed class FakeElementRecognizer : IElementRecognizer
 {
-    private readonly Dictionary<IElement, Func<int, IReadOnlyList<Rectangle>>> _results = [];
+    private readonly Dictionary<IElement, Func<int, CancellationToken, IReadOnlyList<Rectangle>>> _results = [];
     private readonly Dictionary<IElement, int> _callCounts = [];
     private readonly Lock _gate = new();
 
@@ -29,7 +29,7 @@ internal sealed class FakeElementRecognizer : IElementRecognizer
 
     public void Setup(IElement element, params Rectangle[] locations)
     {
-        this._results[element] = _ => locations;
+        this._results[element] = (_, _) => locations;
     }
 
     /// <summary>
@@ -37,7 +37,15 @@ internal sealed class FakeElementRecognizer : IElementRecognizer
     /// </summary>
     public void Setup(IElement element, Func<int, IReadOnlyList<Rectangle>> locations)
     {
-        this._results[element] = locations;
+        this._results[element] = (attempt, _) => locations(attempt);
+    }
+
+    /// <summary>
+    /// Sets up a search that depends on the number of times the element was searched, starting at 1, and that can observe its cancellation.
+    /// </summary>
+    public void Setup(IElement element, Func<int, CancellationToken, IReadOnlyList<Rectangle>> search)
+    {
+        this._results[element] = search;
     }
 
     public int GetCallCount(IElement element)
@@ -60,7 +68,7 @@ internal sealed class FakeElementRecognizer : IElementRecognizer
         }
 
         return this._results.TryGetValue(element, out var locations)
-            ? locations(count)
+            ? locations(count, cancellationToken)
             : throw new InvalidOperationException($"No result was set up for the element '{element}'.");
     }
 }

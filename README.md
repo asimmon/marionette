@@ -43,6 +43,19 @@ Elements are text (`TextElement`, or just a `string`) or images (`ImageElement`)
 
 When an element is not found, a screenshot of what was searched is written to `DriverOptions.FailureScreenshotPath`.
 
+### Cancellation
+
+Every asynchronous method takes an optional `CancellationToken` as its last parameter, and throws an `OperationCanceledException` when it is canceled. Waiting, searching and moving the mouse stop right away.
+
+```csharp
+using var timeout = new CancellationTokenSource(TimeSpan.FromMinutes(2));
+
+await driver.WaitForAsync("Welcome back", waitFor: TimeSpan.FromSeconds(30), cancellationToken: timeout.Token);
+await driver.MoveToAsync(200, 300, timeout.Token);
+```
+
+In a test, pass the token of your test framework: a test that times out or is aborted then stops driving the desktop instead of clicking around while the next test runs. Cancellation never leaves the desktop in a state you did not ask for: a canceled click releases the mouse button, and a canceled shortcut releases its keys.
+
 ### Languages
 
 The default text model reads Latin script (English, French, German, Spanish, Portuguese, Italian and others, with diacritics). To use another model, give your own detection and recognition ONNX files and character list:
@@ -80,6 +93,7 @@ The public API is the same (`MarionetteDriver`, its extension methods, `ImageEle
 - **`VirtualKeyCode` keeps its names and values** but drops keys that have no meaning on every platform (IME keys, mouse buttons, `Sleep`…) and adds `LeftCommand`, `RightCommand` and `ControlOrCommand`, which is Control on Windows and Linux and Command on macOS.
 - **Tesseract and OpenCV are gone**, so are `tessdata` files and the Tesseract options of `DriverOptions`; `TextRecognitionModel` replaces them. `TextOptions` now defaults to `None`.
 - **.NET 10+ only**, and the library is trim and AOT compatible.
+- **Asynchronous methods accept a `CancellationToken`**, as their last and optional parameter.
 
 Under the hood the image search is lossless but several times faster, the text recognition is more accurate and needs no downloads, and screenshots are pooled to keep memory low.
 

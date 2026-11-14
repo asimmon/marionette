@@ -9,6 +9,9 @@ namespace Askaiser.Marionette.Input;
 /// <summary>
 /// Turns text and keyboard shortcuts into sequences of device events.
 /// </summary>
+/// <remarks>
+/// Sequences can be canceled between two keys, but a canceled shortcut never leaves a key down.
+/// </remarks>
 internal sealed class KeyboardController
 {
     private readonly IKeyboardDevice _device;
@@ -23,109 +26,128 @@ internal sealed class KeyboardController
     /// <summary>
     /// Types text. Line breaks press the Enter key and tabulations press the Tab key, everything else is typed as characters.
     /// </summary>
-    public Task TypeTextAsync(string text)
+    public Task TypeTextAsync(string text, CancellationToken cancellationToken)
     {
-        return Task.Run(() =>
-        {
-            var start = 0;
-            for (var i = 0; i < text.Length; i++)
+        return Task.Run(
+            () =>
             {
-                var c = text[i];
-                if (c is not ('\r' or '\n' or '\t'))
+                var start = 0;
+                for (var i = 0; i < text.Length; i++)
                 {
-                    continue;
+                    var c = text[i];
+                    if (c is not ('\r' or '\n' or '\t'))
+                    {
+                        continue;
+                    }
+
+                    if (i > start)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        this._device.TypeText(text.Substring(start, i - start));
+                    }
+
+                    // A carriage return followed by a line feed is a single line break.
+                    if (c == '\r' && i + 1 < text.Length && text[i + 1] == '\n')
+                    {
+                        i++;
+                    }
+
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    var key = c == '\t' ? VirtualKeyCode.Tab : VirtualKeyCode.Enter;
+                    this._device.Press(key);
+                    this._device.Release(key);
+                    start = i + 1;
                 }
 
-                if (i > start)
+                if (start < text.Length)
                 {
-                    this._device.TypeText(text.Substring(start, i - start));
+                    cancellationToken.ThrowIfCancellationRequested();
+                    this._device.TypeText(start == 0 ? text : text.Substring(start));
                 }
-
-                // A carriage return followed by a line feed is a single line break.
-                if (c == '\r' && i + 1 < text.Length && text[i + 1] == '\n')
-                {
-                    i++;
-                }
-
-                var key = c == '\t' ? VirtualKeyCode.Tab : VirtualKeyCode.Enter;
-                this._device.Press(key);
-                this._device.Release(key);
-                start = i + 1;
-            }
-
-            if (start < text.Length)
-            {
-                this._device.TypeText(text.Substring(start));
-            }
-        });
+            },
+            cancellationToken);
     }
 
     /// <summary>
     /// Presses keys as a shortcut: modifier keys are held down while the other keys are pressed and released one after the other.
     /// </summary>
-    public Task KeyPressAsync(IReadOnlyList<VirtualKeyCode> keys)
+    public Task KeyPressAsync(IReadOnlyList<VirtualKeyCode> keys, CancellationToken cancellationToken)
     {
-        return Task.Run(() =>
-        {
-            var modifiers = new List<VirtualKeyCode>();
-            var others = new List<VirtualKeyCode>();
-
-            foreach (var key in keys)
+        return Task.Run(
+            () =>
             {
-                var target = IsModifier(key) ? modifiers : others;
-                if (!target.Contains(key))
+                var modifiers = new List<VirtualKeyCode>(keys.Count);
+                var others = new List<VirtualKeyCode>(keys.Count);
+
+                foreach (var key in keys)
                 {
-                    target.Add(key);
+                    var target = IsModifier(key) ? modifiers : others;
+                    if (!target.Contains(key))
+                    {
+                        target.Add(key);
+                    }
                 }
-            }
 
-            foreach (var modifier in modifiers)
-            {
-                this._device.Press(modifier);
-            }
-
-            try
-            {
-                this.Settle(modifiers.Count > 0);
-                foreach (var key in others)
+                var pressedModifiers = 0;
+                try
                 {
+                    foreach (var modifier in modifiers)
+                    {
+                        this._device.Press(modifier);
+                        pressedModifiers++;
+                    }
+
+                    this.Settle(modifiers.Count > 0);
+                    foreach (var key in others)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        this._device.Press(key);
+                        this._device.Release(key);
+                    }
+
+                    this.Settle(modifiers.Count > 0);
+                }
+                finally
+                {
+                    // Never leave a modifier key down, even if a key could not be simulated or the shortcut was canceled.
+                    for (var i = pressedModifiers - 1; i >= 0; i--)
+                    {
+                        this._device.Release(modifiers[i]);
+                    }
+                }
+            },
+            cancellationToken);
+    }
+
+    public Task KeyDownAsync(IReadOnlyList<VirtualKeyCode> keys, CancellationToken cancellationToken)
+    {
+        return Task.Run(
+            () =>
+            {
+                foreach (var key in keys)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
                     this._device.Press(key);
+                }
+            },
+            cancellationToken);
+    }
+
+    /// <summary>
+    /// Releases keys. Once started, this is not canceled: stopping halfway would leave keys down.
+    /// </summary>
+    public Task KeyUpAsync(IReadOnlyList<VirtualKeyCode> keys, CancellationToken cancellationToken)
+    {
+        return Task.Run(
+            () =>
+            {
+                foreach (var key in keys)
+                {
                     this._device.Release(key);
                 }
-
-                this.Settle(modifiers.Count > 0);
-            }
-            finally
-            {
-                // Never leave a modifier key down, even if a key could not be simulated.
-                for (var i = modifiers.Count - 1; i >= 0; i--)
-                {
-                    this._device.Release(modifiers[i]);
-                }
-            }
-        });
-    }
-
-    public Task KeyDownAsync(IReadOnlyList<VirtualKeyCode> keys)
-    {
-        return Task.Run(() =>
-        {
-            foreach (var key in keys)
-            {
-                this._device.Press(key);
-            }
-        });
-    }
-
-    public Task KeyUpAsync(IReadOnlyList<VirtualKeyCode> keys)
-    {
-        return Task.Run(() =>
-        {
-            foreach (var key in keys)
-            {
-                this._device.Release(key);
-            }
-        });
+            },
+            cancellationToken);
     }
 
     private static bool IsModifier(VirtualKeyCode key) => key

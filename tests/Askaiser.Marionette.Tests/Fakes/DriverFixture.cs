@@ -8,14 +8,14 @@ namespace Askaiser.Marionette.Tests.Fakes;
 /// </summary>
 internal sealed class DriverFixture : IDisposable
 {
-    public DriverFixture(DriverOptions? options = null)
+    public DriverFixture(DriverOptions? options = null, InputTimings? timings = null)
     {
         this.Driver = new MarionetteDriver(
             options ?? new DriverOptions(),
             new DesktopPlatform(this.Display, this.Mouse, this.Keyboard),
             [this.Recognizer],
             this.FailureWriter,
-            InputTimings.Instant,
+            timings ?? InputTimings.Instant,
             TimeProvider.System);
     }
 

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,6 +25,7 @@ internal sealed partial class ElementLocator
     private readonly IReadOnlyList<IElementRecognizer> _recognizers;
     private readonly IFailureScreenshotWriter _failureWriter;
     private readonly TimeProvider _timeProvider;
+    private readonly Func<ScreenFrame, IElement, Rectangle, CancellationToken, Task<IReadOnlyList<Rectangle>>> _recognize;
 
     public ElementLocator(DriverOptions options, ScreenService screen, IReadOnlyList<IElementRecognizer> recognizers, IFailureScreenshotWriter failureWriter, TimeProvider timeProvider)
     {
@@ -33,23 +34,24 @@ internal sealed partial class ElementLocator
         this._recognizers = recognizers;
         this._failureWriter = failureWriter;
         this._timeProvider = timeProvider;
+        this._recognize = this.RecognizeAsync;
     }
 
     /// <summary>
     /// Waits for an element to be visible.
     /// </summary>
-    public async Task<SearchResult> WaitForAsync(IElement element, TimeSpan waitFor, Rectangle? searchRect, int monitorIndex, NoSingleResultBehavior behavior)
+    public async Task<SearchResult> WaitForAsync(IElement element, TimeSpan waitFor, Rectangle? searchRect, int monitorIndex, NoSingleResultBehavior behavior, CancellationToken cancellationToken)
     {
-        var search = await this.SearchAsync([element], waitFor, searchRect, monitorIndex, static found => found.Count == 1).ConfigureAwait(false);
+        var search = await this.SearchAsync([element], requiredCount: 1, waitFor, searchRect, monitorIndex, cancellationToken).ConfigureAwait(false);
         return await this.CompleteAsync(search, search.Results[0], waitFor, behavior).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Waits for any of the elements to be visible and returns the first one that is, in the order they were given.
     /// </summary>
-    public async Task<SearchResult> WaitForAnyAsync(IReadOnlyList<IElement> elements, TimeSpan waitFor, Rectangle? searchRect, int monitorIndex, NoSingleResultBehavior behavior)
+    public async Task<SearchResult> WaitForAnyAsync(IReadOnlyList<IElement> elements, TimeSpan waitFor, Rectangle? searchRect, int monitorIndex, NoSingleResultBehavior behavior, CancellationToken cancellationToken)
     {
-        var search = await this.SearchAsync(elements, waitFor, searchRect, monitorIndex, static found => found.Count > 0).ConfigureAwait(false);
+        var search = await this.SearchAsync(elements, requiredCount: 1, waitFor, searchRect, monitorIndex, cancellationToken).ConfigureAwait(false);
         var result = search.Results.FirstOrDefault(static candidate => candidate.Success) ?? search.Results[0];
         return await this.CompleteAsync(search, result, waitFor, behavior).ConfigureAwait(false);
     }
@@ -57,9 +59,9 @@ internal sealed partial class ElementLocator
     /// <summary>
     /// Waits for all the elements to be visible. An element that was seen once is considered found, even if it disappears while waiting for the others.
     /// </summary>
-    public async Task<SearchResultCollection> WaitForAllAsync(IReadOnlyList<IElement> elements, TimeSpan waitFor, Rectangle? searchRect, int monitorIndex, NoSingleResultBehavior behavior)
+    public async Task<SearchResultCollection> WaitForAllAsync(IReadOnlyList<IElement> elements, TimeSpan waitFor, Rectangle? searchRect, int monitorIndex, NoSingleResultBehavior behavior, CancellationToken cancellationToken)
     {
-        var search = await this.SearchAsync(elements, waitFor, searchRect, monitorIndex, found => found.Count == elements.Count).ConfigureAwait(false);
+        var search = await this.SearchAsync(elements, requiredCount: elements.Count, waitFor, searchRect, monitorIndex, cancellationToken).ConfigureAwait(false);
 
         // Report the first element that is missing or ambiguous, as if elements had been searched one after the other.
         foreach (var result in search.Results)
@@ -67,7 +69,7 @@ internal sealed partial class ElementLocator
             _ = await this.CompleteAsync(search, result, waitFor, behavior, releaseFrame: false).ConfigureAwait(false);
         }
 
-        search.Frame?.Release();
+        search.Frame.Release();
         return new SearchResultCollection(search.Results);
     }
 
@@ -83,63 +85,103 @@ internal sealed partial class ElementLocator
     [GeneratedRegex("\\s+", RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 1000)]
     private static partial Regex WhitespaceRegex();
 
-    private async Task<Search> SearchAsync(IReadOnlyList<IElement> elements, TimeSpan waitFor, Rectangle? searchRect, int monitorIndex, Func<IReadOnlyCollection<IElement>, bool> isComplete)
+    private static Rectangle GetSearchRegion(MonitorDescription monitor, Rectangle? searchRect)
+    {
+        var monitorBounds = new Rectangle(0, 0, monitor.Width, monitor.Height);
+        if (searchRect == null)
+        {
+            return monitorBounds;
+        }
+
+        // Search rectangles are expressed in the coordinates of the virtual desktop.
+        var relative = searchRect - (monitor.Left, monitor.Top);
+        return relative.Intersect(monitorBounds)
+            ?? throw new ArgumentOutOfRangeException(nameof(searchRect), Messages.Image_Throw_RegionOutOfBounds.FormatInvariant(searchRect, monitor.Width, monitor.Height));
+    }
+
+    /// <summary>
+    /// Looks for elements until <paramref name="requiredCount"/> of them were found or time runs out.
+    /// The frame of the returned search belongs to the caller, which must release it.
+    /// </summary>
+    private async Task<Search> SearchAsync(IReadOnlyList<IElement> elements, int requiredCount, TimeSpan waitFor, Rectangle? searchRect, int monitorIndex, CancellationToken cancellationToken)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(waitFor, TimeSpan.Zero);
+        cancellationToken.ThrowIfCancellationRequested();
 
         foreach (var element in elements)
         {
             _ = this.GetRecognizer(element);
         }
 
-        var monitor = await this._screen.GetMonitorAsync(monitorIndex).ConfigureAwait(false);
+        var monitor = await this._screen.GetMonitorAsync(monitorIndex, cancellationToken).ConfigureAwait(false);
         var region = GetSearchRegion(monitor, searchRect);
         var origin = new Point(monitor.Left + region.Left, monitor.Top + region.Top);
 
         var locations = new IReadOnlyList<Rectangle>[elements.Count];
         Array.Fill(locations, []);
-        var found = new HashSet<IElement>(ReferenceEqualityComparer.Instance);
+        var foundCount = 0;
+
+        // Several elements are searched in parallel. These lists are reused by every attempt.
+        var pendingTasks = elements.Count > 1 ? new List<Task<IReadOnlyList<Rectangle>>>(elements.Count) : null;
+        var pendingIndices = elements.Count > 1 ? new List<int>(elements.Count) : null;
 
         ScreenFrame? frame = null;
-        var startTimestamp = Stopwatch.GetTimestamp();
+        var startTimestamp = this._timeProvider.GetTimestamp();
 
         try
         {
             while (true)
             {
-                var current = await this._screen.AcquireFrameAsync(monitorIndex, CancellationToken.None).ConfigureAwait(false);
+                var current = await this._screen.AcquireFrameAsync(monitorIndex, cancellationToken).ConfigureAwait(false);
                 frame?.Release();
                 frame = current;
 
-                // Elements that were already found are not searched again.
-                var pending = new List<(int Index, Task<IReadOnlyList<Rectangle>> Task)>();
-                for (var i = 0; i < elements.Count; i++)
+                if (pendingTasks == null)
                 {
-                    if (!found.Contains(elements[i]))
+                    locations[0] = await this.LocateAsync(current, elements[0], region, cancellationToken).ConfigureAwait(false);
+                    foundCount = locations[0].Count > 0 ? 1 : 0;
+                }
+                else
+                {
+                    pendingTasks.Clear();
+                    pendingIndices!.Clear();
+
+                    // Elements that were already found are not searched again.
+                    for (var i = 0; i < elements.Count; i++)
                     {
-                        pending.Add((i, current.GetOrAddResult(elements[i], region, (element, searchRegion) => this.RecognizeAsync(current, element, searchRegion))));
+                        if (locations[i].Count == 0)
+                        {
+                            pendingIndices.Add(i);
+                            pendingTasks.Add(this.LocateAsync(current, elements[i], region, cancellationToken));
+                        }
+                    }
+
+                    // This waits for every search, even when one of them fails: they all read the frame, which is released on failure.
+                    await Task.WhenAll(CollectionsMarshal.AsSpan(pendingTasks)).ConfigureAwait(false);
+
+                    for (var i = 0; i < pendingTasks.Count; i++)
+                    {
+                        var found = await pendingTasks[i].ConfigureAwait(false);
+                        if (found.Count > 0)
+                        {
+                            locations[pendingIndices[i]] = found;
+                            foundCount++;
+                        }
                     }
                 }
 
-                await Task.WhenAll(pending.Select(static search => search.Task)).ConfigureAwait(false);
-
-                foreach (var (index, task) in pending)
-                {
-                    locations[index] = await task.ConfigureAwait(false);
-                    if (locations[index].Count > 0)
-                    {
-                        found.Add(elements[index]);
-                    }
-                }
-
-                if (isComplete(found) || Stopwatch.GetElapsedTime(startTimestamp) >= waitFor)
+                if (foundCount >= requiredCount || this._timeProvider.GetElapsedTime(startTimestamp) >= waitFor)
                 {
                     break;
                 }
 
                 if (this._options.WaitForThrottlingInterval > TimeSpan.Zero)
                 {
-                    await Task.Delay(this._options.WaitForThrottlingInterval, this._timeProvider).ConfigureAwait(false);
+                    await Task.Delay(this._options.WaitForThrottlingInterval, this._timeProvider, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
                 }
             }
         }
@@ -159,20 +201,6 @@ internal sealed partial class ElementLocator
         return new Search(results, frame, region);
     }
 
-    private static Rectangle GetSearchRegion(MonitorDescription monitor, Rectangle? searchRect)
-    {
-        var monitorBounds = new Rectangle(0, 0, monitor.Width, monitor.Height);
-        if (searchRect == null)
-        {
-            return monitorBounds;
-        }
-
-        // Search rectangles are expressed in the coordinates of the virtual desktop.
-        var relative = searchRect - (monitor.Left, monitor.Top);
-        return relative.Intersect(monitorBounds)
-            ?? throw new ArgumentOutOfRangeException(nameof(searchRect), Messages.Image_Throw_RegionOutOfBounds.FormatInvariant(searchRect, monitor.Width, monitor.Height));
-    }
-
     private IElementRecognizer GetRecognizer(IElement element)
     {
         ArgumentNullException.ThrowIfNull(element);
@@ -188,10 +216,37 @@ internal sealed partial class ElementLocator
         throw new NotSupportedException(Messages.MarionetteDriver_Throw_UnsupportedElement.FormatInvariant(element.Name, element.GetType().Name));
     }
 
-    private Task<IReadOnlyList<Rectangle>> RecognizeAsync(ScreenFrame frame, IElement element, Rectangle region)
+    /// <summary>
+    /// Returns the locations of an element in a frame. They are only searched once per frame, whatever the number of callers.
+    /// </summary>
+    private Task<IReadOnlyList<Rectangle>> LocateAsync(ScreenFrame frame, IElement element, Rectangle region, CancellationToken cancellationToken)
+    {
+        var task = frame.GetOrAddResult(element, region, this._recognize, cancellationToken);
+
+        // Polling a screen that does not change goes through here: the answer is already known.
+        return task.IsCompletedSuccessfully ? task : this.AwaitSharedSearchAsync(task, frame, element, region, cancellationToken);
+    }
+
+    private async Task<IReadOnlyList<Rectangle>> AwaitSharedSearchAsync(Task<IReadOnlyList<Rectangle>> task, ScreenFrame frame, IElement element, Rectangle region, CancellationToken cancellationToken)
+    {
+        while (true)
+        {
+            try
+            {
+                return await task.ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                // The search was started by another caller of the driver, which canceled it. Start it again for this caller.
+                task = frame.GetOrAddResult(element, region, this._recognize, cancellationToken);
+            }
+        }
+    }
+
+    private Task<IReadOnlyList<Rectangle>> RecognizeAsync(ScreenFrame frame, IElement element, Rectangle region, CancellationToken cancellationToken)
     {
         var recognizer = this.GetRecognizer(element);
-        return Task.Run(() => recognizer.Recognize(frame.GetSurface(region), frame.Display, element, CancellationToken.None));
+        return Task.Run(() => recognizer.Recognize(frame.GetSurface(region), frame.Display, element, cancellationToken), cancellationToken);
     }
 
     /// <summary>
@@ -219,21 +274,27 @@ internal sealed partial class ElementLocator
         catch when (!releaseFrame)
         {
             // The caller keeps the frame for its other results only when everything goes well.
-            search.Frame?.Release();
+            search.Frame.Release();
             throw;
         }
         finally
         {
             if (releaseFrame)
             {
-                search.Frame?.Release();
+                search.Frame.Release();
             }
         }
     }
 
+    /// <summary>
+    /// Saves the part of the screen that was searched when an element could not be found.
+    /// </summary>
+    /// <remarks>
+    /// This is not canceled along with the search: the search already failed, and what explains why is worth the few milliseconds it takes to write.
+    /// </remarks>
     private async Task SaveFailureScreenshotAsync(Search search, IElement element)
     {
-        if (this._options.FailureScreenshotPath == null || search.Frame == null)
+        if (this._options.FailureScreenshotPath == null)
         {
             return;
         }
@@ -249,5 +310,5 @@ internal sealed partial class ElementLocator
         await this._failureWriter.SaveAsync(Path.Combine(this._options.FailureScreenshotPath, fileName), png).ConfigureAwait(false);
     }
 
-    private sealed record Search(SearchResult[] Results, ScreenFrame? Frame, Rectangle Region);
+    private sealed record Search(SearchResult[] Results, ScreenFrame Frame, Rectangle Region);
 }

@@ -29,11 +29,16 @@ internal sealed class FakeDisplayDevice : IDisplayDevice
     /// <summary>Gets or sets the image displayed by every monitor. When null, monitors display a solid color.</summary>
     public Image? Content { get; set; }
 
+    /// <summary>Gets or sets what happens at the beginning of a capture, which lets a test act while the screen is being captured.</summary>
+    public Action? OnCapture { get; set; }
+
     public IReadOnlyList<DisplayInfo> GetDisplays() => Displays;
 
     public PixelBuffer Capture(DisplayInfo display)
     {
         var count = Interlocked.Increment(ref this._captureCount);
+        this.OnCapture?.Invoke();
+
         var buffer = PixelBuffer.Rent(display.Bounds.Width, display.Bounds.Height);
 
         if (this.Content != null)

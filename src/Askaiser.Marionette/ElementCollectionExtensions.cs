@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Askaiser.Marionette;
@@ -13,8 +14,17 @@ public static class ElementCollectionExtensions
 {
     private const string ImageKind = "image";
     private const string TextKind = "text";
+    private const int FileBufferSize = 4096;
 
-    public static async Task LoadAsync(this ElementCollection elements, Stream stream)
+    /// <summary>
+    /// Replaces the content of a collection with the elements of a JSON document, as written by <see cref="SaveAsync(ElementCollection, Stream, CancellationToken)"/>.
+    /// </summary>
+    /// <param name="elements">The collection to fill.</param>
+    /// <param name="stream">The stream to read the JSON document from. It is closed once read.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <exception cref="ArgumentException">The document contains an element that has no name, the same name as another one, or an unknown kind.</exception>
+    /// <exception cref="JsonException">The stream does not contain a valid JSON document.</exception>
+    public static async Task LoadAsync(this ElementCollection elements, Stream stream, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(elements);
         ArgumentNullException.ThrowIfNull(stream);
@@ -22,7 +32,7 @@ public static class ElementCollectionExtensions
         JsonDocument jsonDocument;
         await using (stream.ConfigureAwait(false))
         {
-            jsonDocument = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
+            jsonDocument = await JsonDocument.ParseAsync(stream, default, cancellationToken).ConfigureAwait(false);
         }
 
         using (jsonDocument)
@@ -70,13 +80,33 @@ public static class ElementCollectionExtensions
         }
     }
 
-    public static async Task<ElementCollection> LoadAsync(this ElementCollection elements, string filePath)
+    /// <summary>
+    /// Replaces the content of a collection with the elements of a JSON file, as written by <see cref="SaveAsync(ElementCollection, string, CancellationToken)"/>.
+    /// </summary>
+    /// <param name="elements">The collection to fill.</param>
+    /// <param name="filePath">The path of the JSON file.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <returns>The collection, to chain calls.</returns>
+    /// <exception cref="ArgumentException">The document contains an element that has no name, the same name as another one, or an unknown kind.</exception>
+    /// <exception cref="JsonException">The file does not contain a valid JSON document.</exception>
+    public static async Task<ElementCollection> LoadAsync(this ElementCollection elements, string filePath, CancellationToken cancellationToken = default)
     {
-        await LoadAsync(elements, File.OpenRead(filePath)).ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(elements);
+
+        var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, FileBufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
+        await LoadAsync(elements, stream, cancellationToken).ConfigureAwait(false);
         return elements;
     }
 
-    public static async Task<ElementCollection> SaveAsync(this ElementCollection elements, Stream destinationStream)
+    /// <summary>
+    /// Writes the image and text elements of a collection to a stream as a JSON document, sorted by name.
+    /// </summary>
+    /// <param name="elements">The collection to save.</param>
+    /// <param name="destinationStream">The stream to write to. It is closed once written.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <returns>The collection, to chain calls.</returns>
+    /// <exception cref="NotSupportedException">The collection contains an element that is neither an <see cref="ImageElement"/> nor a <see cref="TextElement"/>.</exception>
+    public static async Task<ElementCollection> SaveAsync(this ElementCollection elements, Stream destinationStream, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(elements);
         ArgumentNullException.ThrowIfNull(destinationStream);
@@ -113,19 +143,35 @@ public static class ElementCollectionExtensions
                     }
 
                     writer.WriteEndObject();
+
+                    // Images are large: send what was written to the stream as it goes rather than buffering the whole document.
+                    if (writer.BytesPending > FileBufferSize)
+                    {
+                        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+                    }
                 }
 
                 writer.WriteEndArray();
-                await writer.FlushAsync().ConfigureAwait(false);
+                await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
             }
         }
 
         return elements;
     }
 
-    public static async Task SaveAsync(this ElementCollection elements, string filePath)
+    /// <summary>
+    /// Writes the image and text elements of a collection to a JSON file, sorted by name. The file is overwritten when it exists.
+    /// </summary>
+    /// <param name="elements">The collection to save.</param>
+    /// <param name="filePath">The path of the JSON file.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <exception cref="NotSupportedException">The collection contains an element that is neither an <see cref="ImageElement"/> nor a <see cref="TextElement"/>.</exception>
+    public static async Task SaveAsync(this ElementCollection elements, string filePath, CancellationToken cancellationToken = default)
     {
-        await SaveAsync(elements, File.Create(filePath)).ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(elements);
+
+        var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, FileBufferSize, FileOptions.Asynchronous);
+        await SaveAsync(elements, stream, cancellationToken).ConfigureAwait(false);
     }
 
     private static string? GetString(JsonElement jsonObject, string propertyName)

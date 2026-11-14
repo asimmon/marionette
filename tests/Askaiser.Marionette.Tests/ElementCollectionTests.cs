@@ -50,31 +50,31 @@ public class ElementCollectionTests
     }
 
     [Test]
-    public async Task SaveAsync_WhenSupportedElements_Works()
+    public async Task SaveAsync_WhenSupportedElements_Works(CancellationToken cancellationToken)
     {
         var collection = new ElementCollection();
         collection.Add(ImageElement);
         collection.Add(TextElement);
 
         using var stream = new MemoryStream();
-        await collection.SaveAsync(stream);
+        await collection.SaveAsync(stream, cancellationToken);
 
         var actualJson = Encoding.UTF8.GetString(stream.ToArray());
         await Assert.That(actualJson).IsEqualTo(ValidJsonCollection);
     }
 
     [Test]
-    public async Task LoadAsync_WhenSupportedElements_Works()
+    public async Task LoadAsync_WhenSupportedElements_Works(CancellationToken cancellationToken)
     {
         using (var stream = new MemoryStream())
         using (var writer = new StreamWriter(stream))
         {
             await writer.WriteAsync(ValidJsonCollection);
-            await writer.FlushAsync(TestContext.Current!.Execution.CancellationToken);
+            await writer.FlushAsync(cancellationToken);
             stream.Seek(0, SeekOrigin.Begin);
 
             var collection = new ElementCollection();
-            await collection.LoadAsync(stream);
+            await collection.LoadAsync(stream, cancellationToken);
 
             await Assert.That(collection.Count).IsEqualTo(2);
             var imageBase = collection.Single(x => x.Name == ImageElement.Name);
@@ -96,27 +96,27 @@ public class ElementCollectionTests
     }
 
     [Test]
-    public async Task SaveAsync_WhenNotSupportedElements_Throws()
+    public async Task SaveAsync_WhenNotSupportedElements_Throws(CancellationToken cancellationToken)
     {
         var collection = new ElementCollection();
         collection.Add(new UnknownElement("yolo"));
 
         using var stream = new MemoryStream();
-        await Assert.ThrowsAsync<NotSupportedException>(async () => await collection.SaveAsync(stream));
+        await Assert.ThrowsAsync<NotSupportedException>(async () => await collection.SaveAsync(stream, cancellationToken));
     }
 
     [Test]
-    public async Task LoadAsync_WhenNotSupportedElements_Works()
+    public async Task LoadAsync_WhenNotSupportedElements_Works(CancellationToken cancellationToken)
     {
         using (var stream = new MemoryStream())
         using (var writer = new StreamWriter(stream))
         {
             await writer.WriteAsync(InvalidJsonCollection);
-            await writer.FlushAsync(TestContext.Current!.Execution.CancellationToken);
+            await writer.FlushAsync(cancellationToken);
             stream.Seek(0, SeekOrigin.Begin);
 
             var collection = new ElementCollection();
-            await Assert.ThrowsAsync<ArgumentException>(async () => await collection.LoadAsync(stream));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await collection.LoadAsync(stream, cancellationToken));
         }
     }
 

@@ -17,14 +17,17 @@ internal sealed class ScreenService : IDisposable
 
     private readonly IDisplayDevice _device;
     private readonly TimeSpan _frameLifetime;
+#pragma warning disable CA2213 // Disposable fields should be disposed: callers may still be waiting for the semaphore, which holds nothing to release as its wait handle is never used
     private readonly SemaphoreSlim _captureGate = new(1, 1);
+#pragma warning restore CA2213
     private readonly Lock _stateGate = new();
 
     private Monitor[] _monitors = [];
     private long _monitorsTimestamp;
     private ScreenFrame? _currentFrame;
     private long _currentFrameTimestamp;
-    private bool _isCurrentFrameStale;
+    private long _currentFrameInputVersion;
+    private long _inputVersion;
     private bool _disposed;
 
     public ScreenService(IDisplayDevice device, TimeSpan frameLifetime)
@@ -36,15 +39,15 @@ internal sealed class ScreenService : IDisposable
     /// <summary>
     /// Returns the monitors of the desktop: the primary one first, then the others from left to right and top to bottom.
     /// </summary>
-    public async Task<MonitorDescription[]> GetMonitorsAsync()
+    public async Task<MonitorDescription[]> GetMonitorsAsync(CancellationToken cancellationToken)
     {
-        var monitors = await this.GetMonitorsInternalAsync().ConfigureAwait(false);
+        var monitors = await this.GetMonitorsInternalAsync(cancellationToken).ConfigureAwait(false);
         return Array.ConvertAll(monitors, static monitor => monitor.Description);
     }
 
-    public async Task<MonitorDescription> GetMonitorAsync(int index)
+    public async Task<MonitorDescription> GetMonitorAsync(int index, CancellationToken cancellationToken)
     {
-        return (await this.GetMonitorInternalAsync(index).ConfigureAwait(false)).Description;
+        return (await this.GetMonitorInternalAsync(index, cancellationToken).ConfigureAwait(false)).Description;
     }
 
     /// <summary>
@@ -52,7 +55,7 @@ internal sealed class ScreenService : IDisposable
     /// </summary>
     public async Task<ScreenFrame> AcquireFrameAsync(int monitorIndex, CancellationToken cancellationToken)
     {
-        var monitor = await this.GetMonitorInternalAsync(monitorIndex).ConfigureAwait(false);
+        var monitor = await this.GetMonitorInternalAsync(monitorIndex, cancellationToken).ConfigureAwait(false);
 
         if (this.TryReuseCurrentFrame(monitor.Display) is { } recent)
         {
@@ -68,11 +71,22 @@ internal sealed class ScreenService : IDisposable
                 return concurrent;
             }
 
+            long inputVersion;
+            lock (this._stateGate)
+            {
+                ObjectDisposedException.ThrowIf(this._disposed, this);
+                inputVersion = this._inputVersion;
+            }
+
             var pixels = await Task.Run(() => this._device.Capture(monitor.Display), cancellationToken).ConfigureAwait(false);
 
             lock (this._stateGate)
             {
-                ObjectDisposedException.ThrowIf(this._disposed, this);
+                if (this._disposed)
+                {
+                    pixels.Dispose();
+                    throw new ObjectDisposedException(nameof(ScreenService));
+                }
 
                 var previous = this._currentFrame;
                 var isUnchanged = previous != null
@@ -81,12 +95,14 @@ internal sealed class ScreenService : IDisposable
                     && previous.Pixels.Height == pixels.Height
                     && previous.Pixels.Span.SequenceEqual(pixels.Span);
 
+                // Input that was simulated during the capture may not be visible in it: such a capture is not reused by searches.
+                this._currentFrameTimestamp = Stopwatch.GetTimestamp();
+                this._currentFrameInputVersion = inputVersion;
+
                 if (isUnchanged && previous!.TryAddReference())
                 {
                     // Nothing changed on the screen: keep the previous frame and what was already computed from it.
                     pixels.Dispose();
-                    this._currentFrameTimestamp = Stopwatch.GetTimestamp();
-                    this._isCurrentFrameStale = false;
                     return previous;
                 }
 
@@ -94,8 +110,6 @@ internal sealed class ScreenService : IDisposable
                 _ = frame.TryAddReference();
 
                 this._currentFrame = frame;
-                this._currentFrameTimestamp = Stopwatch.GetTimestamp();
-                this._isCurrentFrameStale = false;
                 previous?.Release();
                 return frame;
             }
@@ -114,7 +128,7 @@ internal sealed class ScreenService : IDisposable
     {
         lock (this._stateGate)
         {
-            this._isCurrentFrameStale = true;
+            this._inputVersion++;
         }
     }
 
@@ -128,11 +142,23 @@ internal sealed class ScreenService : IDisposable
             }
 
             this._disposed = true;
-            this._currentFrame?.Release();
-            this._currentFrame = null;
         }
 
-        this._captureGate.Dispose();
+        // Let the capture in progress finish: the display device is released right after this service.
+        // Callers that were waiting for their turn then find the service disposed.
+        this._captureGate.Wait();
+        try
+        {
+            lock (this._stateGate)
+            {
+                this._currentFrame?.Release();
+                this._currentFrame = null;
+            }
+        }
+        finally
+        {
+            this._captureGate.Release();
+        }
     }
 
     private ScreenFrame? TryReuseCurrentFrame(DisplayInfo display)
@@ -145,7 +171,11 @@ internal sealed class ScreenService : IDisposable
         lock (this._stateGate)
         {
             var frame = this._currentFrame;
-            if (frame != null && !this._isCurrentFrameStale && frame.Display == display && Stopwatch.GetElapsedTime(this._currentFrameTimestamp) <= this._frameLifetime && frame.TryAddReference())
+            if (frame != null
+                && this._currentFrameInputVersion == this._inputVersion
+                && frame.Display == display
+                && Stopwatch.GetElapsedTime(this._currentFrameTimestamp) <= this._frameLifetime
+                && frame.TryAddReference())
             {
                 return frame;
             }
@@ -154,25 +184,32 @@ internal sealed class ScreenService : IDisposable
         return null;
     }
 
-    private async Task<Monitor> GetMonitorInternalAsync(int index)
+    private async Task<Monitor> GetMonitorInternalAsync(int index, CancellationToken cancellationToken)
     {
-        var monitors = await this.GetMonitorsInternalAsync().ConfigureAwait(false);
+        var monitors = await this.GetMonitorsInternalAsync(cancellationToken).ConfigureAwait(false);
         return index >= 0 && index < monitors.Length
             ? monitors[index]
             : throw new InvalidOperationException(Messages.MonitorService_Throw_MonitorNotFound.FormatInvariant(index));
     }
 
-    private async Task<Monitor[]> GetMonitorsInternalAsync()
+    private ValueTask<Monitor[]> GetMonitorsInternalAsync(CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         lock (this._stateGate)
         {
             if (this._monitors.Length > 0 && Stopwatch.GetElapsedTime(this._monitorsTimestamp) <= DisplayListLifetime)
             {
-                return this._monitors;
+                return new ValueTask<Monitor[]>(this._monitors);
             }
         }
 
-        var displays = await Task.Run(this._device.GetDisplays).ConfigureAwait(false);
+        return new ValueTask<Monitor[]>(this.ReadMonitorsAsync(cancellationToken));
+    }
+
+    private async Task<Monitor[]> ReadMonitorsAsync(CancellationToken cancellationToken)
+    {
+        var displays = await Task.Run(this._device.GetDisplays, cancellationToken).ConfigureAwait(false);
 
         var monitors = displays
             .OrderByDescending(static display => display.IsPrimary)

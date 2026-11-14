@@ -1,5 +1,5 @@
 using System;
-using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using Askaiser.Marionette.Platform;
 
@@ -8,6 +8,9 @@ namespace Askaiser.Marionette.Input;
 /// <summary>
 /// Turns high-level mouse gestures (click, double click, drag and drop...) into sequences of device events with human-like timings.
 /// </summary>
+/// <remarks>
+/// Gestures can be canceled between two events, but a canceled click never leaves a button down.
+/// </remarks>
 internal sealed class MouseController
 {
     private readonly IMouseDevice _device;
@@ -30,8 +33,10 @@ internal sealed class MouseController
     /// Moves the cursor to a position. Unless the speed is immediate, the cursor travels there progressively,
     /// which gives applications the hover events they expect before a click.
     /// </summary>
-    public async Task MoveAsync(int x, int y, MouseSpeed speed)
+    public async Task MoveAsync(int x, int y, MouseSpeed speed, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var duration = speed switch
         {
             MouseSpeed.Fast => this._timings.FastMove,
@@ -44,10 +49,10 @@ internal sealed class MouseController
             var start = this._device.GetPosition();
             if (start.X != x || start.Y != y)
             {
-                var startTimestamp = Stopwatch.GetTimestamp();
+                var startTimestamp = this._timeProvider.GetTimestamp();
                 while (true)
                 {
-                    var progress = Stopwatch.GetElapsedTime(startTimestamp) / duration;
+                    var progress = this._timeProvider.GetElapsedTime(startTimestamp) / duration;
                     if (progress >= 1)
                     {
                         break;
@@ -59,7 +64,7 @@ internal sealed class MouseController
                         (int)Math.Round(start.X + ((x - start.X) * eased)),
                         (int)Math.Round(start.Y + ((y - start.Y) * eased)));
 
-                    await Task.Delay(this._timings.MoveStep, this._timeProvider).ConfigureAwait(false);
+                    await Task.Delay(this._timings.MoveStep, this._timeProvider, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -67,72 +72,85 @@ internal sealed class MouseController
         this._device.MoveTo(x, y);
     }
 
-    public Task SingleClickAsync(int x, int y, MouseSpeed speed)
+    public Task SingleClickAsync(int x, int y, MouseSpeed speed, CancellationToken cancellationToken)
     {
-        return this.ClickAsync(x, y, speed, MouseButton.Left, clicks: 1);
+        return this.ClickAsync(x, y, speed, MouseButton.Left, clicks: 1, cancellationToken);
     }
 
-    public Task DoubleClickAsync(int x, int y, MouseSpeed speed)
+    public Task DoubleClickAsync(int x, int y, MouseSpeed speed, CancellationToken cancellationToken)
     {
-        return this.ClickAsync(x, y, speed, MouseButton.Left, clicks: 2);
+        return this.ClickAsync(x, y, speed, MouseButton.Left, clicks: 2, cancellationToken);
     }
 
-    public Task TripleClickAsync(int x, int y, MouseSpeed speed)
+    public Task TripleClickAsync(int x, int y, MouseSpeed speed, CancellationToken cancellationToken)
     {
-        return this.ClickAsync(x, y, speed, MouseButton.Left, clicks: 3);
+        return this.ClickAsync(x, y, speed, MouseButton.Left, clicks: 3, cancellationToken);
     }
 
-    public Task RightClickAsync(int x, int y, MouseSpeed speed)
+    public Task RightClickAsync(int x, int y, MouseSpeed speed, CancellationToken cancellationToken)
     {
-        return this.ClickAsync(x, y, speed, MouseButton.Right, clicks: 1);
+        return this.ClickAsync(x, y, speed, MouseButton.Right, clicks: 1, cancellationToken);
     }
 
     /// <summary>
     /// Presses the left button at a position and keeps it down.
     /// </summary>
-    public async Task DragFromAsync(int x, int y, MouseSpeed speed)
+    public async Task DragFromAsync(int x, int y, MouseSpeed speed, CancellationToken cancellationToken)
     {
-        await this.MoveAsync(x, y, speed).ConfigureAwait(false);
-        await this.PauseAsync(this._timings.BeforeClick).ConfigureAwait(false);
+        await this.MoveAsync(x, y, speed, cancellationToken).ConfigureAwait(false);
+        await this.PauseAsync(this._timings.BeforeClick, cancellationToken).ConfigureAwait(false);
         this._device.Press(MouseButton.Left);
     }
 
     /// <summary>
     /// Moves to a position and releases the left button.
     /// </summary>
-    public async Task DropToAsync(int x, int y, MouseSpeed speed)
+    public async Task DropToAsync(int x, int y, MouseSpeed speed, CancellationToken cancellationToken)
     {
-        await this.MoveAsync(x, y, speed).ConfigureAwait(false);
-        await this.PauseAsync(this._timings.BeforeClick).ConfigureAwait(false);
+        await this.MoveAsync(x, y, speed, cancellationToken).ConfigureAwait(false);
+        await this.PauseAsync(this._timings.BeforeClick, cancellationToken).ConfigureAwait(false);
         this._device.Release(MouseButton.Left);
     }
 
-    public async Task ScrollAsync(bool up)
+    public async Task ScrollAsync(bool up, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         this._device.Scroll(up ? 1 : -1);
-        await this.PauseAsync(this._timings.AfterScroll).ConfigureAwait(false);
+        await this.PauseAsync(this._timings.AfterScroll, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task ClickAsync(int x, int y, MouseSpeed speed, MouseButton button, int clicks)
+    private async Task ClickAsync(int x, int y, MouseSpeed speed, MouseButton button, int clicks, CancellationToken cancellationToken)
     {
-        await this.MoveAsync(x, y, speed).ConfigureAwait(false);
-        await this.PauseAsync(this._timings.BeforeClick).ConfigureAwait(false);
+        await this.MoveAsync(x, y, speed, cancellationToken).ConfigureAwait(false);
+        await this.PauseAsync(this._timings.BeforeClick, cancellationToken).ConfigureAwait(false);
 
         for (var i = 0; i < clicks; i++)
         {
             if (i > 0)
             {
-                await this.PauseAsync(this._timings.BetweenClicks).ConfigureAwait(false);
+                await this.PauseAsync(this._timings.BetweenClicks, cancellationToken).ConfigureAwait(false);
             }
 
             this._device.Press(button);
-            await this.PauseAsync(this._timings.ButtonHold).ConfigureAwait(false);
-            this._device.Release(button);
+            try
+            {
+                await this.PauseAsync(this._timings.ButtonHold, cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                // A button that went down always comes back up, even when the click is canceled in between.
+                this._device.Release(button);
+            }
         }
     }
 
-    private Task PauseAsync(TimeSpan duration)
+    private Task PauseAsync(TimeSpan duration, CancellationToken cancellationToken)
     {
-        return duration > TimeSpan.Zero ? Task.Delay(duration, this._timeProvider) : Task.CompletedTask;
+        if (duration > TimeSpan.Zero)
+        {
+            return Task.Delay(duration, this._timeProvider, cancellationToken);
+        }
+
+        return cancellationToken.IsCancellationRequested ? Task.FromCanceled(cancellationToken) : Task.CompletedTask;
     }
 }

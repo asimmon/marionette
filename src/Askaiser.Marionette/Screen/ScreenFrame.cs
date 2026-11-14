@@ -86,9 +86,17 @@ internal sealed class ScreenFrame
     /// Gets the locations of an element in a region of this frame, searching for it only the first time.
     /// Polling a screen that does not change therefore costs nothing more than capturing it.
     /// </summary>
-    public Task<IReadOnlyList<Rectangle>> GetOrAddResult(IElement element, Rectangle region, Func<IElement, Rectangle, Task<IReadOnlyList<Rectangle>>> search)
+    /// <remarks>
+    /// The search is shared by the callers that ask for the same element at the same time, but it is only bound to the cancellation
+    /// token of the caller that started it: a canceled search is forgotten, and callers that are not canceled must ask for it again.
+    /// </remarks>
+    public Task<IReadOnlyList<Rectangle>> GetOrAddResult(IElement element, Rectangle region, Func<ScreenFrame, IElement, Rectangle, CancellationToken, Task<IReadOnlyList<Rectangle>>> search, CancellationToken cancellationToken)
     {
-        var lazy = this._results.GetOrAdd((element, region), static (key, search) => new Lazy<Task<IReadOnlyList<Rectangle>>>(() => search(key.Element, key.Region), LazyThreadSafetyMode.ExecutionAndPublication), search);
+        var lazy = this._results.GetOrAdd(
+            (element, region),
+            static (key, state) => new Lazy<Task<IReadOnlyList<Rectangle>>>(() => state.Search(state.Frame, key.Element, key.Region, state.CancellationToken), LazyThreadSafetyMode.ExecutionAndPublication),
+            (Frame: this, Search: search, CancellationToken: cancellationToken));
+
         var task = lazy.Value;
 
         if (task.IsFaulted || task.IsCanceled)
