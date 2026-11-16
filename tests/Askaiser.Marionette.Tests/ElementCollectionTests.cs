@@ -23,7 +23,7 @@ public class ElementCollectionTests
     }
 
     [Test]
-    public async Task TryGetValue_WhenDoesNotExists_ReturnsTrue()
+    public async Task TryGetValue_WhenDoesNotExists_ReturnsFalse()
     {
         var collection = new ElementCollection();
         collection.Add(ImageElement);
@@ -32,7 +32,7 @@ public class ElementCollectionTests
     }
 
     [Test]
-    public async Task GetIndexer_WhenDoesNotExists_Throws()
+    public async Task GetIndexer_WhenExists_Returns()
     {
         var collection = new ElementCollection();
         collection.Add(ImageElement);
@@ -41,7 +41,7 @@ public class ElementCollectionTests
     }
 
     [Test]
-    public async Task GetIndexer_WhenExists_Returns()
+    public async Task GetIndexer_WhenDoesNotExists_Throws()
     {
         var collection = new ElementCollection();
         collection.Add(ImageElement);
@@ -106,7 +106,7 @@ public class ElementCollectionTests
     }
 
     [Test]
-    public async Task LoadAsync_WhenNotSupportedElements_Works(CancellationToken cancellationToken)
+    public async Task LoadAsync_WhenNotSupportedElements_Throws(CancellationToken cancellationToken)
     {
         using (var stream = new MemoryStream())
         using (var writer = new StreamWriter(stream))
