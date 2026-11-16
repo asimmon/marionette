@@ -140,6 +140,33 @@ public class RectangleTests
     }
 
     [Test]
+    [Arguments(-1d, 1d)]
+    [Arguments(1d, -1d)]
+    [Arguments(-1d, -1d)]
+    public async Task Multiply_WithNegativeFactor_Throws(double factorX, double factorY)
+    {
+        var rect = new Rectangle(5, 5, 20, 20);
+        Assert.Throws<ArgumentOutOfRangeException>(() => _ = rect * (factorX, factorY));
+    }
+
+    [Test]
+    [Arguments(-1d, 1d)]
+    [Arguments(1d, -1d)]
+    [Arguments(-1d, -1d)]
+    public async Task Divide_WithNegativeFactor_Throws(double factorX, double factorY)
+    {
+        var rect = new Rectangle(5, 5, 20, 20);
+        Assert.Throws<ArgumentOutOfRangeException>(() => _ = rect / (factorX, factorY));
+    }
+
+    [Test]
+    public async Task Multiply_WithZeroFactor_ReturnsEmptyRectangleAtOrigin()
+    {
+        var rect = new Rectangle(5, 5, 20, 20);
+        await Assert.That(rect * (0d, 0d)).IsEqualTo(new Rectangle(0, 0, 0, 0));
+    }
+
+    [Test]
     public async Task BoundingCenters()
     {
         var rect = new Rectangle(10, 20, 100, 200);

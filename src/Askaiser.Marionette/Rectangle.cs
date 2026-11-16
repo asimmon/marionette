@@ -98,31 +98,35 @@ public record Rectangle
         }
     }
 
+    // Unlike the From* methods below, which validate their arguments before narrowing a rectangle, these operators
+    // build their result through the constructor. A "with" expression copies the instance and assigns its properties
+    // without running the constructor, which let these operators return a rectangle whose left was greater than its
+    // right: scaling by a negative factor gave a negative width, a center outside of the rectangle, and From* methods
+    // that threw about a width or a height the caller never passed.
+
     /// <summary>
     /// Moves a rectangle by a horizontal and a vertical distance, without changing its size.
     /// </summary>
     /// <param name="rect">The rectangle to move.</param>
     /// <param name="xy">The distances, in pixels, to add to the X and Y coordinates.</param>
-    public static Rectangle operator +(Rectangle rect, ValueTuple<int, int> xy) => rect with
-    {
-        Left = rect.Left + xy.Item1,
-        Top = rect.Top + xy.Item2,
-        Right = rect.Right + xy.Item1,
-        Bottom = rect.Bottom + xy.Item2,
-    };
+    /// <exception cref="ArgumentOutOfRangeException">The coordinates of the moved rectangle overflow.</exception>
+    public static Rectangle operator +(Rectangle rect, ValueTuple<int, int> xy) => new Rectangle(
+        rect.Left + xy.Item1,
+        rect.Top + xy.Item2,
+        rect.Right + xy.Item1,
+        rect.Bottom + xy.Item2);
 
     /// <summary>
     /// Moves a rectangle by a horizontal and a vertical distance in the opposite direction, without changing its size.
     /// </summary>
     /// <param name="rect">The rectangle to move.</param>
     /// <param name="xy">The distances, in pixels, to subtract from the X and Y coordinates.</param>
-    public static Rectangle operator -(Rectangle rect, ValueTuple<int, int> xy) => rect with
-    {
-        Left = rect.Left - xy.Item1,
-        Top = rect.Top - xy.Item2,
-        Right = rect.Right - xy.Item1,
-        Bottom = rect.Bottom - xy.Item2,
-    };
+    /// <exception cref="ArgumentOutOfRangeException">The coordinates of the moved rectangle overflow.</exception>
+    public static Rectangle operator -(Rectangle rect, ValueTuple<int, int> xy) => new Rectangle(
+        rect.Left - xy.Item1,
+        rect.Top - xy.Item2,
+        rect.Right - xy.Item1,
+        rect.Bottom - xy.Item2);
 
     /// <summary>
     /// Moves a rectangle by the coordinates of a point, without changing its size.
@@ -146,13 +150,12 @@ public record Rectangle
     /// </summary>
     /// <param name="rect">The rectangle to scale.</param>
     /// <param name="xy">The factors that the X and Y coordinates are multiplied by.</param>
-    public static Rectangle operator *(Rectangle rect, ValueTuple<double, double> xy) => rect with
-    {
-        Left = (int)Math.Round(rect.Left * xy.Item1),
-        Top = (int)Math.Round(rect.Top * xy.Item2),
-        Right = (int)Math.Round(rect.Right * xy.Item1),
-        Bottom = (int)Math.Round(rect.Bottom * xy.Item2),
-    };
+    /// <exception cref="ArgumentOutOfRangeException">A factor is negative, which would turn the rectangle inside out.</exception>
+    public static Rectangle operator *(Rectangle rect, ValueTuple<double, double> xy) => new Rectangle(
+        (int)Math.Round(rect.Left * xy.Item1),
+        (int)Math.Round(rect.Top * xy.Item2),
+        (int)Math.Round(rect.Right * xy.Item1),
+        (int)Math.Round(rect.Bottom * xy.Item2));
 
     /// <summary>
     /// Scales a rectangle from the origin: the coordinates of its edges are divided by a horizontal and a vertical factor, then rounded.
@@ -160,6 +163,7 @@ public record Rectangle
     /// </summary>
     /// <param name="rect">The rectangle to scale.</param>
     /// <param name="xy">The factors that the X and Y coordinates are divided by.</param>
+    /// <exception cref="ArgumentOutOfRangeException">A factor is negative, which would turn the rectangle inside out.</exception>
     public static Rectangle operator /(Rectangle rect, ValueTuple<double, double> xy) => rect * (1d / xy.Item1, 1d / xy.Item2);
 
     /// <summary>
