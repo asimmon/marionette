@@ -94,12 +94,13 @@ Askaiser.Marionette.MarionetteDriverExtensions
 Askaiser.Marionette.MarionetteException
 Askaiser.Marionette.MarionetteException.MarionetteException(string! message) -> void
 Askaiser.Marionette.MonitorDescription
-Askaiser.Marionette.MonitorDescription.Deconstruct(out int Index, out int Left, out int Top, out int Right, out int Bottom) -> void
+Askaiser.Marionette.MonitorDescription.Deconstruct(out int Index, out int Left, out int Top, out int Right, out int Bottom, out bool IsPrimary) -> void
 Askaiser.Marionette.MonitorDescription.Index.get -> int
 Askaiser.Marionette.MonitorDescription.Index.init -> void
 Askaiser.Marionette.MonitorDescription.IsPrimary.get -> bool
+Askaiser.Marionette.MonitorDescription.IsPrimary.init -> void
 Askaiser.Marionette.MonitorDescription.MonitorDescription(Askaiser.Marionette.MonitorDescription! original) -> void
-Askaiser.Marionette.MonitorDescription.MonitorDescription(int Index, int Left, int Top, int Right, int Bottom) -> void
+Askaiser.Marionette.MonitorDescription.MonitorDescription(int Index, int Left, int Top, int Right, int Bottom, bool IsPrimary) -> void
 Askaiser.Marionette.MouseSpeed
 Askaiser.Marionette.MouseSpeed.Fast = 1 -> Askaiser.Marionette.MouseSpeed
 Askaiser.Marionette.MouseSpeed.Immediate = 0 -> Askaiser.Marionette.MouseSpeed

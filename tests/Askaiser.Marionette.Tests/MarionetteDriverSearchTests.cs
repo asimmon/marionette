@@ -387,7 +387,7 @@ public class MarionetteDriverSearchTests
         await Assert.That(monitors.Select(monitor => monitor.Index)).IsEquivalentTo([0, 1, 2, 3, 4], CollectionOrdering.Matching);
         Point[] expectedOrigins = [new Point(0, 0), new Point(-1920, 0), new Point(0, -1080), new Point(0, 1080), new Point(1920, 0)];
         await Assert.That(monitors.Select(monitor => monitor.TopLeft)).IsEquivalentTo(expectedOrigins, CollectionOrdering.Matching);
-        await Assert.That(monitors[0].IsPrimary).IsTrue();
+        await Assert.That(monitors.Select(monitor => monitor.IsPrimary)).IsEquivalentTo([true, false, false, false, false], CollectionOrdering.Matching);
         await Assert.That(await fixture.Driver.GetCurrentMonitorAsync(cancellationToken)).IsEqualTo(monitors[0]);
     }
 

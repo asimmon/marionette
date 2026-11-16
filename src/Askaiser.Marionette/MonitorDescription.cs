@@ -9,17 +9,19 @@ namespace Askaiser.Marionette;
 /// <param name="Top">The Y coordinate of the top edge of the monitor.</param>
 /// <param name="Right">The X coordinate of the right edge of the monitor, which is exclusive.</param>
 /// <param name="Bottom">The Y coordinate of the bottom edge of the monitor, which is exclusive.</param>
-public record MonitorDescription(int Index, int Left, int Top, int Right, int Bottom)
+/// <param name="IsPrimary">
+/// Whether this is the primary monitor of the desktop, as designated by the operating system: the monitor that carries the
+/// taskbar on Windows, the menu bar on macOS, and the output marked primary with <c>xrandr</c> on Linux. Exactly one monitor
+/// of a desktop is primary, and it is always the one at index zero.
+/// </param>
+/// <remarks>
+/// The primary monitor is not deduced from its position. Its top-left corner is the origin of the virtual desktop on Windows
+/// and macOS, but not on Linux, where the origin is the top-left corner of the rectangle that encloses every monitor and where
+/// the primary monitor is a choice of the user that is independent of how monitors are arranged.
+/// </remarks>
+public record MonitorDescription(int Index, int Left, int Top, int Right, int Bottom, bool IsPrimary)
     : Rectangle(Left, Top, Right, Bottom)
 {
-    /// <summary>
-    /// Gets a value indicating whether this is the primary monitor, which is the one whose top-left corner is the origin of the desktop.
-    /// </summary>
-    public bool IsPrimary
-    {
-        get => this.Left == 0 && this.Top == 0;
-    }
-
     /// <summary>Returns the index, the bounds and the size of the monitor, formatted as <c>Monitor #index (left,top,right,bottom) widthxheight</c>.</summary>
     public override string ToString()
     {

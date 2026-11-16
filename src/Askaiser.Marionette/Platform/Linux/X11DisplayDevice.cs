@@ -49,6 +49,9 @@ internal sealed unsafe class X11DisplayDevice : IDisplayDevice
 
             try
             {
+                // The primary monitor is the output the user marked as primary, which RandR reports first and which has
+                // nothing to do with where that output sits: the origin of an X screen is the corner of the rectangle that
+                // encloses every monitor. No output at all may be marked as primary, and the caller then chooses one.
                 var monitors = Xlib.XRRGetMonitors(display, this._connection.RootWindow, getActive: 1, out var count);
                 if (monitors != null)
                 {

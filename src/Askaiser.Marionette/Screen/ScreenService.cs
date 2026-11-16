@@ -211,11 +211,14 @@ internal sealed class ScreenService : IDisposable
     {
         var displays = await Task.Run(this._device.GetDisplays, cancellationToken).ConfigureAwait(false);
 
+        // The monitor the operating system designates as the primary one comes first. Exactly one monitor is reported as
+        // primary, whatever the operating system says: X11 lets the user mark no output as primary, and a display that
+        // mirrors the main one may also claim to be it on macOS. The monitor closest to the origin of the desktop then wins.
         var monitors = displays
             .OrderByDescending(static display => display.IsPrimary)
             .ThenBy(static display => display.Bounds.Left)
             .ThenBy(static display => display.Bounds.Top)
-            .Select(static (display, index) => new Monitor(new MonitorDescription(index, display.Bounds.Left, display.Bounds.Top, display.Bounds.Right, display.Bounds.Bottom), display))
+            .Select(static (display, index) => new Monitor(new MonitorDescription(index, display.Bounds.Left, display.Bounds.Top, display.Bounds.Right, display.Bounds.Bottom, IsPrimary: index == 0), display))
             .ToArray();
 
         lock (this._stateGate)

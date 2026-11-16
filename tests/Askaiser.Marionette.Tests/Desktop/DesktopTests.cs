@@ -26,6 +26,10 @@ public sealed class DesktopTests
         await Assert.That(current).IsEqualTo(monitors[0]);
         await Assert.That(current.Width).IsGreaterThan(0);
         await Assert.That(current.Height).IsGreaterThan(0);
+
+        // Whatever this operating system designates as its primary monitor, a single monitor is reported as primary, and first.
+        await Assert.That(monitors.Count(monitor => monitor.IsPrimary)).IsEqualTo(1);
+        await Assert.That(monitors[0].IsPrimary).IsTrue();
     }
 
     [Test]
