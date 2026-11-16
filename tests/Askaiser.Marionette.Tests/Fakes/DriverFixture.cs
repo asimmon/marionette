@@ -1,6 +1,5 @@
 using Askaiser.Marionette.Input;
 using Askaiser.Marionette.Platform;
-using Askaiser.Marionette.Screen;
 
 namespace Askaiser.Marionette.Tests.Fakes;
 
@@ -9,7 +8,7 @@ namespace Askaiser.Marionette.Tests.Fakes;
 /// </summary>
 internal sealed class DriverFixture : IDisposable
 {
-    public DriverFixture(DriverOptions? options = null, InputTimings? timings = null, ScreenRecorderSettings? recorderSettings = null)
+    public DriverFixture(DriverOptions? options = null, InputTimings? timings = null)
     {
         this.Driver = new MarionetteDriver(
             options ?? new DriverOptions(),
@@ -17,7 +16,6 @@ internal sealed class DriverFixture : IDisposable
             [this.Recognizer],
             this.FailureWriter,
             timings ?? InputTimings.Instant,
-            recorderSettings ?? ScreenRecorderSettings.Default,
             TimeProvider.System);
     }
 
@@ -29,7 +27,7 @@ internal sealed class DriverFixture : IDisposable
 
     public FakeElementRecognizer Recognizer { get; } = new();
 
-    public FakeFailureFileWriter FailureWriter { get; } = new();
+    public FakeFailureScreenshotWriter FailureWriter { get; } = new();
 
     public MarionetteDriver Driver { get; }
 

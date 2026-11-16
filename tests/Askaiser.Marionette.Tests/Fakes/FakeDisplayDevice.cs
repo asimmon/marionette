@@ -26,16 +26,11 @@ internal sealed class FakeDisplayDevice : IDisplayDevice
     /// </summary>
     public bool ChangesOnEveryCapture { get; set; } = true;
 
-    /// <summary>Gets or sets the image displayed by every monitor. When null, every monitor displays a solid color of its own.</summary>
+    /// <summary>Gets or sets the image displayed by every monitor. When null, monitors display a solid color.</summary>
     public Image? Content { get; set; }
 
     /// <summary>Gets or sets what happens at the beginning of a capture, which lets a test act while the screen is being captured.</summary>
     public Action? OnCapture { get; set; }
-
-    /// <summary>
-    /// Returns the color of the pixels of a monitor that displays no image, as the value of each of their four bytes.
-    /// </summary>
-    public static byte GetSolidColor(DisplayInfo display) => (byte)(0x40 + (display.Handle * 0x10));
 
     public IReadOnlyList<DisplayInfo> GetDisplays() => Displays;
 
@@ -52,7 +47,7 @@ internal sealed class FakeDisplayDevice : IDisplayDevice
         }
         else
         {
-            buffer.Span.Fill(GetSolidColor(display));
+            buffer.Span.Fill(0x40);
         }
 
         if (this.ChangesOnEveryCapture)

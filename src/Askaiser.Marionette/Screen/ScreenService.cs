@@ -28,7 +28,6 @@ internal sealed class ScreenService : IDisposable
     private long _currentFrameTimestamp;
     private long _currentFrameInputVersion;
     private long _inputVersion;
-    private long _frameSequence;
     private bool _disposed;
 
     public ScreenService(IDisplayDevice device, TimeSpan frameLifetime)
@@ -54,25 +53,11 @@ internal sealed class ScreenService : IDisposable
     /// <summary>
     /// Returns what a monitor currently displays. The caller must release the frame when done with it.
     /// </summary>
-    public Task<ScreenFrame> AcquireFrameAsync(int monitorIndex, CancellationToken cancellationToken)
-    {
-        return this.AcquireFrameAsync(monitorIndex, this._frameLifetime, cancellationToken);
-    }
-
-    /// <summary>
-    /// Returns what a monitor currently displays, reusing the last capture when it is not older than <paramref name="maxAge"/>.
-    /// The caller must release the frame when done with it.
-    /// </summary>
-    public async Task<ScreenFrame> AcquireFrameAsync(int monitorIndex, TimeSpan maxAge, CancellationToken cancellationToken)
+    public async Task<ScreenFrame> AcquireFrameAsync(int monitorIndex, CancellationToken cancellationToken)
     {
         var monitor = await this.GetMonitorInternalAsync(monitorIndex, cancellationToken).ConfigureAwait(false);
 
-        if (maxAge > this._frameLifetime)
-        {
-            maxAge = this._frameLifetime;
-        }
-
-        if (this.TryReuseCurrentFrame(monitor.Display, maxAge) is { } recent)
+        if (this.TryReuseCurrentFrame(monitor.Display) is { } recent)
         {
             return recent;
         }
@@ -81,7 +66,7 @@ internal sealed class ScreenService : IDisposable
         await this._captureGate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            if (this.TryReuseCurrentFrame(monitor.Display, maxAge) is { } concurrent)
+            if (this.TryReuseCurrentFrame(monitor.Display) is { } concurrent)
             {
                 return concurrent;
             }
@@ -121,7 +106,7 @@ internal sealed class ScreenService : IDisposable
                     return previous;
                 }
 
-                var frame = new ScreenFrame(pixels, monitor.Display, ++this._frameSequence);
+                var frame = new ScreenFrame(pixels, monitor.Display);
                 _ = frame.TryAddReference();
 
                 this._currentFrame = frame;
@@ -176,9 +161,9 @@ internal sealed class ScreenService : IDisposable
         }
     }
 
-    private ScreenFrame? TryReuseCurrentFrame(DisplayInfo display, TimeSpan maxAge)
+    private ScreenFrame? TryReuseCurrentFrame(DisplayInfo display)
     {
-        if (maxAge <= TimeSpan.Zero)
+        if (this._frameLifetime <= TimeSpan.Zero)
         {
             return null;
         }
@@ -189,7 +174,7 @@ internal sealed class ScreenService : IDisposable
             if (frame != null
                 && this._currentFrameInputVersion == this._inputVersion
                 && frame.Display == display
-                && Stopwatch.GetElapsedTime(this._currentFrameTimestamp) <= maxAge
+                && Stopwatch.GetElapsedTime(this._currentFrameTimestamp) <= this._frameLifetime
                 && frame.TryAddReference())
             {
                 return frame;
