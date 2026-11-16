@@ -12,8 +12,8 @@ namespace Askaiser.Marionette.Platform.MacOS;
 /// </summary>
 /// <remarks>
 /// macOS positions windows and the cursor in points, while a capture is made of pixels: there are two pixels per point on
-/// most Mac screens. Marionette works in pixels everywhere, so this class also converts between both systems. The pixel
-/// bounds of a monitor are its bounds in points multiplied by its own scale factor.
+/// most Mac screens. Marionette works in pixels everywhere, so this class also converts between both systems.
+/// <see cref="MacDisplayLayout"/> places the monitors in the pixel coordinates of the virtual desktop.
 /// </remarks>
 [SupportedOSPlatform("macos")]
 internal sealed unsafe class MacDisplayDevice : IDisplayDevice
@@ -84,23 +84,8 @@ internal sealed unsafe class MacDisplayDevice : IDisplayDevice
     /// </summary>
     public CoreGraphics.CGPoint ToPoints(int x, int y)
     {
-        var geometries = this.GetGeometries();
-        var geometry = geometries[0];
-
-        foreach (var candidate in geometries)
-        {
-            if (x >= candidate.Pixels.Left && x < candidate.Pixels.Right && y >= candidate.Pixels.Top && y < candidate.Pixels.Bottom)
-            {
-                geometry = candidate;
-                break;
-            }
-        }
-
-        return new CoreGraphics.CGPoint
-        {
-            X = geometry.Points.X + ((x - geometry.Pixels.Left) / geometry.Scale),
-            Y = geometry.Points.Y + ((y - geometry.Pixels.Top) / geometry.Scale),
-        };
+        var (pointX, pointY) = MacDisplayLayout.FindFromPixels(this.GetGeometries(), x, y).ToPoints(x, y);
+        return new CoreGraphics.CGPoint { X = pointX, Y = pointY };
     }
 
     /// <summary>
@@ -108,22 +93,7 @@ internal sealed unsafe class MacDisplayDevice : IDisplayDevice
     /// </summary>
     public Point ToPixels(CoreGraphics.CGPoint point)
     {
-        var geometries = this.GetGeometries();
-        var geometry = geometries[0];
-
-        foreach (var candidate in geometries)
-        {
-            var points = candidate.Points;
-            if (point.X >= points.X && point.X < points.X + points.Width && point.Y >= points.Y && point.Y < points.Y + points.Height)
-            {
-                geometry = candidate;
-                break;
-            }
-        }
-
-        return new Point(
-            geometry.Pixels.Left + (int)Math.Round((point.X - geometry.Points.X) * geometry.Scale),
-            geometry.Pixels.Top + (int)Math.Round((point.Y - geometry.Points.Y) * geometry.Scale));
+        return MacDisplayLayout.FindFromPoints(this.GetGeometries(), point.X, point.Y).ToPixels(point.X, point.Y);
     }
 
     public void Dispose()
@@ -140,35 +110,38 @@ internal sealed unsafe class MacDisplayDevice : IDisplayDevice
         }
 
         var mainId = CoreGraphics.CGMainDisplayID();
-        var geometries = new DisplayGeometry[count];
+        var displays = new MacDisplay[count];
 
         for (var i = 0; i < count; i++)
         {
             var points = CoreGraphics.CGDisplayBounds(ids[i]);
-            var scale = 1.0;
-
-            var mode = CoreGraphics.CGDisplayCopyDisplayMode(ids[i]);
-            if (mode != 0)
-            {
-                var pixelWidth = (double)CoreGraphics.CGDisplayModeGetPixelWidth(mode);
-                var pointWidth = (double)CoreGraphics.CGDisplayModeGetWidth(mode);
-                if (pixelWidth > 0 && pointWidth > 0)
-                {
-                    scale = pixelWidth / pointWidth;
-                }
-
-                CoreGraphics.CGDisplayModeRelease(mode);
-            }
-
-            var left = (int)Math.Round(points.X * scale);
-            var top = (int)Math.Round(points.Y * scale);
-            var width = Math.Max(1, (int)Math.Round(points.Width * scale));
-            var height = Math.Max(1, (int)Math.Round(points.Height * scale));
-
-            geometries[i] = new DisplayGeometry(ids[i], ids[i] == mainId, points, new Rectangle(left, top, left + width, top + height), scale);
+            displays[i] = new MacDisplay(ids[i], ids[i] == mainId, new PointsRectangle(points.X, points.Y, points.Width, points.Height), GetScale(ids[i]));
         }
 
-        return geometries;
+        return MacDisplayLayout.Compute(displays);
+    }
+
+    /// <summary>
+    /// Returns how many pixels a display shows per point, which is the ratio of both widths of its current mode.
+    /// </summary>
+    private static double GetScale(uint displayId)
+    {
+        var mode = CoreGraphics.CGDisplayCopyDisplayMode(displayId);
+        if (mode == 0)
+        {
+            return 1.0;
+        }
+
+        try
+        {
+            var pixelWidth = (double)CoreGraphics.CGDisplayModeGetPixelWidth(mode);
+            var pointWidth = (double)CoreGraphics.CGDisplayModeGetWidth(mode);
+            return pixelWidth > 0 && pointWidth > 0 ? pixelWidth / pointWidth : 1.0;
+        }
+        finally
+        {
+            CoreGraphics.CGDisplayModeRelease(mode);
+        }
     }
 
     private static nint CreateImage(uint displayId)
@@ -260,6 +233,4 @@ internal sealed unsafe class MacDisplayDevice : IDisplayDevice
 
         return geometries;
     }
-
-    private readonly record struct DisplayGeometry(uint Id, bool IsMain, CoreGraphics.CGRect Points, Rectangle Pixels, double Scale);
 }
