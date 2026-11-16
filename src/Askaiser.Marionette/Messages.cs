@@ -22,6 +22,7 @@ internal static class Messages
     public const string DriverOptions_Throw_NegativeWaitForThrottlingInterval = "'waitFor' throttling interval cannot be negative.";
     public const string DriverOptions_Throw_NegativeDefaultWaitForDuration = "Default 'waitFor' duration cannot be negative.";
     public const string DriverOptions_Throw_NegativeDefaultKeyboardSleepAfterDuration = "Default 'sleepAfter' duration cannot be negative.";
+    public const string DriverOptions_Throw_EmptyFailurePath = "The path of the directory cannot be empty.";
     public const string MarionetteDriver_Throw_ElementsEmpty = "Elements cannot be empty.";
     public const string MarionetteDriver_Throw_ScrollTicksNotGreaterThanZero = "Scroll ticks must be greater than zero.";
     public const string MarionetteDriver_Throw_EmptyKeyCodes = "Key codes cannot be empty.";

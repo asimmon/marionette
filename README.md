@@ -41,7 +41,7 @@ await driver.SingleClickAnyAsync(new IElement[] { okButton, yesButton }); // whi
 
 Elements are text (`TextElement`, or just a `string`) or images (`ImageElement`). Images are matched by normalized cross-correlation, with an optional threshold and grayscale mode; the search is exact and fast: a typical icon is found on a 1080p screen in about 15 ms. Text is detected and read by a bundled neural OCR (PP-OCR on ONNX Runtime), which also tells where each character is, so you can click a single word inside a sentence. Text is matched whatever its case, unless `TextElement.IgnoreCase` is false. `TextOptions` preprocess the screen before it is read (grayscale, black and white, negative), which is rarely needed.
 
-When an element is not found, a screenshot of what was searched is written to `DriverOptions.FailureScreenshotPath`.
+A search that does not find its element, or finds it more than once, throws. When it does, a screenshot of what was searched is written to `DriverOptions.FailureScreenshotPath`.
 
 ### Cancellation
 

@@ -212,6 +212,18 @@ public class MarionetteDriverSearchTests
     }
 
     [Test]
+    public async Task Options_ValidateTheFailureScreenshotPath()
+    {
+        Assert.Throws<ArgumentException>(() => _ = new DriverOptions { FailureScreenshotPath = string.Empty });
+        Assert.Throws<ArgumentException>(() => _ = new DriverOptions { FailureScreenshotPath = "  " });
+
+        var options = new DriverOptions { FailureScreenshotPath = " failures " };
+        await Assert.That(options.FailureScreenshotPath).IsEqualTo("failures");
+        await Assert.That(new DriverOptions { FailureScreenshotPath = null }.FailureScreenshotPath).IsNull();
+        await Assert.That(new DriverOptions().FailureScreenshotPath).IsNull();
+    }
+
+    [Test]
     public async Task WaitFor_WhenElementIsAmbiguous_SavesAFailureScreenshot(CancellationToken cancellationToken)
     {
         using var fixture = new DriverFixture(new DriverOptions { FailureScreenshotPath = "failures" });

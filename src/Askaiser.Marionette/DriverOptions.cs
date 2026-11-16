@@ -20,12 +20,23 @@ public sealed class DriverOptions
 
     /// <summary>
     /// Gets the directory where a screenshot is saved when an element is not found, or found more than once.
+    /// The screenshot is a PNG file that shows the part of the monitor that was searched.
     /// Default value: null, no screenshots are saved.
     /// </summary>
     public string? FailureScreenshotPath
     {
         get;
-        init => field = value?.Trim() is { Length: > 0 } trimmedValue ? trimmedValue : throw new ArgumentException(nameof(this.FailureScreenshotPath), nameof(value));
+        init
+        {
+            if (value == null)
+            {
+                field = null;
+                return;
+            }
+
+            var trimmed = value.Trim();
+            field = trimmed.Length > 0 ? trimmed : throw new ArgumentException(Messages.DriverOptions_Throw_EmptyFailurePath, nameof(value));
+        }
     }
 
     /// <summary>
