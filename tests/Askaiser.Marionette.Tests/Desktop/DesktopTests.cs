@@ -11,6 +11,7 @@ public sealed class DesktopTests
 {
     private static readonly TimeSpan PageTimeout = TimeSpan.FromSeconds(60);
     private static readonly TimeSpan ReactionTimeout = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan CursorSettleTimeout = TimeSpan.FromSeconds(5);
 
     [Test]
     public async Task Monitors_AreListed_WithThePrimaryOneFirst(CancellationToken cancellationToken)
@@ -63,9 +64,7 @@ public sealed class DesktopTests
         foreach (var (x, y) in new[] { (monitor.Left + 200, monitor.Top + 150), (monitor.Left + (monitor.Width / 2), monitor.Top + (monitor.Height / 2)), (monitor.Left + 31, monitor.Top + 57) })
         {
             await driver.MoveToAsync(x, y, cancellationToken);
-            await driver.SleepAsync(100, cancellationToken);
-
-            var position = driver.GetMousePositionAsync();
+            var position = await WaitForCursorAsync(driver, x, y, cancellationToken);
 
             // High pixel density screens position the cursor in points, which can round a pixel away.
             await Assert.That(Math.Abs(position.X - x)).IsLessThanOrEqualTo(1);
@@ -73,7 +72,7 @@ public sealed class DesktopTests
         }
 
         await driver.SetMouseSpeed(MouseSpeed.Fast).MoveToAsync(monitor.Left + 300, monitor.Top + 300, cancellationToken);
-        var final = driver.GetMousePositionAsync();
+        var final = await WaitForCursorAsync(driver, monitor.Left + 300, monitor.Top + 300, cancellationToken);
         await Assert.That(Math.Abs(final.X - (monitor.Left + 300))).IsLessThanOrEqualTo(1);
         await Assert.That(Math.Abs(final.Y - (monitor.Top + 300))).IsLessThanOrEqualTo(1);
     }
@@ -150,6 +149,36 @@ public sealed class DesktopTests
                 Debug.WriteLine(ex);
             }
         }
+    }
+
+    /// <summary>
+    /// Reads where the operating system reports the cursor until it is at the expected position, and returns the last position
+    /// read when it never gets there, so that the assertions of the caller still fail on a cursor that moved to the wrong place.
+    /// </summary>
+    /// <remarks>
+    /// Moving the cursor is asynchronous on every platform: the move is posted to the window server, which applies it when it
+    /// drains its events, so a read taken right after a move can still report where the cursor was before. Polling makes the
+    /// test depend on where the cursor ends up rather than on how quickly the machine gets it there, which a fixed pause cannot
+    /// do: the pause is either too short on a loaded continuous integration runner, or wasted on every other run.
+    /// </remarks>
+    private static async Task<Point> WaitForCursorAsync(MarionetteDriver driver, int x, int y, CancellationToken cancellationToken)
+    {
+        var elapsed = Stopwatch.StartNew();
+        Point position;
+
+        do
+        {
+            position = driver.GetMousePositionAsync();
+            if (Math.Abs(position.X - x) <= 1 && Math.Abs(position.Y - y) <= 1)
+            {
+                return position;
+            }
+
+            await driver.SleepAsync(20, cancellationToken);
+        }
+        while (elapsed.Elapsed < CursorSettleTimeout);
+
+        return position;
     }
 
     /// <summary>
