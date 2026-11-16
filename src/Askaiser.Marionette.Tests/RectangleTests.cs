@@ -142,6 +142,33 @@ public class RectangleTests
         Assert.Equal(new Rectangle(5, 5, 20, 20), rect / (2, 3));
     }
 
+    [Theory]
+    [InlineData(-1d, 1d)]
+    [InlineData(1d, -1d)]
+    [InlineData(-1d, -1d)]
+    public void Multiply_WithNegativeFactor_Throws(double factorX, double factorY)
+    {
+        var rect = new Rectangle(5, 5, 20, 20);
+        Assert.Throws<ArgumentOutOfRangeException>(() => rect * (factorX, factorY));
+    }
+
+    [Theory]
+    [InlineData(-1d, 1d)]
+    [InlineData(1d, -1d)]
+    [InlineData(-1d, -1d)]
+    public void Divide_WithNegativeFactor_Throws(double factorX, double factorY)
+    {
+        var rect = new Rectangle(5, 5, 20, 20);
+        Assert.Throws<ArgumentOutOfRangeException>(() => rect / (factorX, factorY));
+    }
+
+    [Fact]
+    public void Multiply_WithZeroFactor_ReturnsEmptyRectangleAtOrigin()
+    {
+        var rect = new Rectangle(5, 5, 20, 20);
+        Assert.Equal(new Rectangle(0, 0, 0, 0), rect * (0d, 0d));
+    }
+
     [Fact]
     public void BoundingCenters()
     {

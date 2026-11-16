@@ -97,33 +97,30 @@ public record Rectangle
         }
     }
 
-    public static Rectangle operator +(Rectangle rect, ValueTuple<int, int> xy) => rect with
-    {
-        Left = rect.Left + xy.Item1,
-        Top = rect.Top + xy.Item2,
-        Right = rect.Right + xy.Item1,
-        Bottom = rect.Bottom + xy.Item2,
-    };
+    // These operators go through the constructor instead of a "with" expression, because a "with" expression
+    // copies the instance and assigns its properties without running the constructor's validation, which would
+    // let them build a rectangle whose left is greater than its right (negative scaling factors, for instance).
+    public static Rectangle operator +(Rectangle rect, ValueTuple<int, int> xy) => new Rectangle(
+        rect.Left + xy.Item1,
+        rect.Top + xy.Item2,
+        rect.Right + xy.Item1,
+        rect.Bottom + xy.Item2);
 
-    public static Rectangle operator -(Rectangle rect, ValueTuple<int, int> xy) => rect with
-    {
-        Left = rect.Left - xy.Item1,
-        Top = rect.Top - xy.Item2,
-        Right = rect.Right - xy.Item1,
-        Bottom = rect.Bottom - xy.Item2,
-    };
+    public static Rectangle operator -(Rectangle rect, ValueTuple<int, int> xy) => new Rectangle(
+        rect.Left - xy.Item1,
+        rect.Top - xy.Item2,
+        rect.Right - xy.Item1,
+        rect.Bottom - xy.Item2);
 
     public static Rectangle operator +(Rectangle rect, Point xy) => rect + (xy.X, xy.Y);
 
     public static Rectangle operator -(Rectangle rect, Point xy) => rect - (xy.X, xy.Y);
 
-    public static Rectangle operator *(Rectangle rect, ValueTuple<double, double> xy) => rect with
-    {
-        Left = (int)Math.Round(rect.Left * xy.Item1),
-        Top = (int)Math.Round(rect.Top * xy.Item2),
-        Right = (int)Math.Round(rect.Right * xy.Item1),
-        Bottom = (int)Math.Round(rect.Bottom * xy.Item2),
-    };
+    public static Rectangle operator *(Rectangle rect, ValueTuple<double, double> xy) => new Rectangle(
+        (int)Math.Round(rect.Left * xy.Item1),
+        (int)Math.Round(rect.Top * xy.Item2),
+        (int)Math.Round(rect.Right * xy.Item1),
+        (int)Math.Round(rect.Bottom * xy.Item2));
 
     public static Rectangle operator /(Rectangle rect, ValueTuple<double, double> xy) => rect * (1d / xy.Item1, 1d / xy.Item2);
 
